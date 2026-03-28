@@ -1,0 +1,64 @@
+name: iOS Build & Test
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - '.claude/**'
+      - 'Skills/**'
+  pull_request:
+    branches: [master]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - '.claude/**'
+      - 'Skills/**'
+
+concurrency:
+  group: ios-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios-build:
+    name: Xcode Build (iOS Simulator)
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Select Xcode
+        run: |
+          # Use Xcode 16.3 (Swift 6.1) if available, fall back to latest
+          if [ -d "/Applications/Xcode_16.3.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.3.app/Contents/Developer
+          elif [ -d "/Applications/Xcode_16.2.app" ]; then
+            sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+          fi
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -scheme BrainApp -project BrainApp.xcodeproj
+
+      - name: Build for iOS Simulator
+        run: |
+          xcodebuild build \
+            -scheme BrainApp \
+            -project BrainApp.xcodeproj \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            | tail -20
+
+      - name: Run BrainApp Tests
+        run: |
+          xcodebuild test \
+            -scheme BrainApp \
+            -project BrainApp.xcodeproj \
+            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            -only-testing:BrainAppTests \
+            | tail -40

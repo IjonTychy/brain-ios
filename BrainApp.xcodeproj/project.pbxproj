@@ -1,0 +1,1352 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		T1010001 /* HandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1020001 /* HandlerTests.swift */; };
+		T1010002 /* LocalizationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1020002 /* LocalizationServiceTests.swift */; };
+		T1010003 /* LLMAuthModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1020003 /* LLMAuthModeTests.swift */; };
+		T1010004 /* BrainThemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1020004 /* BrainThemeTests.swift */; };
+		H1010001 /* AIHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020001 /* AIHandlers.swift */; };
+		H1010002 /* CalendarReminderHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020002 /* CalendarReminderHandlers.swift */; };
+		H1010003 /* ContactHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020003 /* ContactHandlers.swift */; };
+		H1010004 /* CoreActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020004 /* CoreActionHandlers.swift */; };
+		H1010005 /* EntryHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020005 /* EntryHandlers.swift */; };
+		H1010006 /* FileNetworkHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020006 /* FileNetworkHandlers.swift */; };
+		H1010007 /* LinkTagHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020007 /* LinkTagHandlers.swift */; };
+		H1010008 /* MemoryHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020008 /* MemoryHandlers.swift */; };
+		H1010009 /* SkillRuleHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020009 /* SkillRuleHandlers.swift */; };
+		H1010010 /* SystemUIHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020010 /* SystemUIHandlers.swift */; };
+		B1010072 /* BrainAPIAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020072 /* BrainAPIAuthService.swift */; };
+		B1010003 /* BiometricAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020003 /* BiometricAuth.swift */; };
+		B1010004 /* BootstrapSkills.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020004 /* BootstrapSkills.swift */; };
+		B1010005 /* BrainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020005 /* BrainApp.swift */; };
+		B1010006 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020006 /* ContentView.swift */; };
+		B1010007 /* DataBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020007 /* DataBridge.swift */; };
+		B1010008 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020008 /* KeychainService.swift */; };
+		B1010009 /* SkillRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020009 /* SkillRenderer.swift */; };
+		B1010010 /* SkillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020010 /* SkillView.swift */; };
+		B1010011 /* SkillViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020011 /* SkillViewModel.swift */; };
+		B1010060 /* StoreKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020060 /* StoreKitManager.swift */; };
+		B1010061 /* PaywallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020061 /* PaywallView.swift */; };
+		B1010062 /* SkillCompilePrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020062 /* SkillCompilePrompt.swift */; };
+		B1010063 /* SkillAutoCompileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020063 /* SkillAutoCompileView.swift */; };
+		B1010064 /* SkillContextProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020064 /* SkillContextProvider.swift */; };
+		B1010065 /* SkillCompilationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020065 /* SkillCompilationView.swift */; };
+		B1010066 /* SkillDataResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020066 /* SkillDataResolver.swift */; };
+		B1010067 /* SkillProposalGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020067 /* SkillProposalGenerator.swift */; };
+		B1010068 /* ShortcutsSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020068 /* ShortcutsSetupView.swift */; };
+		B1010012 /* ContactsBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020012 /* ContactsBridge.swift */; };
+		B1010013 /* EventKitBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020013 /* EventKitBridge.swift */; };
+		B1010014 /* LocationBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020014 /* LocationBridge.swift */; };
+		B1010015 /* NotificationBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020015 /* NotificationBridge.swift */; };
+		B1010016 /* SpotlightBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020016 /* SpotlightBridge.swift */; };
+		B1010017 /* AnthropicProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020017 /* AnthropicProvider.swift */; };
+		B1010GP1 /* GeminiProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020GP1 /* GeminiProvider.swift */; };
+		B1010GO1 /* GoogleOAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020GO1 /* GoogleOAuthService.swift */; };
+		B1010AM1 /* LLMAuthMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020AM1 /* LLMAuthMode.swift */; };
+		B1010018 /* CertificatePinning.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020018 /* CertificatePinning.swift */; };
+		B1010019 /* OpenAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020019 /* OpenAIProvider.swift */; };
+
+		B1010020 /* BrainCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1000080 /* BrainCore */; };
+		B1010050 /* SwiftMail in Frameworks */ = {isa = PBXBuildFile; productRef = E1000080 /* SwiftMail */; };
+		B1010021 /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020021 /* ChatService.swift */; };
+		B1010022 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020022 /* OnboardingView.swift */; };
+		B1010023 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020023 /* SettingsView.swift */; };
+		B1010024 /* EntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020024 /* EntryDetailView.swift */; };
+		B1010025 /* SkillRendererLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020025 /* SkillRendererLayout.swift */; };
+		B1010026 /* SkillRendererContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020026 /* SkillRendererContent.swift */; };
+		B1010027 /* SkillRendererInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020027 /* SkillRendererInput.swift */; };
+		B1010028 /* SkillRendererInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020028 /* SkillRendererInteraction.swift */; };
+		B1010029 /* SkillRendererData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020029 /* SkillRendererData.swift */; };
+		B1010030 /* SkillRendererFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020030 /* SkillRendererFeedback.swift */; };
+		B1010031 /* SkillRendererContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020031 /* SkillRendererContainer.swift */; };
+		B1010032 /* SkillRendererSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020032 /* SkillRendererSystem.swift */; };
+		B1010039 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1020039 /* Assets.xcassets */; };
+		B1010033 /* EmailBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020033 /* EmailBridge.swift */; };
+		B1010034 /* ScannerBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020034 /* ScannerBridge.swift */; };
+		B1010035 /* NFCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020035 /* NFCBridge.swift */; };
+		B1010036 /* SpeechBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020036 /* SpeechBridge.swift */; };
+		B1010037 /* PencilBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020037 /* PencilBridge.swift */; };
+		B1010082 /* CameraBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020082 /* CameraBridge.swift */; };
+		B1010200 /* FontBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020200 /* FontBridge.swift */; };
+		B1010201 /* MorseBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020201 /* MorseBridge.swift */; };
+		B1010202 /* AudioAnalysisBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020202 /* AudioAnalysisBridge.swift */; };
+		B1010203 /* SensorSpectrumBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020203 /* SensorSpectrumBridge.swift */; };
+		B1010204 /* CameraAnalysisBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020204 /* CameraAnalysisBridge.swift */; };
+		B1010205 /* StopwatchBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020205 /* StopwatchBridge.swift */; };
+		B1010206 /* SensorBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020206 /* SensorBridge.swift */; };
+		B1010207 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020207 /* ProfileView.swift */; };
+		B1010208 /* BrainAssistantSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020208 /* BrainAssistantSheet.swift */; };
+		B1010209 /* AvailableModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020209 /* AvailableModels.swift */; };
+		B1010210 /* EntryTypeConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020210 /* EntryTypeConfig.swift */; };
+		B1010211 /* SystemPromptBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020211 /* SystemPromptBuilder.swift */; };
+		B1010212 /* VoiceInputManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020212 /* VoiceInputManager.swift */; };
+		B1010213 /* BundledDocumentLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020213 /* BundledDocumentLoader.swift */; };
+		B1010216 /* SystemPromptEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020216 /* SystemPromptEditorView.swift */; };
+		B1010217 /* MoreTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020217 /* MoreTabView.swift */; };
+		B1010218 /* PeopleTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020218 /* PeopleTabView.swift */; };
+		B1010219 /* LLMProviderSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020219 /* LLMProviderSettingsView.swift */; };
+		B101021A /* LLMBillingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B102021A /* LLMBillingView.swift */; };
+		B1010214 /* ethiksystem.md in Resources */ = {isa = PBXBuildFile; fileRef = B1020214 /* ethiksystem.md */; };
+		B1010215 /* alignment-ableitung.md in Resources */ = {isa = PBXBuildFile; fileRef = B1020215 /* alignment-ableitung.md */; };
+		B1SK02000000000000000101 /* brain-handwriting-font.brainskill.md in Resources */ = {isa = PBXBuildFile; fileRef = B1SK01000000000000000101 /* brain-handwriting-font.brainskill.md */; };
+		B1SK02000000000000000102 /* brain-language-de.brainskill.md in Resources */ = {isa = PBXBuildFile; fileRef = B1SK01000000000000000102 /* brain-language-de.brainskill.md */; };
+		B1SK02000000000000000103 /* brain-language-en.brainskill.md in Resources */ = {isa = PBXBuildFile; fileRef = B1SK01000000000000000103 /* brain-language-en.brainskill.md */; };
+		B1SK02000000000000000104 /* brain-business-card.brainskill.md in Resources */ = {isa = PBXBuildFile; fileRef = B1SK01000000000000000104 /* brain-business-card.brainskill.md */; };
+		B1010083 /* AudioBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020083 /* AudioBridge.swift */; };
+		B1010084 /* HealthBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020084 /* HealthBridge.swift */; };
+		B1010085 /* BluetoothBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020085 /* BluetoothBridge.swift */; };
+		B1010086 /* HomeBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020086 /* HomeBridge.swift */; };
+		B1010038 /* ToolDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020038 /* ToolDefinitions.swift */; };
+		B1010040 /* ProactiveService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020040 /* ProactiveService.swift */; };
+		B1010080 /* PeriodicAnalysisService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020080 /* PeriodicAnalysisService.swift */; };
+		B1010081 /* BehaviorTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020081 /* BehaviorTracker.swift */; };
+		B1010041 /* BriefingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020041 /* BriefingView.swift */; };
+		B1010042 /* BrainIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020042 /* BrainIntents.swift */; };
+		B1010043 /* ShortcutsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020043 /* ShortcutsProvider.swift */; };
+		B1010044 /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020044 /* SearchView.swift */; };
+		B1010045 /* OnDeviceProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020045 /* OnDeviceProvider.swift */; };
+		B1010046 /* NLPInputParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020046 /* NLPInputParser.swift */; };
+		B1010047 /* ConversationMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020047 /* ConversationMemory.swift */; };
+		B1010048 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020048 /* SharedContainer.swift */; };
+		B1010049 /* SkillManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020049 /* SkillManagerView.swift */; };
+		B1010056 /* ProposalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020056 /* ProposalView.swift */; };
+		B1010051 /* EntryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020051 /* EntryRepository.swift */; };
+		B1010052 /* TagRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020052 /* TagRepository.swift */; };
+		B1010053 /* LinkRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020053 /* LinkRepository.swift */; };
+		B1010054 /* SearchRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020054 /* SearchRepository.swift */; };
+		B1010055 /* DashboardRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020055 /* DashboardRepository.swift */; };
+		B1010057 /* OnThisDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020057 /* OnThisDayView.swift */; };
+		B1010058 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020058 /* MapView.swift */; };
+		B1010059 /* BackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020059 /* BackupView.swift */; };
+		B1010071 /* EmbeddingBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020071 /* EmbeddingBridge.swift */; };
+		C1010001 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1020001 /* ShareViewController.swift */; };
+		C1010002 /* BrainCore in Frameworks */ = {isa = PBXBuildFile; productRef = C1000080 /* BrainCore */; };
+		C1010003 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020048 /* SharedContainer.swift */; };
+		D1010001 /* BrainWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1020001 /* BrainWidgets.swift */; };
+		D1010002 /* BrainCore in Frameworks */ = {isa = PBXBuildFile; productRef = D1000080 /* BrainCore */; };
+		D1010003 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020048 /* SharedContainer.swift */; };
+		C1010010 /* BrainShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = C1000001 /* BrainShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D1010010 /* BrainWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D1000001 /* BrainWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B1SK05000000000000000001 /* SkillBundleLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1SK04000000000000000001 /* SkillBundleLoader.swift */; };
+		B1SK02000000000000000100 /* brain-handwriting-notes.brainskill.md in Resources */ = {isa = PBXBuildFile; fileRef = B1SK01000000000000000100 /* brain-handwriting-notes.brainskill.md */; };
+		F00100000000000000000001 /* MailTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000001 /* MailTabView.swift */; };
+		F00100000000000000000002 /* PrivacyZoneSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000002 /* PrivacyZoneSettingsView.swift */; };
+		F00100000000000000000003 /* MailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000003 /* MailDetailView.swift */; };
+		F00100000000000000000004 /* MailComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000004 /* MailComposeView.swift */; };
+		F00100000000000000000005 /* RulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000005 /* RulesView.swift */; };
+		F00100000000000000000029 /* CalendarTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000029 /* CalendarTabView.swift */; };
+		F00100000000000000000030 /* FilesTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000030 /* FilesTabView.swift */; };
+		N1010001 /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020001 /* NetworkMonitor.swift */; };
+		N1010002 /* KnowledgeGraphView.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020002 /* KnowledgeGraphView.swift */; };
+		N1010003 /* ValidationModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020003 /* ValidationModifier.swift */; };
+		N1010004 /* BrainTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020004 /* BrainTheme.swift */; };
+		FX010001 /* BrainEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = FX020001 /* BrainEffects.swift */; };
+		HB010001 /* BrainHelpButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = HB020001 /* BrainHelpButton.swift */; };
+		FSRHGTFBMXRBS9ZB63LF1ZUZ /* BrainHelpContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7N1CXM5Q4A9CM9WLQ3RO7F4F /* BrainHelpContent.swift */; };
+		7N1CXM5Q4A9CM9WLQ3RO7F4F /* BrainHelpContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainHelpContent.swift; sourceTree = "<group>"; };
+		N1010005 /* ToolDefinitions+Entry.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020005 /* ToolDefinitions+Entry.swift */; };
+		N1010006 /* ToolDefinitions+Communication.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020006 /* ToolDefinitions+Communication.swift */; };
+		N1010007 /* ToolDefinitions+System.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020007 /* ToolDefinitions+System.swift */; };
+		N1010008 /* ToolDefinitions+AI.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020008 /* ToolDefinitions+AI.swift */; };
+		N1010009 /* CloudKitBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020009 /* CloudKitBridge.swift */; };
+		N1010010 /* LocalizationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = N1020010 /* LocalizationService.swift */; };
+		N1010011 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = N1020011 /* PrivacyInfo.xcprivacy */; };
+		2BCB6FD754E44D269C5E43C3 /* QuickCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4950CCFD40014D69872D921A /* QuickCaptureView.swift */; };
+		55B5F9E064154EC1AFF42B81 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134C505915CB4D699858862B /* ChatView.swift */; };
+		98A8312D7BEE42259D6C2949 /* OpenAICompatibleProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A664072F34E07BE05F514 /* OpenAICompatibleProvider.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		C1050001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1000050 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C1000040;
+			remoteInfo = BrainShareExtension;
+		};
+		D1050001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1000050 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D1000040;
+			remoteInfo = BrainWidgets;
+		};
+		T1050001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A1000050 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A1000040;
+			remoteInfo = BrainApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B1050001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				C1010010 /* BrainShareExtension.appex in Embed Foundation Extensions */,
+				D1010010 /* BrainWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		T1020001 /* HandlerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HandlerTests.swift; sourceTree = "<group>"; };
+		T1020002 /* LocalizationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationServiceTests.swift; sourceTree = "<group>"; };
+		T1020003 /* LLMAuthModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMAuthModeTests.swift; sourceTree = "<group>"; };
+		T1020004 /* BrainThemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainThemeTests.swift; sourceTree = "<group>"; };
+		T1000001 /* BrainAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BrainAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A1000001 /* BrainApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrainApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1000001 /* BrainShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrainShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1000001 /* BrainWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrainWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		H1020001 /* AIHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHandlers.swift; sourceTree = "<group>"; };
+		H1020002 /* CalendarReminderHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarReminderHandlers.swift; sourceTree = "<group>"; };
+		H1020003 /* ContactHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactHandlers.swift; sourceTree = "<group>"; };
+		H1020004 /* CoreActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreActionHandlers.swift; sourceTree = "<group>"; };
+		H1020005 /* EntryHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryHandlers.swift; sourceTree = "<group>"; };
+		H1020006 /* FileNetworkHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileNetworkHandlers.swift; sourceTree = "<group>"; };
+		H1020007 /* LinkTagHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkTagHandlers.swift; sourceTree = "<group>"; };
+		H1020008 /* MemoryHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryHandlers.swift; sourceTree = "<group>"; };
+		H1020009 /* SkillRuleHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRuleHandlers.swift; sourceTree = "<group>"; };
+		H1020010 /* SystemUIHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemUIHandlers.swift; sourceTree = "<group>"; };
+		B1020072 /* BrainAPIAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainAPIAuthService.swift; sourceTree = "<group>"; };
+		B1020003 /* BiometricAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuth.swift; sourceTree = "<group>"; };
+		B1020004 /* BootstrapSkills.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BootstrapSkills.swift; sourceTree = "<group>"; };
+		B1020005 /* BrainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainApp.swift; sourceTree = "<group>"; };
+		B1020006 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B1020007 /* DataBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataBridge.swift; sourceTree = "<group>"; };
+		B1020008 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		B1020009 /* SkillRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRenderer.swift; sourceTree = "<group>"; };
+		B1020010 /* SkillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillView.swift; sourceTree = "<group>"; };
+		B1020011 /* SkillViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillViewModel.swift; sourceTree = "<group>"; };
+		B1020060 /* StoreKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreKitManager.swift; sourceTree = "<group>"; };
+		B1020061 /* PaywallView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaywallView.swift; sourceTree = "<group>"; };
+		B1020062 /* SkillCompilePrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCompilePrompt.swift; sourceTree = "<group>"; };
+		B1020063 /* SkillAutoCompileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillAutoCompileView.swift; sourceTree = "<group>"; };
+		B1020064 /* SkillContextProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillContextProvider.swift; sourceTree = "<group>"; };
+		B1020065 /* SkillCompilationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillCompilationView.swift; sourceTree = "<group>"; };
+		B1020066 /* SkillDataResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillDataResolver.swift; sourceTree = "<group>"; };
+		B1020067 /* SkillProposalGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillProposalGenerator.swift; sourceTree = "<group>"; };
+		B1020068 /* ShortcutsSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsSetupView.swift; sourceTree = "<group>"; };
+		B1020012 /* ContactsBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsBridge.swift; sourceTree = "<group>"; };
+		B1020013 /* EventKitBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventKitBridge.swift; sourceTree = "<group>"; };
+		B1020014 /* LocationBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationBridge.swift; sourceTree = "<group>"; };
+		B1020015 /* NotificationBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationBridge.swift; sourceTree = "<group>"; };
+		B1020016 /* SpotlightBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightBridge.swift; sourceTree = "<group>"; };
+		B1020071 /* EmbeddingBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmbeddingBridge.swift; sourceTree = "<group>"; };
+		B1020017 /* AnthropicProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnthropicProvider.swift; sourceTree = "<group>"; };
+		B1020GP1 /* GeminiProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiProvider.swift; sourceTree = "<group>"; };
+		B1020GO1 /* GoogleOAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleOAuthService.swift; sourceTree = "<group>"; };
+		B1020AM1 /* LLMAuthMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMAuthMode.swift; sourceTree = "<group>"; };
+		B1020018 /* CertificatePinning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePinning.swift; sourceTree = "<group>"; };
+		B1020019 /* OpenAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIProvider.swift; sourceTree = "<group>"; };
+		B1020021 /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
+		B1020022 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		B1020023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B1020024 /* EntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailView.swift; sourceTree = "<group>"; };
+		B1020025 /* SkillRendererLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererLayout.swift; sourceTree = "<group>"; };
+		B1020026 /* SkillRendererContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererContent.swift; sourceTree = "<group>"; };
+		B1020027 /* SkillRendererInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererInput.swift; sourceTree = "<group>"; };
+		B1020028 /* SkillRendererInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererInteraction.swift; sourceTree = "<group>"; };
+		B1020029 /* SkillRendererData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererData.swift; sourceTree = "<group>"; };
+		B1020030 /* SkillRendererFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererFeedback.swift; sourceTree = "<group>"; };
+		B1020031 /* SkillRendererContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererContainer.swift; sourceTree = "<group>"; };
+		B1020032 /* SkillRendererSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererSystem.swift; sourceTree = "<group>"; };
+		B1020033 /* EmailBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailBridge.swift; sourceTree = "<group>"; };
+		B1020034 /* ScannerBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerBridge.swift; sourceTree = "<group>"; };
+		B1020035 /* NFCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFCBridge.swift; sourceTree = "<group>"; };
+		B1020036 /* SpeechBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechBridge.swift; sourceTree = "<group>"; };
+		B1020037 /* PencilBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PencilBridge.swift; sourceTree = "<group>"; };
+		B1020082 /* CameraBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraBridge.swift; sourceTree = "<group>"; };
+		B1020200 /* FontBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontBridge.swift; sourceTree = "<group>"; };
+		B1020201 /* MorseBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MorseBridge.swift; sourceTree = "<group>"; };
+		B1020202 /* AudioAnalysisBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioAnalysisBridge.swift; sourceTree = "<group>"; };
+		B1020203 /* SensorSpectrumBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorSpectrumBridge.swift; sourceTree = "<group>"; };
+		B1020204 /* CameraAnalysisBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraAnalysisBridge.swift; sourceTree = "<group>"; };
+		B1020205 /* StopwatchBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StopwatchBridge.swift; sourceTree = "<group>"; };
+		B1020206 /* SensorBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorBridge.swift; sourceTree = "<group>"; };
+		B1020207 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		B1020208 /* BrainAssistantSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainAssistantSheet.swift; sourceTree = "<group>"; };
+		B1020209 /* AvailableModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableModels.swift; sourceTree = "<group>"; };
+		B1020210 /* EntryTypeConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryTypeConfig.swift; sourceTree = "<group>"; };
+		B1020211 /* SystemPromptBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPromptBuilder.swift; sourceTree = "<group>"; };
+		B1020212 /* VoiceInputManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceInputManager.swift; sourceTree = "<group>"; };
+		B1020213 /* BundledDocumentLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BundledDocumentLoader.swift; sourceTree = "<group>"; };
+		B1020216 /* SystemPromptEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemPromptEditorView.swift; sourceTree = "<group>"; };
+		B1020217 /* MoreTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreTabView.swift; sourceTree = "<group>"; };
+		B1020218 /* PeopleTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeopleTabView.swift; sourceTree = "<group>"; };
+		B1020219 /* LLMProviderSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProviderSettingsView.swift; sourceTree = "<group>"; };
+		B102021A /* LLMBillingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMBillingView.swift; sourceTree = "<group>"; };
+		B1020214 /* ethiksystem.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "Resources/ethiksystem.md"; sourceTree = "<group>"; };
+		B1020215 /* alignment-ableitung.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "Resources/alignment-ableitung.md"; sourceTree = "<group>"; };
+		B1SK01000000000000000101 /* brain-handwriting-font.brainskill.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "brain-handwriting-font.brainskill.md"; sourceTree = "<group>"; };
+		B1SK01000000000000000102 /* brain-language-de.brainskill.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "brain-language-de.brainskill.md"; sourceTree = "<group>"; };
+		B1SK01000000000000000103 /* brain-language-en.brainskill.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "brain-language-en.brainskill.md"; sourceTree = "<group>"; };
+		B1SK01000000000000000104 /* brain-business-card.brainskill.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "brain-business-card.brainskill.md"; sourceTree = "<group>"; };
+		B1020083 /* AudioBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioBridge.swift; sourceTree = "<group>"; };
+		B1020084 /* HealthBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthBridge.swift; sourceTree = "<group>"; };
+		B1020085 /* BluetoothBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothBridge.swift; sourceTree = "<group>"; };
+		B1020086 /* HomeBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeBridge.swift; sourceTree = "<group>"; };
+		B1020038 /* ToolDefinitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolDefinitions.swift; sourceTree = "<group>"; };
+		B1020040 /* ProactiveService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProactiveService.swift; sourceTree = "<group>"; };
+		B1020080 /* PeriodicAnalysisService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeriodicAnalysisService.swift; sourceTree = "<group>"; };
+		B1020081 /* BehaviorTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorTracker.swift; sourceTree = "<group>"; };
+		B1020041 /* BriefingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BriefingView.swift; sourceTree = "<group>"; };
+		B1020042 /* BrainIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainIntents.swift; sourceTree = "<group>"; };
+		B1020043 /* ShortcutsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutsProvider.swift; sourceTree = "<group>"; };
+		B1020044 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		B1020045 /* OnDeviceProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceProvider.swift; sourceTree = "<group>"; };
+		B1020046 /* NLPInputParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NLPInputParser.swift; sourceTree = "<group>"; };
+		B1020047 /* ConversationMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationMemory.swift; sourceTree = "<group>"; };
+		B1020048 /* SharedContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedContainer.swift; sourceTree = "<group>"; };
+		B1020049 /* SkillManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillManagerView.swift; sourceTree = "<group>"; };
+		B1020056 /* ProposalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProposalView.swift; sourceTree = "<group>"; };
+		B1020051 /* EntryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryRepository.swift; sourceTree = "<group>"; };
+		B1020052 /* TagRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagRepository.swift; sourceTree = "<group>"; };
+		B1020053 /* LinkRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LinkRepository.swift; sourceTree = "<group>"; };
+		B1020054 /* SearchRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchRepository.swift; sourceTree = "<group>"; };
+		B1020055 /* DashboardRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardRepository.swift; sourceTree = "<group>"; };
+		B1020057 /* OnThisDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnThisDayView.swift; sourceTree = "<group>"; };
+		B1020058 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
+		B1020059 /* BackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupView.swift; sourceTree = "<group>"; };
+		B1020039 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		C1020001 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		D1020001 /* BrainWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainWidgets.swift; sourceTree = "<group>"; };
+		B1SK04000000000000000001 /* SkillBundleLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillBundleLoader.swift; sourceTree = "<group>"; };
+		B1SK01000000000000000100 /* brain-handwriting-notes.brainskill.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "brain-handwriting-notes.brainskill.md"; sourceTree = "<group>"; };
+		F00200000000000000000001 /* MailTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailTabView.swift; sourceTree = "<group>"; };
+		F00200000000000000000002 /* PrivacyZoneSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyZoneSettingsView.swift; sourceTree = "<group>"; };
+		F00200000000000000000003 /* MailDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailDetailView.swift; sourceTree = "<group>"; };
+		F00200000000000000000004 /* MailComposeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailComposeView.swift; sourceTree = "<group>"; };
+		F00200000000000000000005 /* RulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RulesView.swift; sourceTree = "<group>"; };
+		F00200000000000000000029 /* CalendarTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarTabView.swift; sourceTree = "<group>"; };
+		F00200000000000000000030 /* FilesTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilesTabView.swift; sourceTree = "<group>"; };
+		N1020001 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		N1020002 /* KnowledgeGraphView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphView.swift; sourceTree = "<group>"; };
+		N1020003 /* ValidationModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ValidationModifier.swift; sourceTree = "<group>"; };
+		N1020004 /* BrainTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainTheme.swift; sourceTree = "<group>"; };
+		FX020001 /* BrainEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainEffects.swift; sourceTree = "<group>"; };
+		HB020001 /* BrainHelpButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainHelpButton.swift; sourceTree = "<group>"; };
+		N1020005 /* ToolDefinitions+Entry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolDefinitions+Entry.swift"; sourceTree = "<group>"; };
+		N1020006 /* ToolDefinitions+Communication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolDefinitions+Communication.swift"; sourceTree = "<group>"; };
+		N1020007 /* ToolDefinitions+System.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolDefinitions+System.swift"; sourceTree = "<group>"; };
+		N1020008 /* ToolDefinitions+AI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ToolDefinitions+AI.swift"; sourceTree = "<group>"; };
+		N1020009 /* CloudKitBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitBridge.swift; sourceTree = "<group>"; };
+		N1020010 /* LocalizationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationService.swift; sourceTree = "<group>"; };
+		N1020011 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		4950CCFD40014D69872D921A /* QuickCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureView.swift; sourceTree = "<group>"; };
+		134C505915CB4D699858862B /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
+		4B7A664072F34E07BE05F514 /* OpenAICompatibleProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAICompatibleProvider.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A1000020 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1010020 /* BrainCore in Frameworks */,
+				B1010050 /* SwiftMail in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1000020 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1010002 /* BrainCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1000020 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1010002 /* BrainCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		T1000020 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A1000030 = {
+			isa = PBXGroup;
+			children = (
+				B1030001 /* BrainApp */,
+				B1SK03000000000000000001 /* Skills */,
+				T1030001 /* BrainAppTests */,
+				C1030001 /* BrainShareExtension */,
+				D1030001 /* BrainWidgets */,
+				A1000031 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A1000031 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A1000001 /* BrainApp.app */,
+				C1000001 /* BrainShareExtension.appex */,
+				D1000001 /* BrainWidgets.appex */,
+				T1000001 /* BrainAppTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B1030001 /* BrainApp */ = {
+			isa = PBXGroup;
+			children = (
+				H1030001 /* Handlers */,
+				B1020003 /* BiometricAuth.swift */,
+				B1020004 /* BootstrapSkills.swift */,
+				B1020072 /* BrainAPIAuthService.swift */,
+				B1020005 /* BrainApp.swift */,
+				B1020021 /* ChatService.swift */,
+				B1020006 /* ContentView.swift */,
+				B1020007 /* DataBridge.swift */,
+				B1020024 /* EntryDetailView.swift */,
+				B1020008 /* KeychainService.swift */,
+				B1020022 /* OnboardingView.swift */,
+				B1020023 /* SettingsView.swift */,
+				B1020009 /* SkillRenderer.swift */,
+				B1020025 /* SkillRendererLayout.swift */,
+				B1020026 /* SkillRendererContent.swift */,
+				B1020027 /* SkillRendererInput.swift */,
+				B1020028 /* SkillRendererInteraction.swift */,
+				B1020029 /* SkillRendererData.swift */,
+				B1020030 /* SkillRendererFeedback.swift */,
+				B1020031 /* SkillRendererContainer.swift */,
+				B1020032 /* SkillRendererSystem.swift */,
+				B1020010 /* SkillView.swift */,
+				B1020011 /* SkillViewModel.swift */,
+				B1020060 /* StoreKitManager.swift */,
+				B1020061 /* PaywallView.swift */,
+				B1020062 /* SkillCompilePrompt.swift */,
+				B1020063 /* SkillAutoCompileView.swift */,
+				B1020064 /* SkillContextProvider.swift */,
+				B1020065 /* SkillCompilationView.swift */,
+				B1020066 /* SkillDataResolver.swift */,
+				B1020067 /* SkillProposalGenerator.swift */,
+				B1020068 /* ShortcutsSetupView.swift */,
+				B1020038 /* ToolDefinitions.swift */,
+				N1020005 /* ToolDefinitions+Entry.swift */,
+				N1020006 /* ToolDefinitions+Communication.swift */,
+				N1020007 /* ToolDefinitions+System.swift */,
+				N1020008 /* ToolDefinitions+AI.swift */,
+				N1020001 /* NetworkMonitor.swift */,
+				N1020002 /* KnowledgeGraphView.swift */,
+				N1020003 /* ValidationModifier.swift */,
+				N1020004 /* BrainTheme.swift */,
+				FX020001 /* BrainEffects.swift */,
+				HB020001 /* BrainHelpButton.swift */,
+				7N1CXM5Q4A9CM9WLQ3RO7F4F /* BrainHelpContent.swift */,
+				N1020009 /* CloudKitBridge.swift */,
+				N1020010 /* LocalizationService.swift */,
+				N1020011 /* PrivacyInfo.xcprivacy */,
+				B1020040 /* ProactiveService.swift */,
+				B1020080 /* PeriodicAnalysisService.swift */,
+				B1020081 /* BehaviorTracker.swift */,
+				B1020041 /* BriefingView.swift */,
+				B1020042 /* BrainIntents.swift */,
+				B1020043 /* ShortcutsProvider.swift */,
+				B1020044 /* SearchView.swift */,
+				B1020046 /* NLPInputParser.swift */,
+				B1020047 /* ConversationMemory.swift */,
+				B1020048 /* SharedContainer.swift */,
+				B1020049 /* SkillManagerView.swift */,
+				B1020056 /* ProposalView.swift */,
+				B1020057 /* OnThisDayView.swift */,
+				B1020058 /* MapView.swift */,
+				B1020059 /* BackupView.swift */,
+				F00200000000000000000001 /* MailTabView.swift */,
+				F00200000000000000000002 /* PrivacyZoneSettingsView.swift */,
+				F00200000000000000000003 /* MailDetailView.swift */,
+				F00200000000000000000004 /* MailComposeView.swift */,
+				F00200000000000000000005 /* RulesView.swift */,
+				F00200000000000000000029 /* CalendarTabView.swift */,
+				F00200000000000000000030 /* FilesTabView.swift */,
+				B1020207 /* ProfileView.swift */,
+				B1020208 /* BrainAssistantSheet.swift */,
+				B1020209 /* AvailableModels.swift */,
+				B1020210 /* EntryTypeConfig.swift */,
+				B1020211 /* SystemPromptBuilder.swift */,
+				B1020212 /* VoiceInputManager.swift */,
+				B1020213 /* BundledDocumentLoader.swift */,
+				B1020216 /* SystemPromptEditorView.swift */,
+				B1020217 /* MoreTabView.swift */,
+				B1020218 /* PeopleTabView.swift */,
+				B1020219 /* LLMProviderSettingsView.swift */,
+				B102021A /* LLMBillingView.swift */,
+				B1020214 /* ethiksystem.md */,
+				B1020215 /* alignment-ableitung.md */,
+				B1SK04000000000000000001 /* SkillBundleLoader.swift */,
+				B1020039 /* Assets.xcassets */,
+				B1030002 /* Bridges */,
+				B1030003 /* LLMProviders */,
+				B1030004 /* Repositories */,
+				4950CCFD40014D69872D921A /* QuickCaptureView.swift */,
+				134C505915CB4D699858862B /* ChatView.swift */,
+			);
+			name = BrainApp;
+			path = Sources/BrainApp;
+			sourceTree = "<group>";
+		};
+		B1030002 /* Bridges */ = {
+			isa = PBXGroup;
+			children = (
+				B1020012 /* ContactsBridge.swift */,
+				B1020013 /* EventKitBridge.swift */,
+				B1020014 /* LocationBridge.swift */,
+				B1020015 /* NotificationBridge.swift */,
+				B1020016 /* SpotlightBridge.swift */,
+				B1020033 /* EmailBridge.swift */,
+				B1020034 /* ScannerBridge.swift */,
+				B1020035 /* NFCBridge.swift */,
+				B1020036 /* SpeechBridge.swift */,
+				B1020037 /* PencilBridge.swift */,
+				B1020071 /* EmbeddingBridge.swift */,
+				B1020082 /* CameraBridge.swift */,
+				B1020083 /* AudioBridge.swift */,
+				B1020084 /* HealthBridge.swift */,
+				B1020085 /* BluetoothBridge.swift */,
+				B1020086 /* HomeBridge.swift */,
+				B1020200 /* FontBridge.swift */,
+				B1020201 /* MorseBridge.swift */,
+				B1020202 /* AudioAnalysisBridge.swift */,
+				B1020203 /* SensorSpectrumBridge.swift */,
+				B1020204 /* CameraAnalysisBridge.swift */,
+				B1020205 /* StopwatchBridge.swift */,
+				B1020206 /* SensorBridge.swift */,
+			);
+			path = Bridges;
+			sourceTree = "<group>";
+		};
+		B1030003 /* LLMProviders */ = {
+			isa = PBXGroup;
+			children = (
+				B1020017 /* AnthropicProvider.swift */,
+				B1020GP1 /* GeminiProvider.swift */,
+				B1020GO1 /* GoogleOAuthService.swift */,
+				B1020AM1 /* LLMAuthMode.swift */,
+				B1020018 /* CertificatePinning.swift */,
+				B1020019 /* OpenAIProvider.swift */,
+				B1020045 /* OnDeviceProvider.swift */,
+				4B7A664072F34E07BE05F514 /* OpenAICompatibleProvider.swift */,
+			);
+			path = LLMProviders;
+			sourceTree = "<group>";
+		};
+		B1030004 /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				B1020055 /* DashboardRepository.swift */,
+				B1020051 /* EntryRepository.swift */,
+				B1020053 /* LinkRepository.swift */,
+				B1020054 /* SearchRepository.swift */,
+				B1020052 /* TagRepository.swift */,
+			);
+			path = Repositories;
+			sourceTree = "<group>";
+		};
+		OB030001 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		H1030001 /* Handlers */ = {
+			isa = PBXGroup;
+			children = (
+				H1020001 /* AIHandlers.swift */,
+				H1020002 /* CalendarReminderHandlers.swift */,
+				H1020003 /* ContactHandlers.swift */,
+				H1020004 /* CoreActionHandlers.swift */,
+				H1020005 /* EntryHandlers.swift */,
+				H1020006 /* FileNetworkHandlers.swift */,
+				H1020007 /* LinkTagHandlers.swift */,
+				H1020008 /* MemoryHandlers.swift */,
+				H1020009 /* SkillRuleHandlers.swift */,
+				H1020010 /* SystemUIHandlers.swift */,
+			);
+			name = Handlers;
+			path = Handlers;
+			sourceTree = "<group>";
+		};
+		C1030001 /* BrainShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				C1020001 /* ShareViewController.swift */,
+			);
+			name = BrainShareExtension;
+			path = Sources/BrainShareExtension;
+			sourceTree = "<group>";
+		};
+		D1030001 /* BrainWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				D1020001 /* BrainWidgets.swift */,
+			);
+			name = BrainWidgets;
+			path = Sources/BrainWidgets;
+			sourceTree = "<group>";
+		};
+		B1SK03000000000000000001 /* Skills */ = {
+			isa = PBXGroup;
+			children = (
+				B1SK01000000000000000100 /* brain-handwriting-notes.brainskill.md */,
+				B1SK01000000000000000101 /* brain-handwriting-font.brainskill.md */,
+				B1SK01000000000000000102 /* brain-language-de.brainskill.md */,
+				B1SK01000000000000000103 /* brain-language-en.brainskill.md */,
+				B1SK01000000000000000104 /* brain-business-card.brainskill.md */,
+			);
+			name = Skills;
+			path = Skills;
+			sourceTree = "<group>";
+		};
+		T1030001 /* BrainAppTests */ = {
+			isa = PBXGroup;
+			children = (
+				T1020001 /* HandlerTests.swift */,
+				T1020002 /* LocalizationServiceTests.swift */,
+				T1020003 /* LLMAuthModeTests.swift */,
+				T1020004 /* BrainThemeTests.swift */,
+			);
+			path = Tests/BrainAppTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A1000040 /* BrainApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A1000060;
+			buildPhases = (
+				B1040001 /* Sources */,
+				A1000020 /* Frameworks */,
+				B1040002 /* Resources */,
+				B1050001 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C1060001 /* PBXTargetDependency */,
+				D1060001 /* PBXTargetDependency */,
+			);
+			name = BrainApp;
+			packageProductDependencies = (
+				A1000080 /* BrainCore */,
+				E1000080 /* SwiftMail */,
+			);
+			productName = BrainApp;
+			productReference = A1000001 /* BrainApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		C1000040 /* BrainShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C1000060;
+			buildPhases = (
+				C1040001 /* Sources */,
+				C1000020 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BrainShareExtension;
+			packageProductDependencies = (
+				C1000080 /* BrainCore */,
+			);
+			productName = BrainShareExtension;
+			productReference = C1000001 /* BrainShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		D1000040 /* BrainWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1000060;
+			buildPhases = (
+				D1040001 /* Sources */,
+				D1000020 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BrainWidgets;
+			packageProductDependencies = (
+				D1000080 /* BrainCore */,
+			);
+			productName = BrainWidgets;
+			productReference = D1000001 /* BrainWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		T1000040 /* BrainAppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = T1000060;
+			buildPhases = (
+				T1040001 /* Sources */,
+				T1000020 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				T1060001 /* PBXTargetDependency */,
+			);
+			name = BrainAppTests;
+			packageProductDependencies = (
+				T1000080 /* BrainCore */,
+			);
+			productName = BrainAppTests;
+			productReference = T1000001 /* BrainAppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A1000050 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+			};
+			buildConfigurationList = A1000070;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = de;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				de,
+				en,
+				Base,
+			);
+			mainGroup = A1000030;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A1000090 /* XCLocalSwiftPackageReference "." */,
+				E1000090 /* XCRemoteSwiftPackageReference "SwiftMail" */,
+			);
+			productRefGroup = A1000031 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A1000040 /* BrainApp */,
+				T1000040 /* BrainAppTests */,
+				C1000040 /* BrainShareExtension */,
+				D1000040 /* BrainWidgets */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B1040001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FSRHGTFBMXRBS9ZB63LF1ZUZ /* BrainHelpContent.swift in Sources */,
+				H1010001 /* AIHandlers.swift in Sources */,
+				H1010002 /* CalendarReminderHandlers.swift in Sources */,
+				H1010003 /* ContactHandlers.swift in Sources */,
+				H1010004 /* CoreActionHandlers.swift in Sources */,
+				H1010005 /* EntryHandlers.swift in Sources */,
+				H1010006 /* FileNetworkHandlers.swift in Sources */,
+				H1010007 /* LinkTagHandlers.swift in Sources */,
+				H1010008 /* MemoryHandlers.swift in Sources */,
+				H1010009 /* SkillRuleHandlers.swift in Sources */,
+				H1010010 /* SystemUIHandlers.swift in Sources */,
+				B1010003 /* BiometricAuth.swift in Sources */,
+				B1010004 /* BootstrapSkills.swift in Sources */,
+				B1010072 /* BrainAPIAuthService.swift in Sources */,
+				B1010005 /* BrainApp.swift in Sources */,
+				B1010021 /* ChatService.swift in Sources */,
+				B1010006 /* ContentView.swift in Sources */,
+				B1010007 /* DataBridge.swift in Sources */,
+				B1010024 /* EntryDetailView.swift in Sources */,
+				B1010008 /* KeychainService.swift in Sources */,
+				B1010022 /* OnboardingView.swift in Sources */,
+				B1010023 /* SettingsView.swift in Sources */,
+				B1010009 /* SkillRenderer.swift in Sources */,
+				B1010025 /* SkillRendererLayout.swift in Sources */,
+				B1010026 /* SkillRendererContent.swift in Sources */,
+				B1010027 /* SkillRendererInput.swift in Sources */,
+				B1010028 /* SkillRendererInteraction.swift in Sources */,
+				B1010029 /* SkillRendererData.swift in Sources */,
+				B1010030 /* SkillRendererFeedback.swift in Sources */,
+				B1010031 /* SkillRendererContainer.swift in Sources */,
+				B1010032 /* SkillRendererSystem.swift in Sources */,
+				B1010010 /* SkillView.swift in Sources */,
+				B1010011 /* SkillViewModel.swift in Sources */,
+				B1010060 /* StoreKitManager.swift in Sources */,
+				B1010061 /* PaywallView.swift in Sources */,
+				B1010062 /* SkillCompilePrompt.swift in Sources */,
+				B1010063 /* SkillAutoCompileView.swift in Sources */,
+				B1010064 /* SkillContextProvider.swift in Sources */,
+				B1010065 /* SkillCompilationView.swift in Sources */,
+				B1010066 /* SkillDataResolver.swift in Sources */,
+				B1010067 /* SkillProposalGenerator.swift in Sources */,
+				B1010068 /* ShortcutsSetupView.swift in Sources */,
+				B1010012 /* ContactsBridge.swift in Sources */,
+				B1010013 /* EventKitBridge.swift in Sources */,
+				B1010014 /* LocationBridge.swift in Sources */,
+				B1010015 /* NotificationBridge.swift in Sources */,
+				B1010016 /* SpotlightBridge.swift in Sources */,
+				B1010017 /* AnthropicProvider.swift in Sources */,
+				B1010GP1 /* GeminiProvider.swift in Sources */,
+				B1010GO1 /* GoogleOAuthService.swift in Sources */,
+				B1010AM1 /* LLMAuthMode.swift in Sources */,
+				B1010018 /* CertificatePinning.swift in Sources */,
+				B1010019 /* OpenAIProvider.swift in Sources */,
+				B1010033 /* EmailBridge.swift in Sources */,
+				B1010034 /* ScannerBridge.swift in Sources */,
+				B1010035 /* NFCBridge.swift in Sources */,
+				B1010036 /* SpeechBridge.swift in Sources */,
+				B1010037 /* PencilBridge.swift in Sources */,
+				B1010082 /* CameraBridge.swift in Sources */,
+				B1010083 /* AudioBridge.swift in Sources */,
+				B1010084 /* HealthBridge.swift in Sources */,
+				B1010085 /* BluetoothBridge.swift in Sources */,
+				B1010086 /* HomeBridge.swift in Sources */,
+				B1010200 /* FontBridge.swift in Sources */,
+				B1010201 /* MorseBridge.swift in Sources */,
+				B1010202 /* AudioAnalysisBridge.swift in Sources */,
+				B1010203 /* SensorSpectrumBridge.swift in Sources */,
+				B1010204 /* CameraAnalysisBridge.swift in Sources */,
+				B1010205 /* StopwatchBridge.swift in Sources */,
+				B1010206 /* SensorBridge.swift in Sources */,
+				B1010207 /* ProfileView.swift in Sources */,
+				B1010208 /* BrainAssistantSheet.swift in Sources */,
+				B1010209 /* AvailableModels.swift in Sources */,
+				B1010210 /* EntryTypeConfig.swift in Sources */,
+				B1010211 /* SystemPromptBuilder.swift in Sources */,
+				B1010212 /* VoiceInputManager.swift in Sources */,
+				B1010213 /* BundledDocumentLoader.swift in Sources */,
+				B1010216 /* SystemPromptEditorView.swift in Sources */,
+				B1010217 /* MoreTabView.swift in Sources */,
+				B1010218 /* PeopleTabView.swift in Sources */,
+				B1010219 /* LLMProviderSettingsView.swift in Sources */,
+				B101021A /* LLMBillingView.swift in Sources */,
+				B1010038 /* ToolDefinitions.swift in Sources */,
+				B1010040 /* ProactiveService.swift in Sources */,
+				B1010080 /* PeriodicAnalysisService.swift in Sources */,
+				B1010081 /* BehaviorTracker.swift in Sources */,
+				B1010041 /* BriefingView.swift in Sources */,
+				B1010042 /* BrainIntents.swift in Sources */,
+				B1010043 /* ShortcutsProvider.swift in Sources */,
+				B1010044 /* SearchView.swift in Sources */,
+				B1010045 /* OnDeviceProvider.swift in Sources */,
+				B1010046 /* NLPInputParser.swift in Sources */,
+				B1010047 /* ConversationMemory.swift in Sources */,
+				B1010048 /* SharedContainer.swift in Sources */,
+				B1010049 /* SkillManagerView.swift in Sources */,
+				B1010056 /* ProposalView.swift in Sources */,
+				B1010057 /* OnThisDayView.swift in Sources */,
+				B1010058 /* MapView.swift in Sources */,
+				B1010059 /* BackupView.swift in Sources */,
+				B1010051 /* EntryRepository.swift in Sources */,
+				B1010052 /* TagRepository.swift in Sources */,
+				B1010053 /* LinkRepository.swift in Sources */,
+				B1010054 /* SearchRepository.swift in Sources */,
+				B1010055 /* DashboardRepository.swift in Sources */,
+				B1SK05000000000000000001 /* SkillBundleLoader.swift in Sources */,
+				B1010071 /* EmbeddingBridge.swift in Sources */,
+				F00100000000000000000001 /* MailTabView.swift in Sources */,
+				F00100000000000000000002 /* PrivacyZoneSettingsView.swift in Sources */,
+				F00100000000000000000003 /* MailDetailView.swift in Sources */,
+				F00100000000000000000004 /* MailComposeView.swift in Sources */,
+				F00100000000000000000005 /* RulesView.swift in Sources */,
+				F00100000000000000000029 /* CalendarTabView.swift in Sources */,
+				F00100000000000000000030 /* FilesTabView.swift in Sources */,
+				N1010001 /* NetworkMonitor.swift in Sources */,
+				N1010002 /* KnowledgeGraphView.swift in Sources */,
+				N1010003 /* ValidationModifier.swift in Sources */,
+				N1010004 /* BrainTheme.swift in Sources */,
+				FX010001 /* BrainEffects.swift in Sources */,
+				HB010001 /* BrainHelpButton.swift in Sources */,
+				N1010005 /* ToolDefinitions+Entry.swift in Sources */,
+				N1010006 /* ToolDefinitions+Communication.swift in Sources */,
+				N1010007 /* ToolDefinitions+System.swift in Sources */,
+				N1010008 /* ToolDefinitions+AI.swift in Sources */,
+				N1010009 /* CloudKitBridge.swift in Sources */,
+				N1010010 /* LocalizationService.swift in Sources */,
+				55B5F9E064154EC1AFF42B81 /* ChatView.swift in Sources */,
+				2BCB6FD754E44D269C5E43C3 /* QuickCaptureView.swift in Sources */,
+				98A8312D7BEE42259D6C2949 /* OpenAICompatibleProvider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C1040001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C1010001 /* ShareViewController.swift in Sources */,
+				C1010003 /* SharedContainer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D1040001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D1010001 /* BrainWidgets.swift in Sources */,
+				D1010003 /* SharedContainer.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		T1040001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				T1010001 /* HandlerTests.swift in Sources */,
+				T1010002 /* LocalizationServiceTests.swift in Sources */,
+				T1010003 /* LLMAuthModeTests.swift in Sources */,
+				T1010004 /* BrainThemeTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B1040002 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1010039 /* Assets.xcassets in Resources */,
+				N1010011 /* PrivacyInfo.xcprivacy in Resources */,
+				B1SK02000000000000000100 /* brain-handwriting-notes.brainskill.md in Resources */,
+				B1SK02000000000000000101 /* brain-handwriting-font.brainskill.md in Resources */,
+				B1SK02000000000000000102 /* brain-language-de.brainskill.md in Resources */,
+				B1SK02000000000000000103 /* brain-language-en.brainskill.md in Resources */,
+				B1SK02000000000000000104 /* brain-business-card.brainskill.md in Resources */,
+				B1010214 /* ethiksystem.md in Resources */,
+				B1010215 /* alignment-ableitung.md in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		C1060001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C1000040 /* BrainShareExtension */;
+			targetProxy = C1050001 /* PBXContainerItemProxy */;
+		};
+		D1060001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D1000040 /* BrainWidgets */;
+			targetProxy = D1050001 /* PBXContainerItemProxy */;
+		};
+		T1060001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A1000040 /* BrainApp */;
+			targetProxy = T1050001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		A1000061 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/BrainApp/BrainApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = TEAM_ID_HERE;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/BrainApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "I, Brain";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Brain braucht Zugriff auf deinen Kalender, um Termine anzuzeigen.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Brain braucht Zugriff auf deine Kontakte, um sie in der People-Ansicht anzuzeigen.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Brain verwendet Face ID, um deine Daten zu schuetzen.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Brain braucht deinen Standort fuer ortsbezogene Skills.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Brain braucht Mikrofon-Zugriff fuer Spracherkennung und Audioaufnahmen.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Brain braucht Kamera-Zugriff fuer Fotos und Dokument-Scans.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Brain braucht Zugriff auf deine Fotos um Bilder als Eintraege zu importieren.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Brain kann deine Gesundheitsdaten lesen, um Muster zu erkennen und Zusammenhaenge herzustellen.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Brain kann Gesundheitsdaten speichern, z.B. wenn du Messwerte per Chat eintraegst.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Brain nutzt Bluetooth fuer BLE-Geraete-Erkennung in Skills.";
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "Brain steuert dein Smart Home ueber HomeKit-Szenen und -Geraete.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Brain nutzt Spracherkennung fuer Voice Capture.";
+				INFOPLIST_KEY_NFCReaderUsageDescription = "Brain liest NFC-Tags fuer kontextbezogene Aktionen.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIBackgroundModes = "fetch processing";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.brain-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A1000062 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/BrainApp/BrainApp.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = TEAM_ID_HERE;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/BrainApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "I, Brain";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCalendarsUsageDescription = "Brain braucht Zugriff auf deinen Kalender, um Termine anzuzeigen.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Brain braucht Zugriff auf deine Kontakte, um sie in der People-Ansicht anzuzeigen.";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Brain verwendet Face ID, um deine Daten zu schuetzen.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Brain braucht deinen Standort fuer ortsbezogene Skills.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Brain braucht Mikrofon-Zugriff fuer Spracherkennung und Audioaufnahmen.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Brain braucht Kamera-Zugriff fuer Fotos und Dokument-Scans.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Brain braucht Zugriff auf deine Fotos um Bilder als Eintraege zu importieren.";
+				INFOPLIST_KEY_NSHealthShareUsageDescription = "Brain kann deine Gesundheitsdaten lesen, um Muster zu erkennen und Zusammenhaenge herzustellen.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "Brain kann Gesundheitsdaten speichern, z.B. wenn du Messwerte per Chat eintraegst.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Brain nutzt Bluetooth fuer BLE-Geraete-Erkennung in Skills.";
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "Brain steuert dein Smart Home ueber HomeKit-Szenen und -Geraete.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Brain nutzt Spracherkennung fuer Voice Capture.";
+				INFOPLIST_KEY_NFCReaderUsageDescription = "Brain liest NFC-Tags fuer kontextbezogene Aktionen.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIBackgroundModes = "fetch processing";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.brain-ios";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C1000061 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = TEAM_ID_HERE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/BrainShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Brain Share";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.brain-ios.share-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C1000062 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = TEAM_ID_HERE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/BrainShareExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Brain Share";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.brain-ios.share-extension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		D1000061 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = TEAM_ID_HERE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/BrainWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Brain Widgets";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.brain-ios.widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D1000062 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 8;
+				DEVELOPMENT_TEAM = TEAM_ID_HERE;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Sources/BrainWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Brain Widgets";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.brain-ios.widgets";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A1000071 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+			};
+			name = Debug;
+		};
+		A1000072 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_OPTIMIZATION_LEVEL = s;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		T1000061 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TEAM_ID_HERE;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.brain-ios.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BrainApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BrainApp";
+			};
+			name = Debug;
+		};
+		T1000062 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = TEAM_ID_HERE;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.brain-ios.tests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BrainApp.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BrainApp";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A1000060 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000061 /* Debug */,
+				A1000062 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A1000070 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A1000071 /* Debug */,
+				A1000072 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C1000060 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C1000061 /* Debug */,
+				C1000062 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D1000060 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1000061 /* Debug */,
+				D1000062 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		T1000060 = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				T1000061 /* Debug */,
+				T1000062 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E1000090 /* XCRemoteSwiftPackageReference "SwiftMail" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Cocoanetics/SwiftMail.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.3.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A1000090 /* XCLocalSwiftPackageReference "." */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = .;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1000080 /* BrainCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1000090 /* XCLocalSwiftPackageReference "." */;
+			productName = BrainCore;
+		};
+		C1000080 /* BrainCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1000090 /* XCLocalSwiftPackageReference "." */;
+			productName = BrainCore;
+		};
+		D1000080 /* BrainCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1000090 /* XCLocalSwiftPackageReference "." */;
+			productName = BrainCore;
+		};
+		E1000080 /* SwiftMail */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E1000090 /* XCRemoteSwiftPackageReference "SwiftMail" */;
+			productName = SwiftMail;
+		};
+		T1000080 /* BrainCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1000090 /* XCLocalSwiftPackageReference "." */;
+			productName = BrainCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+
+	};
+	rootObject = A1000050 /* Project object */;
+}

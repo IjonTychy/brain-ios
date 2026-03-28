@@ -1,0 +1,6 @@
+.build/
+.env
+.mcp.json
+.claude/settings.json
+xcuserdata/
+*.xcuserdatad/
