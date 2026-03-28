@@ -1,6 +1,6 @@
 # brain-ios
 
-A native iOS runtime engine that turns Markdown skill definitions into fully functional native apps — no app update required.
+What it should do (but doesn't, unless someone better than me makes it work): A native iOS runtime engine that turns Markdown skill definitions into fully functional native apps — no app update required.
 
 ## What is this?
 
