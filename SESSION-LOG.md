@@ -6,6 +6,53 @@
 
 ---
 
+## Wiederaufnahme-Assessment (Zora-Review) -- 03.07.2026
+
+### Abgeschlossen
+
+- **Projekt-Review nach 3 Monaten Pause** -- Drei parallele Deep-Dives (BrainCore-Engine,
+  BrainApp-Schicht, Testsuite) plus CI-Verifikation via GitHub API. Vollstaendige Findings
+  in REVIEW-NOTES.md (Eintrag 03.07.2026).
+- **Repo-Zustand verifiziert** -- Public Release vom 28.03.2026: Historie auf 2 Commits
+  gesquasht, Branch `master` -> `main`, alle Identifier anonymisiert (`com.example.*`).
+  216 Swift-Dateien, ~53'400 LOC, 590 @Test-Funktionen.
+- **Doku-Abgleich** -- Mail-Delete-Sync und StoreKit sind im Code implementiert (Doku
+  fuehrte beide noch als offen); Datei-Splits von OnboardingView/MailTabView existieren
+  dagegen nicht mehr (wieder God Objects).
+
+### Entscheidungen
+
+- **Verdikt: rettbar** -- Substanz gut (Engine real, Tests substanziell, Security sauber,
+  pbxproj konsistent). Gebrochen ist die Infrastruktur: CI triggert auf nicht mehr
+  existentes `master`, 2 Tests durch Anonymisierung rot, Doku-Drift.
+- **Wahrscheinliche Root Cause fuer actions_json-Problem identifiziert:** Expression-Sprache
+  im Parser deutlich schmaler als in ARCHITECTURE.md/Skill-Creator-Prompt versprochen.
+
+### Tests
+
+- `swift test`: nicht ausfuehrbar (kein Swift-Toolchain, Toolchain-Download von
+  Netzwerk-Policy blockiert). Statische Analyse: 2 garantiert rote Tests in
+  ExpressionParserTests.swift:41-51.
+- GitHub Actions: letzter (und einziger) Lauf 28.03.2026; gruenes Ergebnis nicht belastbar
+  (`| tail` ohne pipefail maskiert xcodebuild-Fehler).
+
+### Offene Probleme
+
+- Siehe REVIEW-NOTES.md 03.07.2026 (9 offene Findings, priorisiert).
+
+### Naechster Schritt
+
+- Phase 1 Stabilisierung: CI-Trigger auf `main`, pipefail, 2 Test-Assertions fixen,
+  Suite gruen bekommen, Doku-Snapshots (CLAUDE.md) berichtigen.
+
+### Systemzustand
+
+- OK: Codebase substanziell intakt, keine Security-Findings
+- Gebrochen: CI (falscher Branch-Trigger), 2 Tests (Anonymisierung), Deploy (Platzhalter-IDs)
+- Ausstehend: Expression-Sprache vs. Doku angleichen, actions_json-Schema-Validierung
+
+---
+
 ## Contacts Crash Fix + Settings UI + Dashboard Fix -- 26.03.2026
 
 ### Abgeschlossen
