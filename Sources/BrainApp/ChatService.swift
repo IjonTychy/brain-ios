@@ -373,17 +373,19 @@ final class ChatService {
         }
         let selectedModel = chatModelOverride ?? UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
 
-        // Route to On-Device provider if explicitly selected or auto-routed via privacy zones.
-        // OnDeviceProvider conforms to LLMProvider but not ToolUseProvider (no tool-use support).
-        // When on-device is requested but not available, fall through to cloud providers.
-        // TODO: Add ToolUseProvider conformance to OnDeviceProvider (stub that disables tools)
-        //       or refactor buildProvider() to return (any LLMProvider)? for tool-less chat.
+        // Route to an on-device provider if explicitly selected. Availability
+        // decides which one: Apple Foundation Models first, then the best
+        // downloaded GGUF model (Gemma). Both run tool-less through the adapter.
+        // When nothing on-device is usable, fall through to cloud providers.
         if selectedModel == "on-device" || selectedModel.hasPrefix("on-device") {
-            let provider = OnDeviceProvider()
-            if provider.isAvailable, let toolProvider = provider as? any ToolUseProvider {
-                return toolProvider
+            let apple = OnDeviceProvider()
+            if apple.isAvailable {
+                return ToolLessProviderAdapter(base: apple)
             }
-            // On-device not available or doesn't support tools — fall through to cloud
+            if let gemma = GemmaProvider.bestAvailable(), gemma.isAvailable {
+                return ToolLessProviderAdapter(base: gemma)
+            }
+            // Nothing on-device available — fall through to cloud
         }
 
         // Cache API keys once to avoid redundant Keychain reads (each read triggers Face ID)

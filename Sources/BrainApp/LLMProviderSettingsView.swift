@@ -346,17 +346,35 @@ struct LLMProviderSettingsView: View {
     // MARK: - On-Device
 
     private var onDeviceSection: some View {
-        Section {
+        let appleAvailable = OnDeviceProvider().isAvailable
+        return Section {
             HStack {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-                Text("Immer verfügbar")
+                Image(systemName: appleAvailable ? "checkmark.circle.fill" : "circle.dashed")
+                    .foregroundStyle(appleAvailable ? .green : .secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Apple Foundation Models")
+                    Text(appleAvailable
+                         ? "Verfügbar"
+                         : "Auf diesem Gerät nicht verfügbar (benötigt iOS 26+)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            ForEach(OnDeviceModelCatalog.models) { spec in
+                OnDeviceModelRow(spec: spec)
+            }
+
+            if !GemmaRuntime.isSupported {
+                Label("Gemma-Inferenz benötigt das llama.cpp Swift-Package — siehe docs/ON-DEVICE-MODELS.md",
+                      systemImage: "info.circle")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
         } header: {
             Label("Auf dem Gerät (Offline)", systemImage: "iphone")
         } footer: {
-            Text("Apple Foundation Models. Kostenlos, privat, keine API-Keys noetig.")
+            Text("Kostenlos, privat, keine API-Keys noetig. Modelle werden nach Bedarf geladen — welches Modell antwortet, entscheidet die Verfügbarkeit auf diesem Gerät.")
         }
     }
 
@@ -450,6 +468,77 @@ struct LLMProviderSettingsView: View {
             isGoogleOAuthLoggedIn = true
         } catch {
             googleOAuthError = error.localizedDescription
+        }
+    }
+}
+
+// MARK: - On-Device Model Row
+
+// One downloadable GGUF model in the on-device section: shows availability,
+// download state and management actions. Backed by OnDeviceModelStore.
+struct OnDeviceModelRow: View {
+    let spec: OnDeviceModelSpec
+
+    private var store: OnDeviceModelStore { .shared }
+
+    private var isDownloaded: Bool { OnDeviceModelStore.isDownloaded(spec) }
+    private var fitsDevice: Bool { OnDeviceModelStore.deviceMeetsRequirements(spec) }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(spec.displayName)
+                    Text(statusText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                trailingControl
+            }
+            if case .failed(let message) = store.state(for: spec) {
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
+        }
+        .accessibilityIdentifier("onDeviceModel_\(spec.id)")
+    }
+
+    private var statusText: String {
+        if !fitsDevice {
+            return "Benötigt mind. \(spec.minPhysicalMemoryGB) GB RAM — dieses Gerät hat zu wenig"
+        }
+        if store.state(for: spec) == .downloading {
+            return "Wird geladen (~\(spec.approximateSizeMB) MB)..."
+        }
+        if isDownloaded {
+            let mb = OnDeviceModelStore.downloadedBytes(spec) / 1_048_576
+            return GemmaRuntime.isSupported
+                ? "Bereit (\(mb) MB)"
+                : "Geladen (\(mb) MB) — Inferenz-Package fehlt"
+        }
+        return "Nicht geladen (~\(spec.approximateSizeMB) MB Download)"
+    }
+
+    @ViewBuilder
+    private var trailingControl: some View {
+        if store.state(for: spec) == .downloading {
+            ProgressView()
+        } else if isDownloaded {
+            Button("Löschen", role: .destructive) {
+                store.delete(spec)
+            }
+            .font(.caption)
+        } else if fitsDevice {
+            Button("Laden") {
+                Task { await store.download(spec) }
+            }
+            .font(.caption)
+            .buttonStyle(.bordered)
+        } else {
+            Image(systemName: "exclamationmark.triangle")
+                .foregroundStyle(.orange)
         }
     }
 }
