@@ -6,6 +6,98 @@
 
 ---
 
+## Phase 1+2 Stabilisierung: CI, Engine-Vokabular, Gemma On-Device -- 04.07.2026
+
+### Abgeschlossen
+
+- **CI repariert und erstmals verifiziert gruen (BrainCore)** -- Trigger auf `main` +
+  `claude/**`, pipefail in xcodebuild-Steps, `libsqlite3-dev` im Linux-Container,
+  GRDB 7.8.0 -> 7.11.1 (enthaelt die Linux-Snapshot-Fixes). Ergebnis: Die komplette
+  BrainCore-Suite (548 Tests) laeuft erstmals nachweisbar durch -- SUCCESS auf Commit
+  `83209a1`. iOS-Workflow nutzt jetzt das neueste installierte Xcode + dynamische
+  Simulator-Wahl (Xcode-16.3-Pin hatte keine Simulator-Runtime; der "gruene"
+  Release-Lauf vom 28.03. war ein durch `| tail` maskierter False Positive).
+- **Expression-Sprache auf Doku-Stand ausgebaut** (`ExpressionParser`) -- and/or/not,
+  contains, matches (Regex), Array-Indexing (`items[0].title`), Datums-Mathematik
+  (`{{now + 7d}}`, Dauern s/m/h/d/w), Filter mit Argumenten (truncate(n), relative,
+  format('dd.MM.yyyy'), short, currency('CHF')). Operator-Erkennung quote-/paren-aware.
+  25 neue Tests (ExpressionVocabularyTests), alle gruen.
+- **executeSet-Template-Bug behoben** -- gemischte Templates ("Hallo {{name}}!")
+  interpolieren korrekt, reine `{{expr}}` behalten ihren Typ.
+- **validateSemantics vervollstaendigt** -- kennt alle 9 Logic-Primitives und
+  rekursiert in verschachtelte then/else/do/steps/catch-Arrays.
+- **actions_json wird semantisch validiert** -- `skill.create` prueft Steps gegen den
+  vollstaendigen Handler-Katalog (von CoreActionHandlers injiziert) und liefert der
+  KI einen korrigierbaren Fehler mit den unbekannten Typen. Skill-Creator-Prompt um
+  das reale Expression-Vokabular und die Logic-Primitives ergaenzt.
+- **6 vorbestehende Test-/Runtime-Fehler gefixt**, die der allererste vollstaendige
+  Suite-Lauf aufgedeckt hat: (1) Autocomplete haengte ein zweites `*` an die
+  FTS5-Query (`"foo"**` -> Syntaxfehler; Suche-Autocomplete war auch zur Laufzeit
+  kaputt), (2) Porter-Stemming-Test las count via `row[0] as? Int` (auf Linux ohne
+  ObjC-Bridging immer 0), (3-5) drei EmailDeletedIds-Tests erwarteten Single-PK statt
+  des korrekten Composite-PK (messageId, accountId), (6) `Tag` ambiguous mit
+  Testing.Tag in HandlerTests unter Xcode 26.
+- **Widget/Extension-Linking repariert** -- BrainWidgets importiert GRDB direkt,
+  hatte aber keine GRDB-Produktabhaengigkeit; unter dem Xcode-26-Test-Build
+  (dynamisches Package-Produkt) brach der Link. GRDB ist jetzt explizite
+  Paket-Referenz mit Produktabhaengigkeiten auf BrainApp/BrainWidgets/BrainAppTests.
+- **Gemma 4 als On-Device-Backend integriert (availability-based, nichts hardcoded)** --
+  OnDeviceModelCatalog (zur Laufzeit via UserDefaults erweiterbar), OnDeviceModelStore
+  (Download nach Bedarf, RAM-Gating, Backup-Ausschluss), GemmaProvider + GemmaRuntime
+  (llama.cpp hinter `#if canImport(llama)` -- gleiches Muster wie FoundationModels),
+  ToolLessProviderAdapter (macht On-Device-Provider im Chat nutzbar, loest das alte
+  buildProvider-TODO), Routing in ChatService/DataBridge (Apple FM -> bestes
+  geladenes GGUF -> Cloud-Fallthrough), Settings-Sektion mit Download/Loeschen.
+  Aktivierung: llama.cpp-Package in Xcode hinzufuegen, siehe docs/ON-DEVICE-MODELS.md.
+- **StoreKit-Trial gehaertet** (Keychain statt UserDefaults, Migration bestehender
+  Werte), OnDeviceProvider.supportsStreaming ehrlich auf false.
+- **Doku abgeglichen** -- ARCHITECTURE.md (Expression-/Logic-Kapitel = reales
+  Vokabular, Provider-Liste, On-Device-Stand), CLAUDE.md (Snapshot 04.07., main
+  statt master, Prioritaeten, bekannte Probleme), neu: docs/ON-DEVICE-MODELS.md.
+
+### Entscheidungen
+
+- **CI-Trigger auch auf claude/**-Branches:** Etabliert den Test-Feedback-Loop fuer
+  Remote-Sessions ohne lokale Swift-Toolchain.
+- **GRDB-Bump statt CI-Sonderbau:** 7.11.1 enthaelt die offiziellen Linux-Fixes --
+  besser als ein custom-kompiliertes SQLite im Container.
+- **Gemma via llama.cpp + canImport-Gate:** Volle Integration jetzt, Aktivierung als
+  einmaliger Xcode-Schritt. Kein Risiko fuer bestehende Builds; Katalog/Downloads/UI
+  funktionieren unabhaengig davon.
+- **Composite-PK der Email-Tombstones ist korrekt:** Tests wurden an die Migration
+  angepasst (nicht umgekehrt) -- eine geloeschte Mail in Konto A darf Konto B nicht
+  unterdruecken.
+
+### Tests
+
+- BrainCore (Linux, swift:6.1): **548 Tests gruen** (Commit `83209a1`, Run #5) --
+  erster vollstaendig gruener Suite-Lauf der Projektgeschichte.
+- BrainAppTests (macOS/Xcode 26.3): Kompiliert bis auf Tag-Ambiguitaet (gefixt in
+  `fa83caf`); Ergebnis des Laufs siehe Systemzustand.
+
+### Offene Probleme
+
+- iOS-Workflow-Ergebnis fuer `fa83caf` bei Session-Ende noch ausstehend/zu pruefen.
+- Gemma-Inferenz braucht das llama.cpp-Package (Xcode) + Device-Verifikation;
+  GGUF-Download-URLs (unsloth-Mirror) beim ersten Download verifizieren.
+- Platzhalter-Identifier (`com.example.*`) blockieren weiterhin TestFlight/Device.
+- LLMRouter bleibt unverdrahtet (setRouter nie aufgerufen) -- separates Refactoring.
+
+### Naechster Schritt
+
+- iOS-CI gruen bestaetigen, dann PR nach `main`.
+- Echte Bundle-IDs wiederherstellen, Xcode Cloud reaktivieren.
+- llama.cpp-Package hinzufuegen und Gemma auf Device testen.
+
+### Systemzustand
+
+- OK: BrainCore-Suite gruen auf Linux (erstmals verifiziert), CI-Loop etabliert
+- OK: Engine-Vokabular == Doku == Skill-Creator-Prompt
+- OK: Gemma-Integration code-seitig komplett (Aktivierung ausstehend)
+- Ausstehend: iOS-Testlauf-Bestaetigung, Deploy-Identifier, Device-Verifikation
+
+---
+
 ## Wiederaufnahme-Assessment (Zora-Review) -- 03.07.2026
 
 ### Abgeschlossen

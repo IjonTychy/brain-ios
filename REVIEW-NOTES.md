@@ -6,6 +6,44 @@
 
 ---
 
+## Status-Update 04.07.2026 -- Stabilisierungs-Session (Findings-Abgleich)
+
+Abarbeitung der Findings aus dem Review vom 03.07.2026:
+
+- **[BEHOBEN] CI effektiv tot** -- Trigger auf `main` + `claude/**`, pipefail,
+  libsqlite3-dev, Xcode-Auswahl + dynamische Simulator-Wahl. BrainCore-Suite
+  (548 Tests) erstmals nachweisbar gruen (Run zu Commit `83209a1`).
+- **[BEHOBEN] 2 rote Test-Assertions** (ExpressionParserTests) -- Erwartungen an
+  anonymisierte Inputs angepasst.
+- **[BEHOBEN] Expression-Sprache vs. Doku-Drift** -- Parser implementiert jetzt das
+  dokumentierte Vokabular (and/or/not, contains, matches, Array-Indexing,
+  Datums-Mathematik, Filter mit Argumenten); ARCHITECTURE.md und Skill-Creator-Prompt
+  angeglichen; actions_json wird semantisch gegen den Handler-Katalog validiert
+  (skill.create liefert der KI korrigierbare Fehler).
+- **[BEHOBEN] executeSet zerstoert gemischte Templates** -- interpoliert jetzt korrekt;
+  reine Expressions behalten ihren Typ.
+- **[BEHOBEN] validateSemantics-Whitelist** -- alle 9 Logic-Primitives + Rekursion in
+  verschachtelte Steps.
+- **[BEHOBEN] OnDeviceProvider.supportsStreaming** -- ehrlich false.
+- **[BEHOBEN] StoreKit-Trial in UserDefaults** -- Keychain (thisDeviceOnly) mit
+  Migration; Reinstall setzt den Trial nicht mehr zurueck.
+- **[NEU BEHOBEN] FTS5-Autocomplete zur Laufzeit kaputt** -- doppeltes `*` in der
+  MATCH-Query (`"foo"**`); vom ersten vollstaendigen Suite-Lauf aufgedeckt.
+- **[NEU BEHOBEN] Widget/Extension-GRDB-Linking** -- BrainWidgets importierte GRDB
+  ohne Produktabhaengigkeit; unter Xcode-26-Test-Build Link-Fehler. GRDB jetzt
+  explizite Paket-Referenz (App, Widgets, Tests).
+- **[NEU] Gemma 4 E2B/E4B als On-Device-Backend** -- availability-based, Katalog zur
+  Laufzeit erweiterbar, llama.cpp hinter canImport-Gate (Aktivierung: einmaliger
+  Xcode-Schritt, docs/ON-DEVICE-MODELS.md). GGUF-URLs beim ersten Download verifizieren.
+- **[OFFEN] Anonymisierungs-Platzhalter** (com.example.*) -- unveraendert, blockiert
+  TestFlight/Device-Deploy.
+- **[OFFEN] God Objects** (OnboardingView, MailTabView, EmailBridge, SkillManagerView)
+  -- unveraendert.
+- **[OFFEN] LLMRouter nicht verdrahtet** -- `ChatService.setRouter` wird nie aufgerufen.
+- **[OFFEN] Device-Verifikation** -- OAuth, Runtime-Fixes, Gemma-Inferenz.
+
+---
+
 ## Projekt-Review 03.07.2026 -- Wiederaufnahme-Assessment nach Public Release
 
 ### Status: RETTBAR (Substanz gut, Infrastruktur gebrochen)
