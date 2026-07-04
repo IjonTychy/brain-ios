@@ -16,7 +16,8 @@ import FoundationModels
 final class OnDeviceProvider: LLMProvider, @unchecked Sendable {
 
     let name = "apple-on-device"
-    let supportsStreaming = true
+    // Only complete() is implemented — no token streaming or tool use yet.
+    let supportsStreaming = false
     let isOnDevice = true
     let contextWindow = 4096  // Apple's on-device model context
 

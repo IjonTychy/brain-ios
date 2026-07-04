@@ -23,8 +23,10 @@ final class StoreKitManager {
 
     // Trial config
     static let trialDurationDays = 30
-    private static let trialStartKey = "brainTrialStartDate"
+    private static let trialStartKey = "brainTrialStartDate"          // legacy UserDefaults key
+    private static let trialStartKeychainKey = "brain-trial-start"    // survives reinstalls
 
+    private let keychain = KeychainService()
     private let logger = Logger(subsystem: "com.example.brain-ios", category: "StoreKit")
 
     func startListening() {
@@ -87,14 +89,33 @@ final class StoreKitManager {
 
     // MARK: - Trial Management
 
+    // The trial start lives in the Keychain (thisDeviceOnly, no biometry) so a
+    // simple app reinstall does not reset the 30-day window. Existing installs
+    // with a UserDefaults-based start date are migrated on first read.
     var trialStartDate: Date? {
-        UserDefaults.standard.object(forKey: Self.trialStartKey) as? Date
+        if let stored = keychain.read(key: Self.trialStartKeychainKey),
+           let interval = TimeInterval(stored) {
+            return Date(timeIntervalSince1970: interval)
+        }
+        if let legacy = UserDefaults.standard.object(forKey: Self.trialStartKey) as? Date {
+            try? keychain.save(key: Self.trialStartKeychainKey,
+                               value: String(legacy.timeIntervalSince1970))
+            return legacy
+        }
+        return nil
     }
 
     func startTrialIfNeeded() {
-        if UserDefaults.standard.object(forKey: Self.trialStartKey) == nil {
-            UserDefaults.standard.set(Date(), forKey: Self.trialStartKey)
+        guard trialStartDate == nil else { return }
+        let now = Date()
+        do {
+            try keychain.save(key: Self.trialStartKeychainKey,
+                              value: String(now.timeIntervalSince1970))
             logger.info("Trial started")
+        } catch {
+            // Keychain unavailable — degrade to UserDefaults instead of blocking the app
+            UserDefaults.standard.set(now, forKey: Self.trialStartKey)
+            logger.error("Trial start could not be stored in Keychain: \(error)")
         }
     }
 

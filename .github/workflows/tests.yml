@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      - name: Install system dependencies (GRDB needs sqlite3 headers)
+        run: apt-get update && apt-get install -y libsqlite3-dev
+
       - name: Cache SPM dependencies
         uses: actions/cache@v5
         with:

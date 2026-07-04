@@ -23,6 +23,12 @@ public struct LogicInterpreter: Sendable {
         "env", "config", "settings", "admin", "root", "user"
     ]
 
+    /// All step types handled by the interpreter itself (not by action handlers).
+    /// Used by semantic validation to avoid false "handler not registered" warnings.
+    public static let logicStepTypes: Set<String> = [
+        "if", "forEach", "set", "sequence", "try", "delay", "map", "filter", "parallel"
+    ]
+
     public init(dispatcher: ActionDispatcher) {
         self.dispatcher = dispatcher
     }
@@ -200,11 +206,17 @@ public struct LogicInterpreter: Sendable {
 
         let resolvedValue: ExpressionValue
         if case .string(let valueExpr) = assignment.rawValue, valueExpr.contains("{{") {
-            let exprContent = valueExpr
-                .replacingOccurrences(of: "{{", with: "")
-                .replacingOccurrences(of: "}}", with: "")
-                .trimmingCharacters(in: .whitespaces)
-            resolvedValue = parser.evaluateExpression(exprContent, context: context)
+            let trimmedExpr = valueExpr.trimmingCharacters(in: .whitespaces)
+            let inner = String(trimmedExpr.dropFirst(2).dropLast(2))
+            // A single pure "{{expr}}" keeps its typed value; mixed templates
+            // like "Hallo {{name}}!" interpolate to a string instead.
+            if trimmedExpr.hasPrefix("{{"), trimmedExpr.hasSuffix("}}"),
+               !inner.contains("{{"), !inner.contains("}}") {
+                resolvedValue = parser.evaluateExpression(
+                    inner.trimmingCharacters(in: .whitespaces), context: context)
+            } else {
+                resolvedValue = .string(parser.evaluate(valueExpr, context: context))
+            }
         } else {
             resolvedValue = propertyToExpression(assignment.rawValue)
         }

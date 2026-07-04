@@ -29,6 +29,11 @@ import os.log
     let type = "skill.create"
     private let data: any DataProviding
 
+    // Full catalog of registered action-handler types plus logic primitives.
+    // Injected by CoreActionHandlers after all handlers are constructed; when
+    // empty, semantic validation of actions_json is skipped.
+    var knownActionTypes: Set<String> = []
+
     init(data: any DataProviding) { self.data = data }
 
     func execute(properties: [String: PropertyValue], context: ExpressionContext) async throws -> ActionResult {
@@ -51,12 +56,28 @@ import os.log
             return .error("skill.create: screens_json muss einen 'main' Screen enthalten. Der Key 'main' fehlt im JSON.")
         }
 
-        // Validate actions_json if provided
+        // Validate actions_json if provided: first structurally (typed decode),
+        // then semantically against the registered handler catalog so that
+        // LLM-generated skills cannot silently reference nonexistent actions.
         let actionsJSON = properties["actions_json"]?.stringValue
         if let actionsStr = actionsJSON, !actionsStr.isEmpty {
             guard let actionsData = actionsStr.data(using: .utf8),
-                  let _ = try? JSONDecoder().decode([String: ActionDefinition].self, from: actionsData) else {
+                  let decodedActions = try? JSONDecoder().decode([String: ActionDefinition].self, from: actionsData) else {
                 return .error("skill.create: actions_json ist kein gueltiges JSON. Erwartetes Format: {\"actionName\":{\"steps\":[{\"type\":\"entry.create\",\"properties\":{\"title\":\"...\",\"type\":\"thought\"}}]}}")
+            }
+
+            if !knownActionTypes.isEmpty {
+                let probe = SkillDefinition(id: "actions-validation", screens: [:], actions: decodedActions)
+                let warnings = SkillCompiler().validateSemantics(probe) { knownActionTypes.contains($0) }
+                if !warnings.isEmpty {
+                    return .error("""
+                    skill.create: actions_json referenziert unbekannte Action-Typen — \(warnings.joined(separator: "; ")). \
+                    Verwende nur registrierte Action-Primitives (z.B. entry.create, entry.search, entry.update, \
+                    navigate.to, toast, reminder.set, calendar.create, llm.complete) und Logic-Primitives \
+                    (if, forEach, set, sequence, try, delay, map, filter, parallel). \
+                    Korrigiere die Steps und rufe skill.create erneut auf.
+                    """)
+                }
             }
         }
 

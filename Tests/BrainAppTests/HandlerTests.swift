@@ -453,3 +453,131 @@ struct LLMCompleteHandlerTests {
         }
     }
 }
+
+// MARK: - SkillCreateHandler actions_json validation
+
+@Suite("SkillCreateHandler actions_json Validation")
+struct SkillCreateActionsValidationTests {
+
+    private static let markdown = """
+    ---
+    id: test-skill
+    name: Test Skill
+    description: Testet actions_json Validierung
+    version: '1.0'
+    ---
+
+    # Test Skill
+    """
+
+    private static let screensJSON = """
+    {"main":{"type":"stack","properties":{"direction":"vertical"},"children":[]}}
+    """
+
+    @MainActor private func makeHandler() throws -> SkillCreateHandler {
+        let mock = try AppMockDataProvider()
+        let handler = SkillCreateHandler(data: mock)
+        handler.knownActionTypes = Set(["entry.create", "toast", "navigate.to"])
+            .union(LogicInterpreter.logicStepTypes)
+        return handler
+    }
+
+    @Test("Rejects actions_json with unknown action types")
+    @MainActor func rejectsUnknownActionTypes() async throws {
+        let handler = try makeHandler()
+
+        let actionsJSON = """
+        {"boom":{"steps":[{"type":"entry.explode","properties":{}}]}}
+        """
+        let result = try await handler.execute(
+            properties: [
+                "markdown": .string(Self.markdown),
+                "screens_json": .string(Self.screensJSON),
+                "actions_json": .string(actionsJSON),
+            ],
+            context: ExpressionContext()
+        )
+
+        if case .error(let message) = result {
+            #expect(message.contains("entry.explode"))
+            #expect(message.contains("unbekannte Action-Typen"))
+        } else {
+            Issue.record("Expected .error for unknown action type")
+        }
+    }
+
+    @Test("Rejects unknown types nested inside logic steps")
+    @MainActor func rejectsNestedUnknownTypes() async throws {
+        let handler = try makeHandler()
+
+        let actionsJSON = """
+        {"run":{"steps":[{"type":"if","properties":{
+            "condition":"count > 0",
+            "then":[{"type":"entry.vanish","properties":{}}]
+        }}]}}
+        """
+        let result = try await handler.execute(
+            properties: [
+                "markdown": .string(Self.markdown),
+                "screens_json": .string(Self.screensJSON),
+                "actions_json": .string(actionsJSON),
+            ],
+            context: ExpressionContext()
+        )
+
+        if case .error(let message) = result {
+            #expect(message.contains("entry.vanish"))
+        } else {
+            Issue.record("Expected .error for nested unknown action type")
+        }
+    }
+
+    @Test("Accepts actions_json using registered handlers and logic primitives")
+    @MainActor func acceptsValidActions() async throws {
+        let handler = try makeHandler()
+
+        let actionsJSON = """
+        {"add":{"steps":[
+            {"type":"set","properties":{"name":"title","value":"Neu"}},
+            {"type":"entry.create","properties":{"title":"{{title}}","entryType":"task"}},
+            {"type":"toast","properties":{"message":"Gespeichert"}}
+        ]}}
+        """
+        let result = try await handler.execute(
+            properties: [
+                "markdown": .string(Self.markdown),
+                "screens_json": .string(Self.screensJSON),
+                "actions_json": .string(actionsJSON),
+            ],
+            context: ExpressionContext()
+        )
+
+        if case .value(let val) = result, case .object(let obj) = val {
+            #expect(obj["id"] == .string("test-skill"))
+        } else {
+            Issue.record("Expected successful install, got \(result)")
+        }
+    }
+
+    @Test("Skips semantic validation when catalog is empty")
+    @MainActor func skipsValidationWithoutCatalog() async throws {
+        let mock = try AppMockDataProvider()
+        let handler = SkillCreateHandler(data: mock)  // knownActionTypes stays empty
+
+        let actionsJSON = """
+        {"boom":{"steps":[{"type":"entry.explode","properties":{}}]}}
+        """
+        let result = try await handler.execute(
+            properties: [
+                "markdown": .string(Self.markdown),
+                "screens_json": .string(Self.screensJSON),
+                "actions_json": .string(actionsJSON),
+            ],
+            context: ExpressionContext()
+        )
+
+        if case .error(let message) = result {
+            #expect(!message.contains("unbekannte Action-Typen"))
+        }
+    }
+}
