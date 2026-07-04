@@ -319,7 +319,7 @@ struct TagAddHandlerTests {
         _ = try await handler.execute(
             properties: [
                 "entryId": .int(1),
-                "tagName": .string("important"),
+                "tag": .string("important"),
             ],
             context: ExpressionContext()
         )
@@ -351,7 +351,8 @@ struct KnowledgeSaveHandlerTests {
         #expect(mock.savedFacts.first?.object == "Coffee")
 
         if case .value(let val) = result, case .object(let dict) = val {
-            #expect(dict["status"] == .string("saved"))
+            #expect(dict["subject"] == .string("User"))
+            #expect(dict["id"] == .int(1))
         } else {
             Issue.record("Expected .value(.object(...))")
         }
@@ -392,15 +393,15 @@ struct AISummarizeHandlerTests {
         let handler = AISummarizeHandler(data: mock)
 
         let result = try await handler.execute(
-            properties: ["id": .int(1)],
+            properties: ["entryId": .int(1)],
             context: ExpressionContext()
         )
 
-        // MockLLMProvider returns "Mock response"
-        if case .value(let val) = result, case .object(let dict) = val {
-            #expect(dict["summary"] == .string("Mock response"))
+        // MockLLMProvider returns "Mock response"; ai.summarize yields plain text
+        if case .value(let val) = result, case .string(let summary) = val {
+            #expect(summary == "Mock response")
         } else {
-            Issue.record("Expected .value(.object(...))")
+            Issue.record("Expected .value(.string(...))")
         }
     }
 
@@ -410,7 +411,7 @@ struct AISummarizeHandlerTests {
         let handler = AISummarizeHandler(data: mock)
 
         let result = try await handler.execute(
-            properties: ["id": .int(999)],
+            properties: ["entryId": .int(999)],
             context: ExpressionContext()
         )
 

@@ -69,7 +69,7 @@ struct LocalizationServiceTests {
         let service = LocalizationService.shared
         #expect(service.resolve("button.save") == "Speichern")
         #expect(service.resolve("button.cancel") == "Abbrechen")
-        #expect(service.resolve("button.delete") == "Loeschen")
+        #expect(service.resolve("button.delete") == "Löschen")
         #expect(service.resolve("settings.title") == "Einstellungen")
         #expect(service.resolve("chat.placeholder") == "Nachricht an Brain...")
         #expect(service.resolve("onboarding.welcome") == "Willkommen bei Brain")
