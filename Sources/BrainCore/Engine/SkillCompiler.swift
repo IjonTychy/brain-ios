@@ -384,17 +384,56 @@ public struct SkillCompiler: Sendable {
 
     // H5: Semantic validation — check if referenced action handlers exist.
     // Returns warnings (not errors) since custom skills may use external handlers.
+    // Recurses into nested step arrays (then/else/do/steps/catch) so that
+    // handlers referenced inside if/forEach/sequence/try/delay are checked too.
     public func validateSemantics(_ definition: SkillDefinition, dispatcher: ActionDispatcher) -> [String] {
+        validateSemantics(definition) { dispatcher.hasHandler(for: $0) }
+    }
+
+    // Predicate-based variant for callers that know the handler catalog without
+    // holding a dispatcher (e.g. pre-install validation of LLM-generated skills).
+    public func validateSemantics(
+        _ definition: SkillDefinition,
+        isRegisteredHandler: (String) -> Bool
+    ) -> [String] {
         var warnings: [String] = []
         for (_, action) in definition.actions ?? [:] {
             for step in action.steps {
-                if !["if", "forEach", "set", "sequence"].contains(step.type)
-                    && !dispatcher.hasHandler(for: step.type) {
-                    warnings.append("Handler nicht registriert: '\(step.type)'")
-                }
+                collectHandlerWarnings(step, isRegisteredHandler: isRegisteredHandler, warnings: &warnings)
             }
         }
         return warnings
+    }
+
+    private func collectHandlerWarnings(
+        _ step: ActionStep,
+        isRegisteredHandler: (String) -> Bool,
+        warnings: inout [String]
+    ) {
+        if !LogicInterpreter.logicStepTypes.contains(step.type)
+            && !isRegisteredHandler(step.type) {
+            warnings.append("Handler nicht registriert: '\(step.type)'")
+        }
+
+        guard let properties = step.properties else { return }
+        for key in ["then", "else", "do", "steps", "catch"] {
+            guard case .array(let items)? = properties[key] else { continue }
+            for item in items {
+                guard case .object(let obj) = item,
+                      case .string(let type)? = obj["type"]
+                else { continue }
+
+                var nestedProperties: [String: PropertyValue]? = nil
+                if case .object(let props)? = obj["properties"] {
+                    nestedProperties = props
+                }
+                collectHandlerWarnings(
+                    ActionStep(type: type, properties: nestedProperties),
+                    isRegisteredHandler: isRegisteredHandler,
+                    warnings: &warnings
+                )
+            }
+        }
     }
 
     // Sanitize user-provided markdown content for safe inclusion in LLM prompts.

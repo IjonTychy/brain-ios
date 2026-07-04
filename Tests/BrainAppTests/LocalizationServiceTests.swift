@@ -29,7 +29,7 @@ struct LocalizationServiceTests {
     }
 
     @Test("All built-in German keys are non-empty strings")
-    func builtInGermanKeysNonEmpty() {
+    @MainActor func builtInGermanKeysNonEmpty() {
         let labels = LocalizationService.builtInGerman
         #expect(!labels.isEmpty, "Built-in German dictionary should not be empty")
         for (key, value) in labels {
@@ -39,14 +39,14 @@ struct LocalizationServiceTests {
     }
 
     @Test("Built-in German has minimum expected key count")
-    func builtInGermanMinimumCount() {
+    @MainActor func builtInGermanMinimumCount() {
         let labels = LocalizationService.builtInGerman
         // We know there are tabs, buttons, settings, chat, search, types, common, onboarding, mail, skills, graph, errors
         #expect(labels.count >= 70, "Expected at least 70 built-in keys, got \(labels.count)")
     }
 
     @Test("All built-in German keys use dotted notation")
-    func builtInGermanKeyFormat() {
+    @MainActor func builtInGermanKeyFormat() {
         let labels = LocalizationService.builtInGerman
         for key in labels.keys {
             #expect(key.contains("."), "Key '\(key)' should use dotted notation (e.g. 'tab.home')")
@@ -54,7 +54,7 @@ struct LocalizationServiceTests {
     }
 
     @Test("Key categories cover all expected sections")
-    func builtInGermanCategories() {
+    @MainActor func builtInGermanCategories() {
         let labels = LocalizationService.builtInGerman
         let prefixes = Set(labels.keys.compactMap { $0.split(separator: ".").first.map(String.init) })
 
@@ -69,7 +69,7 @@ struct LocalizationServiceTests {
         let service = LocalizationService.shared
         #expect(service.resolve("button.save") == "Speichern")
         #expect(service.resolve("button.cancel") == "Abbrechen")
-        #expect(service.resolve("button.delete") == "Loeschen")
+        #expect(service.resolve("button.delete") == "Löschen")
         #expect(service.resolve("settings.title") == "Einstellungen")
         #expect(service.resolve("chat.placeholder") == "Nachricht an Brain...")
         #expect(service.resolve("onboarding.welcome") == "Willkommen bei Brain")

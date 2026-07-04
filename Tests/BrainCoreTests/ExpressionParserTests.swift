@@ -40,14 +40,14 @@ struct ExpressionParserTests {
     func interpolation() {
         let context = ctx(["name": .string("Max")])
         let result = parser.evaluate("Hallo {{name}}, willkommen!", context: context)
-        #expect(result == "Hallo Andy, willkommen!")
+        #expect(result == "Hallo Max, willkommen!")
     }
 
     @Test("Multiple expressions in one string")
     func multipleExpressions() {
         let context = ctx(["first": .string("Max"), "last": .string("Testuser")])
         let result = parser.evaluate("{{first}} {{last}}", context: context)
-        #expect(result == "Test User")
+        #expect(result == "Max Testuser")
     }
 
     @Test("No expressions returns original string")

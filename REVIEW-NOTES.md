@@ -6,6 +6,150 @@
 
 ---
 
+## Status-Update 04.07.2026 -- Stabilisierungs-Session (Findings-Abgleich)
+
+Abarbeitung der Findings aus dem Review vom 03.07.2026:
+
+- **[BEHOBEN] CI effektiv tot** -- Trigger auf `main` + `claude/**`, pipefail,
+  libsqlite3-dev, Xcode-Auswahl + dynamische Simulator-Wahl. BrainCore-Suite
+  (548 Tests) erstmals nachweisbar gruen (Run zu Commit `83209a1`).
+- **[BEHOBEN] 2 rote Test-Assertions** (ExpressionParserTests) -- Erwartungen an
+  anonymisierte Inputs angepasst.
+- **[BEHOBEN] Expression-Sprache vs. Doku-Drift** -- Parser implementiert jetzt das
+  dokumentierte Vokabular (and/or/not, contains, matches, Array-Indexing,
+  Datums-Mathematik, Filter mit Argumenten); ARCHITECTURE.md und Skill-Creator-Prompt
+  angeglichen; actions_json wird semantisch gegen den Handler-Katalog validiert
+  (skill.create liefert der KI korrigierbare Fehler).
+- **[BEHOBEN] executeSet zerstoert gemischte Templates** -- interpoliert jetzt korrekt;
+  reine Expressions behalten ihren Typ.
+- **[BEHOBEN] validateSemantics-Whitelist** -- alle 9 Logic-Primitives + Rekursion in
+  verschachtelte Steps.
+- **[BEHOBEN] OnDeviceProvider.supportsStreaming** -- ehrlich false.
+- **[BEHOBEN] StoreKit-Trial in UserDefaults** -- Keychain (thisDeviceOnly) mit
+  Migration; Reinstall setzt den Trial nicht mehr zurueck.
+- **[NEU BEHOBEN] FTS5-Autocomplete zur Laufzeit kaputt** -- doppeltes `*` in der
+  MATCH-Query (`"foo"**`); vom ersten vollstaendigen Suite-Lauf aufgedeckt.
+- **[NEU BEHOBEN] Widget/Extension-GRDB-Linking** -- BrainWidgets importierte GRDB
+  ohne Produktabhaengigkeit; unter Xcode-26-Test-Build Link-Fehler. GRDB jetzt
+  explizite Paket-Referenz (App, Widgets, Tests).
+- **[NEU] Gemma 4 E2B/E4B als On-Device-Backend** -- availability-based, Katalog zur
+  Laufzeit erweiterbar, llama.cpp hinter canImport-Gate (Aktivierung: einmaliger
+  Xcode-Schritt, docs/ON-DEVICE-MODELS.md). GGUF-URLs beim ersten Download verifizieren.
+- **[OFFEN] Anonymisierungs-Platzhalter** (com.example.*) -- unveraendert, blockiert
+  TestFlight/Device-Deploy.
+- **[OFFEN] God Objects** (OnboardingView, MailTabView, EmailBridge, SkillManagerView)
+  -- unveraendert.
+- **[OFFEN] LLMRouter nicht verdrahtet** -- `ChatService.setRouter` wird nie aufgerufen.
+- **[OFFEN] Device-Verifikation** -- OAuth, Runtime-Fixes, Gemma-Inferenz.
+
+---
+
+## Projekt-Review 03.07.2026 -- Wiederaufnahme-Assessment nach Public Release
+
+### Status: RETTBAR (Substanz gut, Infrastruktur gebrochen)
+
+### Kontext
+
+Erster Review seit dem 26.03.2026. Zwischenzeitlich wurde das Repo als Public Release
+neu veroeffentlicht: Historie auf 2 Commits gesquasht ("Initial public release" 28.03.2026),
+Default-Branch von `master` auf `main` umbenannt, saemtliche Identifier anonymisiert
+(`com.example.brain-ios`, `your-domain.example.com`). Drei parallele Deep-Dives
+(Engine-Kern, App-Schicht, Testsuite) plus CI-Verifikation via GitHub API.
+
+### Zusammenfassung
+
+Die Substanz ist deutlich besser als befuerchtet: Die Runtime-Engine ist real und
+diszipliniert implementiert (kein Fassaden-Code), 590 ueberwiegend substanzielle Tests,
+pbxproj vollstaendig konsistent (0 fehlende/tote Referenzen), keine Security-Red-Flags,
+4 von 5 LLM-Providern vollstaendig mit Streaming + Tool-Use. Mail-Delete-Sync und
+StoreKit sind entgegen der Projektdoku bereits implementiert. Gebrochen ist die
+Infrastruktur drumherum: CI laeuft nie (Trigger auf `master`, Branch heisst `main`),
+zwei Tests schlagen durch die Anonymisierung garantiert fehl, und die Doku-Snapshots
+beschreiben einen Stand, der teilweise nicht mehr existiert.
+
+### Findings
+
+- **[OFFEN] Schweregrad: hoch** -- CI effektiv tot: `tests.yml` und `ios-build.yml`
+  triggern ausschliesslich auf `branches: [master]`; der Default-Branch heisst seit dem
+  Public Release `main`. Kein Workflow ist seit 28.03.2026 gelaufen. Zusaetzlich maskiert
+  `xcodebuild ... | tail` in ios-build.yml ohne pipefail jeden Build-Fehler -- der einzige
+  gruene CI-Lauf (28.03.2026, 10s "Build" fuer 53k LOC) ist nicht belastbar.
+  Fix: Trigger auf `main` umstellen, `set -o pipefail` bzw. `-o pipefail` ergaenzen.
+
+- **[OFFEN] Schweregrad: hoch** -- 2 garantiert fehlschlagende Tests in
+  `Tests/BrainCoreTests/ExpressionParserTests.swift:41-51`: Bei der Anonymisierung wurden
+  Inputs geaendert ("Andy" -> "Max"), die #expect-Erwartungen aber nicht. Beweist, dass die
+  Suite seit dem Public Release nie ausgefuehrt wurde.
+
+- **[OFFEN] Schweregrad: hoch** -- Expression-Sprache vs. Doku-Drift (wahrscheinliche
+  Root Cause des bekannten actions_json-Qualitaetsproblems): ARCHITECTURE.md und der
+  Skill-Creator-Prompt versprechen `contains`, `matches`, `and/or`, `{{now + 7d}}`,
+  Pipe-Filter (`relative`, `currency`, `truncate`, `format`) und Array-Indexing
+  (`items[0].title`) -- der ExpressionParser implementiert davon nichts (nur
+  count/uppercase/lowercase/not/length, ExpressionParser.swift:250-269). LLM-generierte
+  Skills, die der Doku folgen, evaluieren still zu null. Fix: Parser erweitern ODER
+  Prompt/Doku auf das reale Vokabular einschraenken -- plus semantische Validierung von
+  actions_json gegen den Handler-Katalog (heute prueft SkillRuleHandlers.swift:54-59 nur
+  JSON-Syntax).
+
+- **[OFFEN] Schweregrad: mittel** -- Anonymisierungs-Platzhalter ueberall
+  (`com.example.brain-ios` in Bundle-IDs, App Group, iCloud-Container, BGTask-IDs,
+  Logger-Subsystems; Entitlements inkl.). Konsequent und damit per globalem Rename
+  reversibel, aber ohne echte Identifier ist kein TestFlight/Device-Deploy moeglich.
+
+- **[OFFEN] Schweregrad: mittel** -- Doku-Drift: CLAUDE.md/SESSION-LOG beschreiben
+  Datei-Splits (OnboardingView, MailTabView), die im aktuellen Stand nicht existieren --
+  beide sind wieder God Objects (1255 bzw. 1193 Zeilen); ebenso EmailBridge (1045),
+  SkillManagerView (876). Umgekehrt sind drei als "offen" gefuehrte Punkte im Code
+  laengst erledigt (siehe BEHOBEN unten).
+
+- **[OFFEN] Schweregrad: mittel** -- LogicInterpreter.executeSet
+  (LogicInterpreter.swift:202-207) strippt `{{`/`}}` global: gemischte Templates wie
+  "Hallo {{name}}!" oder mehrere Expressions in einem set-Wert werden zerstoert.
+  Verwandt: zwei parallele execute(action:)-Pfade mit divergierender Semantik
+  (LogicInterpreter merged .object-Results in den Kontext, ActionDispatcher nicht).
+
+- **[OFFEN] Schweregrad: niedrig** -- OnDeviceProvider deklariert
+  `supportsStreaming = true` (OnDeviceProvider.swift:19), implementiert aber nur
+  `complete()` ohne Streaming/Tool-Use.
+
+- **[OFFEN] Schweregrad: niedrig** -- StoreKit-Trial-Startdatum liegt in UserDefaults
+  (StoreKitManager.swift:26) -- per Reinstall/Datumsaenderung trivial umgehbar.
+  Bewusste Entscheidung treffen oder in Keychain haerten.
+
+- **[OFFEN] Schweregrad: niedrig** -- validateSemantics-Whitelist kennt nur
+  if/forEach/set/sequence (SkillCompiler.swift:391) -- try/delay/map/filter/parallel
+  erzeugen falsche "Handler nicht registriert"-Warnungen. `user` ist reservierter
+  Variablenname (LogicInterpreter.swift:21-24), ARCHITECTURE.md nutzt aber `{{user.name}}`
+  als Beispiel.
+
+- **[BEHOBEN] Schweregrad: mittel** -- Mail-Delete-Sync (war "offen" seit 26.03.):
+  EmailBridge.deleteMessage (EmailBridge.swift:631-668) propagiert Delete zum IMAP-Server
+  (moveToTrash, Fallback \Deleted + expunge) und schreibt Tombstones in `emailDeletedIds`
+  (Migration v13); der Sync ueberspringt tombstoned IDs. Doku war veraltet.
+
+- **[BEHOBEN] Schweregrad: mittel** -- StoreKit (war "ausstehend"): StoreKitManager.swift
+  (StoreKit 2, 30-Tage-Trial + Non-Consumable, Transaction-Listener) plus PaywallView.swift
+  existieren.
+
+- **[INFO]** Verifizierte Metriken: 216 Swift-Dateien, ~53'400 LOC, 590 @Test-Funktionen
+  (517 BrainCore + 73 BrainApp), 6 gebuendelte Skills, 2 Commits Historie.
+  Keine Force-Unwraps/as!/try! in Sources, keine leeren catch-Bloecke, keine Secrets.
+
+### Verdikt
+
+Das Projekt ist kein Sanierungsfall, sondern ein solides Codebase mit gebrochener
+Infrastruktur und veralteter Doku. Empfohlene Reihenfolge:
+1. **Stabilisieren:** CI auf `main` + pipefail, 2 Test-Assertions fixen, Suite auf
+   Linux gruen bekommen (verifizierbar), Doku-Snapshots berichtigen.
+2. **Produktproblem loesen:** Expression-Vokabular und Skill-Creator-Prompt angleichen,
+   actions_json semantisch validieren.
+3. **Deploy-Faehigkeit:** echte Bundle-IDs/App-Group/iCloud-Container wiederherstellen,
+   Xcode Cloud reaktivieren, Device-Verifikation der Fixes vom Maerz.
+4. **Hygiene:** God Objects erneut splitten, OnDevice-Streaming-Flag, Trial-Haertung.
+
+---
+
 ## Session-Review 26.03.2026 -- Contacts Crash Fix + Settings UI + Dashboard Fix
 
 ### Status: OK

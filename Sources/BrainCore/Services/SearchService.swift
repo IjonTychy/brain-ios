@@ -152,9 +152,9 @@ public struct SearchService: Sendable {
         let trimmed = prefix.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return [] }
 
-        // FTS5 prefix query: sanitize then append * for prefix matching (F-09)
-        let sanitized = sanitizeFTS5Query(trimmed)
-        let ftsQuery = "\(sanitized)*"
+        // FTS5 prefix query (F-09): sanitizeFTS5Query already appends * to each
+        // token — appending another one here produced `"foo"**`, an FTS5 syntax error.
+        let ftsQuery = sanitizeFTS5Query(trimmed)
 
         return try pool.read { db in
             let sql = """

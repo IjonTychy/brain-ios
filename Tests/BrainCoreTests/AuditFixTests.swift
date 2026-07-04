@@ -171,16 +171,17 @@ struct AuditFixTests {
         let db = try DatabaseManager.temporary()
 
         // Use a single write connection for both insert and FTS5 query
-        // to avoid WAL snapshot isolation issues between pool.write/pool.read
+        // to avoid WAL snapshot isolation issues between pool.write/pool.read.
+        // Int.fetchOne instead of `row[0] as? Int`: on Linux the SQLite Int64
+        // does not bridge-cast to Int, silently yielding 0.
         let count: Int = try db.pool.write { db in
             try db.execute(sql: "INSERT INTO entries (type, title) VALUES ('note', 'Meeting notes')")
             try db.execute(sql: "INSERT INTO entries (type, title) VALUES ('note', 'Besprechungen mit dem Team')")
 
             // Verify FTS5 trigger populated the index and search works
-            let row = try Row.fetchOne(db, sql: """
+            return try Int.fetchOne(db, sql: """
                 SELECT count(*) FROM entries_fts WHERE entries_fts MATCH '"meeting"'
-                """)
-            return row?[0] as? Int ?? 0
+                """) ?? 0
         }
 
         #expect(count > 0, "FTS5 should find 'Meeting notes' when searching for 'meeting'")

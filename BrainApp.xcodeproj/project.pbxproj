@@ -160,6 +160,10 @@
 		2BCB6FD754E44D269C5E43C3 /* QuickCaptureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4950CCFD40014D69872D921A /* QuickCaptureView.swift */; };
 		55B5F9E064154EC1AFF42B81 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 134C505915CB4D699858862B /* ChatView.swift */; };
 		98A8312D7BEE42259D6C2949 /* OpenAICompatibleProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7A664072F34E07BE05F514 /* OpenAICompatibleProvider.swift */; };
+		GM200001 /* OnDeviceModelCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100001 /* OnDeviceModelCatalog.swift */; };
+		GM200002 /* OnDeviceModelStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100002 /* OnDeviceModelStore.swift */; };
+		GM200003 /* GemmaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100003 /* GemmaProvider.swift */; };
+		GM200004 /* ToolLessProviderAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100004 /* ToolLessProviderAdapter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -348,6 +352,10 @@
 		4950CCFD40014D69872D921A /* QuickCaptureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickCaptureView.swift; sourceTree = "<group>"; };
 		134C505915CB4D699858862B /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		4B7A664072F34E07BE05F514 /* OpenAICompatibleProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAICompatibleProvider.swift; sourceTree = "<group>"; };
+		GM100001 /* OnDeviceModelCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceModelCatalog.swift; sourceTree = "<group>"; };
+		GM100002 /* OnDeviceModelStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceModelStore.swift; sourceTree = "<group>"; };
+		GM100003 /* GemmaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GemmaProvider.swift; sourceTree = "<group>"; };
+		GM100004 /* ToolLessProviderAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolLessProviderAdapter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -548,6 +556,10 @@
 				B1020019 /* OpenAIProvider.swift */,
 				B1020045 /* OnDeviceProvider.swift */,
 				4B7A664072F34E07BE05F514 /* OpenAICompatibleProvider.swift */,
+				GM100001 /* OnDeviceModelCatalog.swift */,
+				GM100002 /* OnDeviceModelStore.swift */,
+				GM100003 /* GemmaProvider.swift */,
+				GM100004 /* ToolLessProviderAdapter.swift */,
 			);
 			path = LLMProviders;
 			sourceTree = "<group>";
@@ -653,6 +665,7 @@
 			packageProductDependencies = (
 				A1000080 /* BrainCore */,
 				E1000080 /* SwiftMail */,
+				G1000081 /* GRDB */,
 			);
 			productName = BrainApp;
 			productReference = A1000001 /* BrainApp.app */;
@@ -691,6 +704,7 @@
 			name = BrainWidgets;
 			packageProductDependencies = (
 				D1000080 /* BrainCore */,
+				G1000082 /* GRDB */,
 			);
 			productName = BrainWidgets;
 			productReference = D1000001 /* BrainWidgets.appex */;
@@ -711,6 +725,7 @@
 			name = BrainAppTests;
 			packageProductDependencies = (
 				T1000080 /* BrainCore */,
+				G1000083 /* GRDB */,
 			);
 			productName = BrainAppTests;
 			productReference = T1000001 /* BrainAppTests.xctest */;
@@ -740,6 +755,7 @@
 			packageReferences = (
 				A1000090 /* XCLocalSwiftPackageReference "." */,
 				E1000090 /* XCRemoteSwiftPackageReference "SwiftMail" */,
+				G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
 			productRefGroup = A1000031 /* Products */;
 			projectDirPath = "";
@@ -886,6 +902,10 @@
 				55B5F9E064154EC1AFF42B81 /* ChatView.swift in Sources */,
 				2BCB6FD754E44D269C5E43C3 /* QuickCaptureView.swift in Sources */,
 				98A8312D7BEE42259D6C2949 /* OpenAICompatibleProvider.swift in Sources */,
+				GM200001 /* OnDeviceModelCatalog.swift in Sources */,
+				GM200002 /* OnDeviceModelStore.swift in Sources */,
+				GM200003 /* GemmaProvider.swift in Sources */,
+				GM200004 /* ToolLessProviderAdapter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1302,6 +1322,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 		E1000090 /* XCRemoteSwiftPackageReference "SwiftMail" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Cocoanetics/SwiftMail.git";
@@ -1320,6 +1348,21 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		G1000081 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+		G1000082 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+		G1000083 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
 		A1000080 /* BrainCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A1000090 /* XCLocalSwiftPackageReference "." */;

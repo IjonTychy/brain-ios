@@ -2,14 +2,14 @@ name: iOS Build & Test
 
 on:
   push:
-    branches: [master]
+    branches: [main, 'claude/**']
     paths-ignore:
       - '*.md'
       - 'docs/**'
       - '.claude/**'
       - 'Skills/**'
   pull_request:
-    branches: [master]
+    branches: [main]
     paths-ignore:
       - '*.md'
       - 'docs/**'
@@ -29,36 +29,49 @@ jobs:
 
       - name: Select Xcode
         run: |
-          # Use Xcode 16.3 (Swift 6.1) if available, fall back to latest
-          if [ -d "/Applications/Xcode_16.3.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.3.app/Contents/Developer
-          elif [ -d "/Applications/Xcode_16.2.app" ]; then
-            sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+          # Use the newest installed Xcode — pinned versions on GitHub images
+          # often lack their matching iOS simulator runtime.
+          NEWEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$NEWEST" ]; then
+            sudo xcode-select -s "$NEWEST/Contents/Developer"
           fi
 
       - name: Show Xcode version
         run: xcodebuild -version
+
+      - name: Pick available iPhone simulator
+        run: |
+          DEVICE_NAME=$(xcrun simctl list devices available | sed -nE 's/^ +(iPhone [^(]+) \(.*/\1/p' | head -1 | sed 's/ *$//')
+          if [ -z "$DEVICE_NAME" ]; then
+            echo "No available iPhone simulator found:"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "Using simulator: $DEVICE_NAME"
+          echo "SIM_DEVICE=$DEVICE_NAME" >> "$GITHUB_ENV"
 
       - name: Resolve packages
         run: xcodebuild -resolvePackageDependencies -scheme BrainApp -project BrainApp.xcodeproj
 
       - name: Build for iOS Simulator
         run: |
+          set -o pipefail
           xcodebuild build \
             -scheme BrainApp \
             -project BrainApp.xcodeproj \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination "platform=iOS Simulator,name=$SIM_DEVICE" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
-            | tail -20
+            | tail -100
 
       - name: Run BrainApp Tests
         run: |
+          set -o pipefail
           xcodebuild test \
             -scheme BrainApp \
             -project BrainApp.xcodeproj \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
+            -destination "platform=iOS Simulator,name=$SIM_DEVICE" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             -only-testing:BrainAppTests \
-            | tail -40
+            | tail -100

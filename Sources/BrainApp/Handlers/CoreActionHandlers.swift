@@ -9,7 +9,8 @@ import os.log
 enum CoreActionHandlers {
     @MainActor static func all(data: any DataProviding, emailBridge: EmailBridge? = nil) -> [any ActionHandler] {
         let email = emailBridge ?? EmailBridge(pool: data.databasePool)
-        return [
+        let skillCreate = SkillCreateHandler(data: data)
+        let handlers: [any ActionHandler] = [
             // Entry CRUD actions
             EntryCreateHandler(data: data),
             EntryUpdateHandler(data: data),
@@ -55,7 +56,7 @@ enum CoreActionHandlers {
             SpotlightIndexHandler(data: data),
             SpotlightDeindexHandler(),
             // Skill actions
-            SkillCreateHandler(data: data),
+            skillCreate,
             SkillListHandler(data: data),
             SkillInstallHandler(data: data),
             // AI-powered actions
@@ -216,5 +217,12 @@ enum CoreActionHandlers {
             StopwatchOpticalHandler(),
             StopwatchProximityHandler(),
         ]
+
+        // Give skill.create the full handler catalog so it can reject
+        // LLM-generated actions_json that references nonexistent action types.
+        skillCreate.knownActionTypes = Set(handlers.map(\.type))
+            .union(LogicInterpreter.logicStepTypes)
+
+        return handlers
     }
 }

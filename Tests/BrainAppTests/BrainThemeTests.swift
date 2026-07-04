@@ -1,94 +1,56 @@
 import Testing
 import SwiftUI
+@testable import BrainCore
 @testable import BrainApp
 
-// MARK: - BrainTheme Color Tests
+// Tests for the BrainTheme design system as implemented after the March 2026
+// frontend overhaul: EntryType.color is the single source of truth for entry
+// colors (the old BrainTheme.entryTypeColor() was removed), radii live in
+// BrainTheme.Radius, semantic colors in BrainTheme.Colors.
 
-@Suite("BrainTheme Entry Type Colors")
-struct BrainThemeColorTests {
+// MARK: - Entry Type Colors
 
-    @Test("Known entry types return non-gray colors")
-    func knownTypesReturnDistinctColors() {
-        let knownTypes = ["task", "event", "note", "thought", "email", "contact", "habit"]
-        let gray = Color.gray
+@Suite("EntryType Colors")
+struct EntryTypeColorTests {
 
-        for type in knownTypes {
-            let color = BrainTheme.entryTypeColor(type)
-            #expect(color != gray, "Entry type '\(type)' should not return gray")
+    @Test("Every entry type has a color")
+    func everyTypeHasColor() {
+        let allTypes: [EntryType] = [.thought, .task, .event, .email, .note, .document]
+        for type in allTypes {
+            _ = type.color  // must not crash; exhaustive switch guarantees coverage
         }
-    }
-
-    @Test("Unknown entry types return gray")
-    func unknownTypeReturnsGray() {
-        #expect(BrainTheme.entryTypeColor("unknown") == .gray)
-        #expect(BrainTheme.entryTypeColor("") == .gray)
-        #expect(BrainTheme.entryTypeColor("foobar") == .gray)
     }
 
     @Test("Task type is blue")
     func taskIsBlue() {
-        #expect(BrainTheme.entryTypeColor("task") == .blue)
+        #expect(EntryType.task.color == .blue)
     }
 
-    @Test("Event type is orange")
-    func eventIsOrange() {
-        #expect(BrainTheme.entryTypeColor("event") == .orange)
+    @Test("Event type is purple")
+    func eventIsPurple() {
+        #expect(EntryType.event.color == .purple)
     }
 
-    @Test("Note and thought types share the same color")
-    func noteAndThoughtSameColor() {
-        #expect(BrainTheme.entryTypeColor("note") == BrainTheme.entryTypeColor("thought"))
+    @Test("Email type is orange")
+    func emailIsOrange() {
+        #expect(EntryType.email.color == .orange)
     }
 
-    @Test("Note type is purple")
-    func noteIsPurple() {
-        #expect(BrainTheme.entryTypeColor("note") == .purple)
-    }
-
-    @Test("Email type is cyan")
-    func emailIsCyan() {
-        #expect(BrainTheme.entryTypeColor("email") == .cyan)
-    }
-
-    @Test("Contact type is green")
-    func contactIsGreen() {
-        #expect(BrainTheme.entryTypeColor("contact") == .green)
-    }
-
-    @Test("Habit type is mint")
-    func habitIsMint() {
-        #expect(BrainTheme.entryTypeColor("habit") == .mint)
-    }
-
-    @Test("Distinct entry types have distinct colors (except note/thought)")
-    func distinctTypesHaveDistinctColors() {
-        // note and thought intentionally share purple
-        let distinctTypes = ["task", "event", "note", "email", "contact", "habit"]
-        var colorMap: [String: Color] = [:]
-
-        for type in distinctTypes {
-            let color = BrainTheme.entryTypeColor(type)
-            // Check this color hasn't been seen from a different type
-            for (existingType, existingColor) in colorMap {
-                #expect(
-                    color != existingColor,
-                    "'\(type)' and '\(existingType)' should have different colors"
-                )
+    @Test("Core entry types have distinct colors")
+    func coreTypesHaveDistinctColors() {
+        let types: [EntryType] = [.thought, .task, .note, .event, .email, .document]
+        var seen: [String: EntryType] = [:]
+        for type in types {
+            let key = String(describing: type.color)
+            if let existing = seen[key] {
+                Issue.record("\(type) and \(existing) share the same color")
             }
-            colorMap[type] = color
+            seen[key] = type
         }
-    }
-
-    @Test("Entry type color is case-sensitive")
-    func colorIsCaseSensitive() {
-        // The switch uses lowercase literals; uppercase should fall through to gray
-        #expect(BrainTheme.entryTypeColor("Task") == .gray)
-        #expect(BrainTheme.entryTypeColor("EVENT") == .gray)
-        #expect(BrainTheme.entryTypeColor("Note") == .gray)
     }
 }
 
-// MARK: - BrainTheme Spacing Tests
+// MARK: - Spacing
 
 @Suite("BrainTheme Spacing")
 struct BrainThemeSpacingTests {
@@ -118,81 +80,84 @@ struct BrainThemeSpacingTests {
         #expect(BrainTheme.spacingLG == 16)
         #expect(BrainTheme.spacingXL == 24)
     }
+
+    @Test("Nested Spacing namespace mirrors the top-level constants")
+    func nestedSpacingMatches() {
+        #expect(BrainTheme.Spacing.xs == BrainTheme.spacingXS)
+        #expect(BrainTheme.Spacing.sm == BrainTheme.spacingSM)
+        #expect(BrainTheme.Spacing.md == BrainTheme.spacingMD)
+        #expect(BrainTheme.Spacing.lg == BrainTheme.spacingLG)
+        #expect(BrainTheme.Spacing.xl == BrainTheme.spacingXL)
+    }
 }
 
-// MARK: - BrainTheme Corner Radius Tests
+// MARK: - Corner Radius
 
 @Suite("BrainTheme Corner Radius")
 struct BrainThemeCornerRadiusTests {
 
     @Test("All corner radius constants are positive")
     func radiiArePositive() {
-        #expect(BrainTheme.cornerRadiusSM > 0)
-        #expect(BrainTheme.cornerRadiusMD > 0)
-        #expect(BrainTheme.cornerRadiusLG > 0)
-        #expect(BrainTheme.cornerRadiusFull > 0)
+        #expect(BrainTheme.Radius.sm > 0)
+        #expect(BrainTheme.Radius.md > 0)
+        #expect(BrainTheme.Radius.lg > 0)
+        #expect(BrainTheme.Radius.xl > 0)
+        #expect(BrainTheme.Radius.card > 0)
     }
 
     @Test("Corner radius constants are in ascending order")
     func radiiAreAscending() {
-        #expect(BrainTheme.cornerRadiusSM < BrainTheme.cornerRadiusMD)
-        #expect(BrainTheme.cornerRadiusMD < BrainTheme.cornerRadiusLG)
-        #expect(BrainTheme.cornerRadiusLG < BrainTheme.cornerRadiusFull)
+        #expect(BrainTheme.Radius.sm < BrainTheme.Radius.md)
+        #expect(BrainTheme.Radius.md < BrainTheme.Radius.lg)
+        #expect(BrainTheme.Radius.lg < BrainTheme.Radius.xl)
     }
 
-    @Test("Capsule radius is large enough for full rounding")
-    func capsuleRadiusIsLarge() {
-        #expect(BrainTheme.cornerRadiusFull >= 50, "Capsule radius should be large enough to create pill shapes")
+    @Test("Top-level radius constants match the nested namespace")
+    func topLevelRadiiMatch() {
+        #expect(BrainTheme.cornerRadiusMD == BrainTheme.Radius.md)
+        #expect(BrainTheme.cornerRadiusLG == BrainTheme.Radius.lg)
     }
 
-    @Test("Specific corner radius values match design spec")
-    func cornerRadiusValues() {
-        #expect(BrainTheme.cornerRadiusSM == 8)
-        #expect(BrainTheme.cornerRadiusMD == 12)
-        #expect(BrainTheme.cornerRadiusLG == 16)
-        #expect(BrainTheme.cornerRadiusFull == 100)
-    }
-}
-
-// MARK: - BrainTheme Card Padding Tests
-
-@Suite("BrainTheme Card Padding")
-struct BrainThemeCardPaddingTests {
-
-    @Test("Card padding has positive values on all edges")
-    func cardPaddingPositive() {
-        let padding = BrainTheme.cardPadding
-        #expect(padding.top > 0)
-        #expect(padding.leading > 0)
-        #expect(padding.bottom > 0)
-        #expect(padding.trailing > 0)
-    }
-
-    @Test("Card padding is symmetric vertically and horizontally")
-    func cardPaddingSymmetric() {
-        let padding = BrainTheme.cardPadding
-        #expect(padding.top == padding.bottom, "Vertical padding should be symmetric")
-        #expect(padding.leading == padding.trailing, "Horizontal padding should be symmetric")
+    @Test("Card radius sits between md and lg")
+    func cardRadiusBetween() {
+        #expect(BrainTheme.Radius.card >= BrainTheme.Radius.md)
+        #expect(BrainTheme.Radius.card <= BrainTheme.Radius.lg)
     }
 }
 
-// MARK: - BrainTheme Static Color Properties Tests
+// MARK: - Semantic Colors
 
-@Suite("BrainTheme Static Colors")
-struct BrainThemeStaticColorTests {
+@Suite("BrainTheme Semantic Colors")
+struct BrainThemeSemanticColorTests {
 
     @Test("Destructive color is red")
     func destructiveIsRed() {
-        #expect(BrainTheme.destructive == Color.red)
+        #expect(BrainTheme.Colors.destructive == Color.red)
     }
 
     @Test("Success color is green")
     func successIsGreen() {
-        #expect(BrainTheme.success == Color.green)
+        #expect(BrainTheme.Colors.success == Color.green)
     }
 
-    @Test("Secondary text color is Color.secondary")
-    func secondaryTextIsSecondary() {
-        #expect(BrainTheme.secondaryText == Color.secondary)
+    @Test("Warning color is orange")
+    func warningIsOrange() {
+        #expect(BrainTheme.Colors.warning == Color.orange)
+    }
+
+    @Test("Error equals destructive")
+    func errorEqualsDestructive() {
+        #expect(BrainTheme.Colors.error == BrainTheme.Colors.destructive)
+    }
+}
+
+// MARK: - Greeting
+
+@Suite("BrainTheme Greeting")
+struct BrainThemeGreetingTests {
+
+    @Test("Greeting is never empty")
+    func greetingNotEmpty() {
+        #expect(!BrainTheme.greeting().isEmpty)
     }
 }

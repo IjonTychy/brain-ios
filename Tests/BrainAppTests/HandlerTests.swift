@@ -20,7 +20,8 @@ final class AppMockDataProvider: DataProviding, @unchecked Sendable {
 
     var stubbedEntry: Entry?
     var stubbedEntries: [Entry] = []
-    var stubbedTags: [Tag] = []
+    // BrainCore.Tag — unqualified "Tag" is ambiguous with Testing.Tag
+    var stubbedTags: [BrainCore.Tag] = []
     var stubbedSkills: [Skill] = []
 
     private var nextEntryId: Int64 = 1
@@ -77,7 +78,8 @@ final class AppMockDataProvider: DataProviding, @unchecked Sendable {
     }
 
     func createLink(sourceId: Int64, targetId: Int64, relation: String) throws -> Link {
-        Link(id: 1, sourceId: sourceId, targetId: targetId, relation: relation)
+        Link(id: 1, sourceId: sourceId, targetId: targetId,
+             relation: LinkRelation(rawValue: relation) ?? .related)
     }
 
     func deleteLink(sourceId: Int64, targetId: Int64) throws {}
@@ -91,8 +93,8 @@ final class AppMockDataProvider: DataProviding, @unchecked Sendable {
         removedTags.append((entryId: entryId, tagName: tagName))
     }
 
-    func listTags() throws -> [Tag] { stubbedTags }
-    func tagCounts() throws -> [(tag: Tag, count: Int)] { stubbedTags.map { ($0, 5) } }
+    func listTags() throws -> [BrainCore.Tag] { stubbedTags }
+    func tagCounts() throws -> [(tag: BrainCore.Tag, count: Int)] { stubbedTags.map { ($0, 5) } }
     func autocomplete(prefix: String, limit: Int) throws -> [Entry] {
         stubbedEntries.filter { ($0.title ?? "").hasPrefix(prefix) }
     }
@@ -317,7 +319,7 @@ struct TagAddHandlerTests {
         _ = try await handler.execute(
             properties: [
                 "entryId": .int(1),
-                "tagName": .string("important"),
+                "tag": .string("important"),
             ],
             context: ExpressionContext()
         )
@@ -349,7 +351,8 @@ struct KnowledgeSaveHandlerTests {
         #expect(mock.savedFacts.first?.object == "Coffee")
 
         if case .value(let val) = result, case .object(let dict) = val {
-            #expect(dict["status"] == .string("saved"))
+            #expect(dict["subject"] == .string("User"))
+            #expect(dict["id"] == .int(1))
         } else {
             Issue.record("Expected .value(.object(...))")
         }
@@ -390,15 +393,15 @@ struct AISummarizeHandlerTests {
         let handler = AISummarizeHandler(data: mock)
 
         let result = try await handler.execute(
-            properties: ["id": .int(1)],
+            properties: ["entryId": .int(1)],
             context: ExpressionContext()
         )
 
-        // MockLLMProvider returns "Mock response"
-        if case .value(let val) = result, case .object(let dict) = val {
-            #expect(dict["summary"] == .string("Mock response"))
+        // MockLLMProvider returns "Mock response"; ai.summarize yields plain text
+        if case .value(let val) = result, case .string(let summary) = val {
+            #expect(summary == "Mock response")
         } else {
-            Issue.record("Expected .value(.object(...))")
+            Issue.record("Expected .value(.string(...))")
         }
     }
 
@@ -408,7 +411,7 @@ struct AISummarizeHandlerTests {
         let handler = AISummarizeHandler(data: mock)
 
         let result = try await handler.execute(
-            properties: ["id": .int(999)],
+            properties: ["entryId": .int(999)],
             context: ExpressionContext()
         )
 
@@ -450,6 +453,134 @@ struct LLMCompleteHandlerTests {
             // Expected
         } else {
             Issue.record("Expected .error for missing prompt")
+        }
+    }
+}
+
+// MARK: - SkillCreateHandler actions_json validation
+
+@Suite("SkillCreateHandler actions_json Validation")
+struct SkillCreateActionsValidationTests {
+
+    private static let markdown = """
+    ---
+    id: test-skill
+    name: Test Skill
+    description: Testet actions_json Validierung
+    version: '1.0'
+    ---
+
+    # Test Skill
+    """
+
+    private static let screensJSON = """
+    {"main":{"type":"stack","properties":{"direction":"vertical"},"children":[]}}
+    """
+
+    @MainActor private func makeHandler() throws -> SkillCreateHandler {
+        let mock = try AppMockDataProvider()
+        let handler = SkillCreateHandler(data: mock)
+        handler.knownActionTypes = Set(["entry.create", "toast", "navigate.to"])
+            .union(LogicInterpreter.logicStepTypes)
+        return handler
+    }
+
+    @Test("Rejects actions_json with unknown action types")
+    @MainActor func rejectsUnknownActionTypes() async throws {
+        let handler = try makeHandler()
+
+        let actionsJSON = """
+        {"boom":{"steps":[{"type":"entry.explode","properties":{}}]}}
+        """
+        let result = try await handler.execute(
+            properties: [
+                "markdown": .string(Self.markdown),
+                "screens_json": .string(Self.screensJSON),
+                "actions_json": .string(actionsJSON),
+            ],
+            context: ExpressionContext()
+        )
+
+        if case .error(let message) = result {
+            #expect(message.contains("entry.explode"))
+            #expect(message.contains("unbekannte Action-Typen"))
+        } else {
+            Issue.record("Expected .error for unknown action type")
+        }
+    }
+
+    @Test("Rejects unknown types nested inside logic steps")
+    @MainActor func rejectsNestedUnknownTypes() async throws {
+        let handler = try makeHandler()
+
+        let actionsJSON = """
+        {"run":{"steps":[{"type":"if","properties":{
+            "condition":"count > 0",
+            "then":[{"type":"entry.vanish","properties":{}}]
+        }}]}}
+        """
+        let result = try await handler.execute(
+            properties: [
+                "markdown": .string(Self.markdown),
+                "screens_json": .string(Self.screensJSON),
+                "actions_json": .string(actionsJSON),
+            ],
+            context: ExpressionContext()
+        )
+
+        if case .error(let message) = result {
+            #expect(message.contains("entry.vanish"))
+        } else {
+            Issue.record("Expected .error for nested unknown action type")
+        }
+    }
+
+    @Test("Accepts actions_json using registered handlers and logic primitives")
+    @MainActor func acceptsValidActions() async throws {
+        let handler = try makeHandler()
+
+        let actionsJSON = """
+        {"add":{"steps":[
+            {"type":"set","properties":{"name":"title","value":"Neu"}},
+            {"type":"entry.create","properties":{"title":"{{title}}","entryType":"task"}},
+            {"type":"toast","properties":{"message":"Gespeichert"}}
+        ]}}
+        """
+        let result = try await handler.execute(
+            properties: [
+                "markdown": .string(Self.markdown),
+                "screens_json": .string(Self.screensJSON),
+                "actions_json": .string(actionsJSON),
+            ],
+            context: ExpressionContext()
+        )
+
+        if case .value(let val) = result, case .object(let obj) = val {
+            #expect(obj["id"] == .string("test-skill"))
+        } else {
+            Issue.record("Expected successful install, got \(result)")
+        }
+    }
+
+    @Test("Skips semantic validation when catalog is empty")
+    @MainActor func skipsValidationWithoutCatalog() async throws {
+        let mock = try AppMockDataProvider()
+        let handler = SkillCreateHandler(data: mock)  // knownActionTypes stays empty
+
+        let actionsJSON = """
+        {"boom":{"steps":[{"type":"entry.explode","properties":{}}]}}
+        """
+        let result = try await handler.execute(
+            properties: [
+                "markdown": .string(Self.markdown),
+                "screens_json": .string(Self.screensJSON),
+                "actions_json": .string(actionsJSON),
+            ],
+            context: ExpressionContext()
+        )
+
+        if case .error(let message) = result {
+            #expect(!message.contains("unbekannte Action-Typen"))
         }
     }
 }

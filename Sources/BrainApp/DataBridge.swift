@@ -517,7 +517,16 @@ final class DataBridge {
         let selectedModel = UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
 
         if selectedModel == "on-device" {
-            return OnDeviceProvider()
+            // Availability decides which on-device backend serves the request:
+            // Apple Foundation Models first, then the best downloaded GGUF
+            // model (Gemma). Falls back to the Apple provider's own error
+            // path when neither is usable.
+            let apple = OnDeviceProvider()
+            if apple.isAvailable { return apple }
+            if let gemma = GemmaProvider.bestAvailable(), gemma.isAvailable {
+                return gemma
+            }
+            return apple
         }
 
         if selectedModel.hasPrefix("gemini") {

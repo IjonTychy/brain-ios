@@ -428,59 +428,70 @@ Swift-Handler, der via JSON-Konfiguration aufgerufen wird.
 Die Logic Engine interpretiert Bedingungen, Schleifen und Transformationen.
 Sie ist bewusst **eingeschränkt** (kein Turing-komplett) um App-Store-konform zu bleiben.
 
-| Primitive | Beschreibung | Beispiel |
-|-----------|-------------|---------|
-| `if` | Bedingung | `{"if": "{{count > 0}}", "then": [...], "else": [...]}` |
-| `forEach` | Über Collection iterieren | `{"forEach": "{{items}}", "as": "item", "do": [...]}` |
-| `map` | Collection transformieren | `{"map": "{{items}}", "to": "{{item.name}}"}` |
-| `filter` | Collection filtern | `{"filter": "{{items}}", "where": "{{item.done == false}}"}` |
-| `set` | Variable setzen | `{"set": "count", "value": "{{items.length}}"}` |
-| `template` | String-Interpolation | `"Hallo {{user.name}}, du hast {{count}} Einträge"` |
-| `math` | Arithmetik | `{{price * quantity}}` |
-| `date` | Datum berechnen | `{{now + 7d}}`, `{{entry.date \| relative}}` |
-| `compare` | Vergleich | `==`, `!=`, `<`, `>`, `contains`, `matches` |
-| `and/or/not` | Boolesche Logik | `{"and": [cond1, cond2]}` |
-| `try` | Fehlerbehandlung | `{"try": [...], "catch": {"action": "toast", "message": "Fehler"}}` |
-| `delay` | Verzögerung | `{"delay": "500ms", "then": [...]}` |
-| `sequence` | Sequenzielle Ausführung | `{"sequence": [step1, step2, step3]}` |
-| `parallel` | Parallele Ausführung | `{"parallel": [task1, task2]}` |
-| `query` | DB-Abfrage | `{{query('entries', {type: 'task', status: 'open'})}}` |
-| `compute` | Berechnete Werte | `{{compute('streak', {type: 'habit-log'})}}` |
-| `format` | Formatierung | `{{value \| currency('CHF')}}`, `{{date \| short}}` |
+Alle Logic-Steps werden als `{"type": "<primitive>", "properties": {...}}` notiert.
+Implementierte Step-Primitives (LogicInterpreter):
+
+| Primitive | Beschreibung | Properties |
+|-----------|-------------|------------|
+| `if` | Bedingung | `condition` (Expression), `then` (Steps), `else` (Steps, optional) |
+| `forEach` | Über Collection iterieren | `data` (Expression → Array), `as` (Variablenname), `do` (Steps) |
+| `map` | Collection transformieren | `data` (Expression → Array), `to` (Expression pro `item`) |
+| `filter` | Collection filtern | `data` (Expression → Array), `where` (Bedingung pro `item`) |
+| `set` | Variable setzen | `name` + `value` — reine `{{expr}}` behalten ihren Typ, gemischte Templates ("Hallo {{name}}!") werden interpoliert |
+| `try` | Fehlerbehandlung | `steps` (Steps), `catch` (Steps; `error`-Variable verfügbar) |
+| `delay` | Verzögerung (max 10s) | `ms` (Int), `then` (Steps) |
+| `sequence` | Sequenzielle Ausführung | `steps` (Steps) |
+| `parallel` | Parallele Ausführung | `steps` (Steps) |
+
+Vergleiche, boolesche Logik (`and`/`or`/`not`), `contains`/`matches`, Arithmetik,
+Datums-Mathematik und Formatierung sind Teil der **Expression-Sprache** (siehe
+naechster Abschnitt) und werden in Bedingungen/Werten verwendet — nicht als
+eigene Step-Typen.
 
 ### Expressions — Template-Sprache
 
-Die Template-Sprache in `{{...}}` unterstützt:
+Die Template-Sprache in `{{...}}` (implementiert in `ExpressionParser`,
+Stand 04.07.2026 — dieses Kapitel beschreibt das reale Vokabular):
 
 ```
-# Variablen
-{{user.name}}
+# Variablen & Pfade
+{{profile.name}}
 {{params.id}}
 {{item.title}}
-
-# Pfade
-{{items[0].name}}
+{{items[0].name}}            → Array-Indexing, auch verschachtelt: matrix[1][0]
 {{settings.theme.primary}}
 
-# Operatoren
-{{count + 1}}
+# Operatoren (brauchen Leerzeichen: "a == b", nicht "a==b")
+{{count + 1}}                → Arithmetik: + - * /
 {{price * 1.077}}
-{{name == "Andy"}}
-{{tags contains "wichtig"}}
+{{name == "Max"}}            → Vergleiche: == != >= <= > <
+{{tags contains "wichtig"}}  → Array-Element, String-Substring oder Object-Key
+{{title matches "^Re:"}}     → Regex-Suche im String
+{{a and b}}, {{a or b}}      → Boolesche Logik (Aliasse: && ||)
+{{not done}}                 → Negation (Praefix)
+
+# Datum & Zeit
+{{now}}                      → aktueller Zeitstempel (DB-Format, UTC)
+{{now + 7d}}                 → Datums-Arithmetik; Dauern: 30s 5m 2h 7d 1w
+{{entry.date - 2h}}
 
 # Pipe-Filter
-{{date | relative}}          → "vor 3 Stunden"
+{{date | relative}}          → "vor 3 Stunden" / "in 2 Tagen"
 {{amount | currency('CHF')}} → "CHF 1'234.50"
 {{text | truncate(100)}}     → "Erster Satz..."
-{{list | count}}             → 42
-{{text | uppercase}}
+{{list | count}}             → 42 (Alias: length)
+{{text | uppercase}}, {{text | lowercase}}
 {{date | format('dd.MM.yyyy')}}
-
-# Funktionen
-{{now}}                      → aktuelles Datum
-{{query('entries', filter)}} → DB-Abfrage
-{{compute('streak', params)}} → berechneter Wert
+{{date | short}}             → "05.01.2026"
+{{flag | not}}
 ```
+
+**Hinweise:**
+- Reservierte Variablennamen (nicht per `set` belegbar): `system`, `context`,
+  `result`, `input`, `output`, `env`, `config`, `settings`, `admin`, `root`, `user`.
+- `query(...)`/`compute(...)`-Funktionsaufrufe sind NICHT Teil der
+  Expression-Sprache — Daten kommen als Variablen aus dem Skill-Kontext
+  (z.B. via `entry.list`-Actions oder Screen-Daten-Bindings).
 
 ---
 
@@ -629,6 +640,8 @@ class OpenAIProvider: LLMProvider { ... }            // GPT + o-Serie
 class GeminiProvider: LLMProvider { ... }            // Gemini (API-Key + Google OAuth)
 class OpenAICompatibleProvider: LLMProvider { ... }  // xAI + Custom Endpoints
 class OnDeviceProvider: LLMProvider { ... }          // On-Device / Apple Foundation Models
+class GemmaProvider: LLMProvider { ... }             // On-Device / GGUF (Gemma 4) via llama.cpp
+                                                     // — aktivierbar, siehe docs/ON-DEVICE-MODELS.md
 
 // Bewusst entfernt
 // Anthropic Max / Session-Key Modus
@@ -636,7 +649,6 @@ class OnDeviceProvider: LLMProvider { ... }          // On-Device / Apple Founda
 // Geplant (nicht implementiert)
 class OllamaProvider: LLMProvider { ... }
 class MLXProvider: LLMProvider { ... }
-class LlamaCppProvider: LLMProvider { ... }
 ```
 
 ### Routing-Logik
@@ -651,8 +663,17 @@ class LlamaCppProvider: LLMProvider { ... }
 
 ### On-Device LLM
 
-**Heute (2026):** MLX Swift mit Llama 3.2 3B oder Phi-3 Mini. ~10-30 tokens/sec
-auf A17/M-Chips. Gut für: Zusammenfassungen, Tagging, einfache Fragen, Klassifizierung.
+**Heute (Stand 04.07.2026):** Zwei Backends, Auswahl rein nach Verfügbarkeit
+(nichts hardcoded — siehe docs/ON-DEVICE-MODELS.md):
+
+1. **Apple Foundation Models** (iOS 26+, unterstützte Hardware)
+2. **Gemma 4 E2B/E4B** (Q4-GGUF, ~1.3/2.5 GB, Download nach Bedarf) via
+   llama.cpp — Katalog und Modell-URLs sind zur Laufzeit erweiterbar,
+   neue Modelle brauchen kein App-Update. Inferenz wird durch Hinzufuegen
+   des llama.cpp-Packages in Xcode aktiviert.
+
+Gut für: Zusammenfassungen, Tagging, einfache Fragen, Klassifizierung, Chat
+ohne Tools. Kein Tool-Use/Streaming auf On-Device (ToolLessProviderAdapter).
 
 **Morgen (2027+):** Grössere Modelle, bessere Quantisierung, Apple Intelligence API.
 Der LLM Router wählt automatisch das beste verfügbare Modell.
