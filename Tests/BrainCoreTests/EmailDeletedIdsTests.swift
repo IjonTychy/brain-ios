@@ -60,8 +60,8 @@ struct EmailDeletedIdsTests {
         #expect(columnNames.contains("deletedAt"))
     }
 
-    @Test("messageId is the primary key")
-    func messageIdIsPrimaryKey() throws {
+    @Test("(messageId, accountId) is the composite primary key")
+    func compositePrimaryKey() throws {
         let db = try makeDB()
 
         let pkColumns = try db.pool.read { conn -> [String] in
@@ -72,7 +72,9 @@ struct EmailDeletedIdsTests {
             }
         }
 
-        #expect(pkColumns == ["messageId"])
+        // Composite PK: the same message can be tombstoned independently
+        // per account (v13 migration).
+        #expect(pkColumns == ["messageId", "accountId"])
     }
 
     // MARK: - Basic CRUD
@@ -136,15 +138,15 @@ struct EmailDeletedIdsTests {
 
     // MARK: - Duplicate handling
 
-    @Test("INSERT OR IGNORE silently ignores duplicate messageId")
+    @Test("INSERT OR IGNORE silently ignores duplicate (messageId, accountId)")
     func insertOrIgnoreDuplicate() throws {
         let db = try makeDB()
 
         // First insertion succeeds
         try recordDeletion(db, messageId: "<dup@example.com>", accountId: "acc-1")
 
-        // Second insertion with same messageId must not throw
-        try recordDeletion(db, messageId: "<dup@example.com>", accountId: "acc-2")
+        // Second insertion with the same composite key must not throw
+        try recordDeletion(db, messageId: "<dup@example.com>", accountId: "acc-1")
 
         // Only one row should exist
         let count = try db.pool.read { conn in
@@ -157,22 +159,31 @@ struct EmailDeletedIdsTests {
         #expect(count == 1)
     }
 
-    @Test("INSERT OR IGNORE preserves original accountId on duplicate")
+    @Test("INSERT OR IGNORE preserves original deletedAt on duplicate")
     func insertOrIgnorePreservesOriginal() throws {
         let db = try makeDB()
 
-        try recordDeletion(db, messageId: "<preserve@example.com>", accountId: "original-account")
-        try recordDeletion(db, messageId: "<preserve@example.com>", accountId: "new-account")
-
-        let row = try db.pool.read { conn in
-            try Row.fetchOne(conn, sql: """
-                SELECT accountId FROM emailDeletedIds WHERE messageId = ?
+        try recordDeletion(db, messageId: "<preserve@example.com>", accountId: "acc-1")
+        let original = try db.pool.read { conn in
+            try String.fetchOne(conn, sql: """
+                SELECT deletedAt FROM emailDeletedIds
+                WHERE messageId = ? AND accountId = ?
                 """,
-                arguments: ["<preserve@example.com>"])
+                arguments: ["<preserve@example.com>", "acc-1"])
         }
 
-        let fetched = try #require(row)
-        #expect((fetched["accountId"] as? String) == "original-account")
+        // Duplicate composite key is ignored — the original row survives untouched
+        try recordDeletion(db, messageId: "<preserve@example.com>", accountId: "acc-1")
+        let afterDuplicate = try db.pool.read { conn in
+            try String.fetchOne(conn, sql: """
+                SELECT deletedAt FROM emailDeletedIds
+                WHERE messageId = ? AND accountId = ?
+                """,
+                arguments: ["<preserve@example.com>", "acc-1"])
+        }
+
+        #expect(original != nil)
+        #expect(afterDuplicate == original)
     }
 
     @Test("Inserting same messageId many times keeps exactly one row")

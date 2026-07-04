@@ -34,7 +34,7 @@ Bei **jedem Commit** muessen folgende Dokumentationen aktualisiert werden:
 3. **ARCHITECTURE.md**: NUR wenn architektonische Aenderungen gemacht wurden
 
 Bei **jedem Push** zusaetzlich:
-4. Pruefen ob Build-Nummer in project.pbxproj erhoeht werden muss (Xcode Cloud triggered bei push auf master)
+4. Pruefen ob Build-Nummer in project.pbxproj erhoeht werden muss (Xcode Cloud triggered bei push auf main)
 
 ## Build & Test
 
@@ -61,8 +61,8 @@ Deployment läuft über **Xcode Cloud** → **TestFlight**. Kein manuelles Signi
 
 ```bash
 # Build-Nummer erhöhen (im Xcode-Projekt oder via Script)
-# Push zu master → Xcode Cloud baut automatisch → TestFlight
-git push origin master
+# Push zu main → Xcode Cloud baut automatisch → TestFlight
+git push origin main
 ```
 
 **Bei Deployment-Fragen, Build-Fehlern oder TestFlight-Builds:** Der installierte
@@ -81,9 +81,9 @@ den gesamten Xcode Cloud Setup-Prozess und alle gelösten Build-Probleme (51+ Bu
 
 ## Git Remote
 
-- **Repo:** IjonTychy/brain-ios (Private)
-- **Branch:** master
-- **Push:** `git push origin master`
+- **Repo:** IjonTychy/brain-ios (Public seit 28.03.2026, Unlicense)
+- **Branch:** main (seit Public Release; vorher master)
+- **Push:** `git push origin main`
 
 Sicherheitsregel: Der PAT wird ausschliesslich via `$GITHUB_TOKEN` oder
 `~/.git-credentials` konfiguriert. Nie in Dokumenten, Commits oder Agent-Outputs.
@@ -99,7 +99,7 @@ Das Projekt existiert an mehreren Orten:
 | **Lokal (Repo)** | `André/Claude/brain-ios/` | Git Clone |
 | **Lokal (Backup)** | `2nd Brain/brain-ios-backup/` | Disaster Recovery |
 
-Nach Commits: `git push origin master`, dann auf VPS und Backup jeweils `git pull`.
+Nach Commits: `git push origin main`, dann auf VPS und Backup jeweils `git pull`.
 
 ## Code-Konventionen
 
@@ -235,28 +235,44 @@ Diese Skills sind in Andys Claude Desktop-App installiert und stehen in jeder Se
 
 ## Current Objective
 
-**Update 26.03.2026:** Contacts-Crash (CNContactFormatter Descriptor), Settings UI
-(Advanced-Toggle entfernt, Proxy nach oben), Dashboard Aufgaben-Tile (goToSearch),
-System Prompt Skill-Creator Hint verstaerkt. SSH Keepalive auf VPS konfiguriert.
-Offen: Mail-Sync (geloeschte Mails kehren zurueck), Skills-Qualitaet (actions_json),
-OAuth nicht auf Device getestet.
+**Update 04.07.2026 (Wiederaufnahme nach Public Release):** CI repariert
+(Trigger main + claude/**, pipefail, libsqlite3-dev), 2 rote Test-Assertions
+gefixt, Expression-Sprache auf das dokumentierte Vokabular ausgebaut
+(and/or/not, contains, matches, Array-Indexing, Datums-Mathematik,
+Filter mit Argumenten), executeSet-Template-Bug behoben, actions_json wird
+jetzt semantisch gegen den Handler-Katalog validiert, StoreKit-Trial in
+Keychain gehaertet, Gemma-4-On-Device-Backend (Katalog + Download + Provider)
+integriert, GRDB auf 7.11.1 (Linux-Fixes). Details: SESSION-LOG 04.07.2026.
 
-### Aktueller Snapshot (26.03.2026)
+### Aktueller Snapshot (04.07.2026)
 
 Bei Konflikten gilt dieser Snapshot vor aelteren Zahlen in diesem Dokument.
 
-- **Runtime-Status:** Contacts-Crash (CNContactFormatter) behoben, Settings UI vereinfacht
-  (kein Advanced-Toggle mehr, Proxy oben), Dashboard Aufgaben-Tile navigiert korrekt (goToSearch).
-  System Prompt Skill-Creator Hint verstaerkt.
-- **Datenhaltung:** App, Widgets, Share Extension und App Intents greifen jetzt ueber
+- **Repo-Status:** Public Release 28.03.2026 (Unlicense): Historie gesquasht
+  (2 Commits + neue Arbeit), Default-Branch `main`, alle Identifier anonymisiert
+  (`com.example.brain-ios`) — fuer TestFlight/Device-Deploy muessen echte
+  Bundle-IDs/App-Group/iCloud-Container wiederhergestellt werden.
+- **CI:** GitHub Actions laufen wieder (main + claude/** Branches). Linux-Job
+  baut BrainCore erstmals nachweisbar; iOS-Job nutzt neuestes Xcode +
+  dynamische Simulator-Wahl. pipefail aktiv — keine maskierten Fehler mehr.
+- **Engine:** ExpressionParser implementiert das in ARCHITECTURE.md
+  dokumentierte Vokabular vollstaendig. skill.create validiert actions_json
+  semantisch (wahrscheinliche Root Cause des Skill-Qualitaetsproblems behoben).
+- **On-Device:** Apple Foundation Models + Gemma 4 E2B/E4B (GGUF-Katalog,
+  Download nach Bedarf). Gemma-Inferenz benoetigt einmalig das
+  llama.cpp-Package in Xcode (docs/ON-DEVICE-MODELS.md).
+- **Datenhaltung:** App, Widgets, Share Extension und App Intents greifen ueber
   `SharedContainer` auf dieselbe SQLite-Datei im App-Group-Container zu.
-- **LLM-Stack:** Anthropic, OpenAI, Gemini, On-Device sowie xAI/custom ueber
-  `OpenAICompatibleProvider`. Kein Anthropic-Max/Session-Token-Modus mehr.
-- **Verifizierte Repo-Metriken:** 502 Commits, 215 getrackte Swift-Dateien,
-  579 `@Test(...)`-Marker und 6 gebuendelte `.brainskill.md`-Dateien.
-- **Infrastruktur:** SSH Keepalive auf VPS (ClientAliveInterval 60, ClientAliveCountMax 10)
-  fuer stabile MacVM-Verbindung.
-- **Offene Baustellen:** Mail-Sync (Delete), Skills actions_json Qualitaet, OAuth Device-Test.
+- **LLM-Stack:** Anthropic, OpenAI, Gemini, On-Device (Apple + Gemma) sowie
+  xAI/custom ueber `OpenAICompatibleProvider`.
+- **Verifizierte Repo-Metriken (03.07.):** 216 getrackte Swift-Dateien,
+  ~53'400 LOC, 590 `@Test`-Funktionen, 6 gebuendelte `.brainskill.md`.
+- **Erledigt (Doku war veraltet):** Mail-Delete-Sync (Tombstones + IMAP-Expunge)
+  und StoreKit (StoreKit 2, Trial + Einmalkauf) sind implementiert.
+- **Offene Baustellen:** Echte Bundle-IDs wiederherstellen, llama.cpp-Package
+  aktivieren, Device-Verifikation (OAuth, Runtime-Fixes, Gemma), God Objects
+  wieder splitten (OnboardingView 1255 Z., MailTabView 1193 Z.), LLMRouter
+  ist nicht verdrahtet (setRouter wird nie aufgerufen).
 
 **Historischer Snapshot 23.03.2026:** App ist funktional, TestFlight aktiv, 540+ Tests grün.
 Google OAuth, Multi-Provider (7 LLM Provider), modularer System-Prompt.
@@ -282,20 +298,20 @@ Grosse Dateien aufgeteilt (4 God Objects eliminiert), ~960 Zeilen Dead Code/Dupl
 | **App Store Description** | Vorhanden in docs/APP-STORE-METADATA.md |
 | **PrivacyInfo.xcprivacy** | Vorhanden |
 | **Screenshots** | Ausstehend (Marketing) |
-| **StoreKit** | Ausstehend (30-Tage-Trial + CHF 49.- Einmalkauf) |
+| **StoreKit** | Implementiert (StoreKit 2: 30-Tage-Trial in Keychain + Einmalkauf, PaywallView); Produkt-Konfiguration in App Store Connect ausstehend |
 
-### Aktuelle Prioritaeten (26.03.2026)
+### Aktuelle Prioritaeten (04.07.2026)
 
 | Priorität | Thema | Beschreibung |
 |-----------|-------|-------------|
-| **Hoch** | Mail Sync Fix | Geloeschte Mails kehren nach Sync zurueck -- Delete-Flag korrekt propagieren |
-| **Hoch** | Skills Qualitaet | actions_json wird nicht zuverlaessig generiert -- Beispiele/Schema verbessern |
-| **Hoch** | StoreKit Integration | 30-Tage-Trial + Non-Consumable IAP CHF 49.- |
-| **Mittel** | OAuth Device-Test | Google OAuth auf physischem iPhone/iPad verifizieren |
-| **Mittel** | Frontend-Overhaul vertiefen | BrainTheme systematisch auf alle produktiven Views ausrollen |
-| **Mittel** | Screenshots | App Store Screenshots erstellen |
-| **Niedrig** | CloudKit Sync | Family & Sync Infrastruktur bei Bedarf aktivieren |
-| **Niedrig** | Vision Pro | 3D Knowledge Graph, Multi-Window fertigstellen |
+| **Hoch** | Deploy-Faehigkeit | Echte Bundle-IDs/App-Group/iCloud-Container wiederherstellen (Public-Release-Anonymisierung rueckgaengig fuer den privaten Build), Xcode Cloud reaktivieren |
+| **Hoch** | CI vollstaendig gruen | BrainCore-Linux + iOS-Build auf main stabil halten (Feedback-Loop etabliert 04.07.) |
+| **Mittel** | Gemma aktivieren | llama.cpp-Package in Xcode hinzufuegen (docs/ON-DEVICE-MODELS.md), auf Device verifizieren |
+| **Mittel** | Device-Verifikation | OAuth, Runtime-Fixes vom Maerz, Skill-Erstellung mit neuem Expression-Vokabular |
+| **Mittel** | God Objects splitten | OnboardingView (1255 Z.), MailTabView (1193 Z.), EmailBridge (1045 Z.), SkillManagerView (876 Z.) |
+| **Mittel** | LLMRouter verdrahten | setRouter wird nie aufgerufen — Routing-Entscheidungsbaum ist toter Code |
+| **Niedrig** | Screenshots | App Store Screenshots erstellen |
+| **Niedrig** | CloudKit Sync / Vision Pro | Bei Bedarf aktivieren bzw. fertigstellen |
 
 Siehe SESSION-LOG für letzten Stand und offene Punkte.
 
@@ -343,7 +359,14 @@ Siehe SESSION-LOG für letzten Stand und offene Punkte.
 - **Primitive-Luecke:** Wenn ein Skill ein Action Primitive braucht das nicht existiert, braucht es
   ein App-Update.
 - **64 Notification Limit:** Reschedule-on-Launch Pattern.
-- **StoreKit noch nicht implementiert:** 30-Tage-Trial + CHF 49.- Einmalkauf geplant.
+- **Anonymisierte Identifier:** Seit dem Public Release stehen ueberall
+  `com.example.brain-ios`-Platzhalter (Bundle-IDs, App Group, iCloud, BGTasks) —
+  ohne Wiederherstellung echter IDs kein TestFlight/Device-Deploy.
+- **Gemma-Inferenz noch nicht aktiv:** Provider/Katalog/Downloads sind eingebaut;
+  das llama.cpp-Package muss einmalig in Xcode hinzugefuegt und auf einem Geraet
+  verifiziert werden (docs/ON-DEVICE-MODELS.md).
+- **LLMRouter nicht verdrahtet:** `ChatService.setRouter` wird nie aufgerufen —
+  der Routing-Entscheidungsbaum laeuft nicht.
 - **Google OAuth braucht User-Setup:** PKCE Flow, Token-Refresh und Keychain-Storage sind
   implementiert; die Client-ID muss weiterhin vom User in Google Cloud Console erstellt werden.
 - **brain-api abgeschaltet:** VPS-Backend nicht mehr aktiv. Backup unter

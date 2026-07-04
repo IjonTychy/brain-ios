@@ -665,6 +665,7 @@
 			packageProductDependencies = (
 				A1000080 /* BrainCore */,
 				E1000080 /* SwiftMail */,
+				G1000081 /* GRDB */,
 			);
 			productName = BrainApp;
 			productReference = A1000001 /* BrainApp.app */;
@@ -703,6 +704,7 @@
 			name = BrainWidgets;
 			packageProductDependencies = (
 				D1000080 /* BrainCore */,
+				G1000082 /* GRDB */,
 			);
 			productName = BrainWidgets;
 			productReference = D1000001 /* BrainWidgets.appex */;
@@ -723,6 +725,7 @@
 			name = BrainAppTests;
 			packageProductDependencies = (
 				T1000080 /* BrainCore */,
+				G1000083 /* GRDB */,
 			);
 			productName = BrainAppTests;
 			productReference = T1000001 /* BrainAppTests.xctest */;
@@ -752,6 +755,7 @@
 			packageReferences = (
 				A1000090 /* XCLocalSwiftPackageReference "." */,
 				E1000090 /* XCRemoteSwiftPackageReference "SwiftMail" */,
+				G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
 			productRefGroup = A1000031 /* Products */;
 			projectDirPath = "";
@@ -1318,6 +1322,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 		E1000090 /* XCRemoteSwiftPackageReference "SwiftMail" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Cocoanetics/SwiftMail.git";
@@ -1336,6 +1348,21 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		G1000081 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+		G1000082 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+		G1000083 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = G1000090 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
 		A1000080 /* BrainCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A1000090 /* XCLocalSwiftPackageReference "." */;
