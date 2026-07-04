@@ -78,7 +78,8 @@ final class AppMockDataProvider: DataProviding, @unchecked Sendable {
     }
 
     func createLink(sourceId: Int64, targetId: Int64, relation: String) throws -> Link {
-        Link(id: 1, sourceId: sourceId, targetId: targetId, relation: relation)
+        Link(id: 1, sourceId: sourceId, targetId: targetId,
+             relation: LinkRelation(rawValue: relation) ?? .related)
     }
 
     func deleteLink(sourceId: Int64, targetId: Int64) throws {}
