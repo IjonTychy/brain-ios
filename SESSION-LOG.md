@@ -70,14 +70,16 @@
 
 ### Tests
 
-- BrainCore (Linux, swift:6.1): **548 Tests gruen** (Commit `83209a1`, Run #5) --
+- BrainCore (Linux, swift:6.1): **548 Tests gruen** (ab Commit `83209a1`) --
   erster vollstaendig gruener Suite-Lauf der Projektgeschichte.
-- BrainAppTests (macOS/Xcode 26.3): Kompiliert bis auf Tag-Ambiguitaet (gefixt in
-  `fa83caf`); Ergebnis des Laufs siehe Systemzustand.
+- iOS Build & Test (macOS, Xcode 26.3, iPhone-Simulator): **gruen** (Commit
+  `ecbb5cd`) -- App + Widgets + Share Extension bauen, 72 BrainAppTests gruen.
+  Auf dem Weg dorthin wurden 5 weitere nie-kompilierte Altlasten gefixt
+  (Tag-Ambiguitaet mit Testing.Tag, BrainThemeTests gegen entfernte API,
+  @MainActor-Isolation, LinkRelation-Typ, 4 veraltete Handler-Erwartungen).
 
 ### Offene Probleme
 
-- iOS-Workflow-Ergebnis fuer `fa83caf` bei Session-Ende noch ausstehend/zu pruefen.
 - Gemma-Inferenz braucht das llama.cpp-Package (Xcode) + Device-Verifikation;
   GGUF-Download-URLs (unsloth-Mirror) beim ersten Download verifizieren.
 - Platzhalter-Identifier (`com.example.*`) blockieren weiterhin TestFlight/Device.
@@ -85,16 +87,16 @@
 
 ### Naechster Schritt
 
-- iOS-CI gruen bestaetigen, dann PR nach `main`.
+- PR nach `main` (beide Workflows gruen).
 - Echte Bundle-IDs wiederherstellen, Xcode Cloud reaktivieren.
 - llama.cpp-Package hinzufuegen und Gemma auf Device testen.
 
 ### Systemzustand
 
-- OK: BrainCore-Suite gruen auf Linux (erstmals verifiziert), CI-Loop etabliert
+- OK: **Beide CI-Workflows gruen** (Linux 548 Tests + macOS Build/72 Tests)
 - OK: Engine-Vokabular == Doku == Skill-Creator-Prompt
 - OK: Gemma-Integration code-seitig komplett (Aktivierung ausstehend)
-- Ausstehend: iOS-Testlauf-Bestaetigung, Deploy-Identifier, Device-Verifikation
+- Ausstehend: Deploy-Identifier, Device-Verifikation
 
 ---
 
