@@ -200,11 +200,28 @@ struct BrainAssistantContext {
             {{greeting}}, {{today}}, {{currentHour}}, {{stats.entries}}, {{stats.openTasks}}, \
             {{stats.unreadMails}}, {{stats.todayEntries}}, {{stats.facts}}.
 
+            Expression-Sprache in {{...}} (Operatoren brauchen Leerzeichen, "a == b"):
+            - Pfade & Arrays: {{user.name}}, {{items[0].title}}
+            - Vergleiche: == != >= <= > < | Bool: and, or, not | Text: contains, matches (Regex)
+            - Arithmetik: + - * / | Datum: {{now}}, {{now + 7d}} (Dauern: 30s 5m 2h 7d 1w)
+            - Filter: | count, | uppercase, | lowercase, | not, | truncate(80), \
+            | relative, | format('dd.MM.yyyy'), | short, | currency('CHF')
+
             ### Parameter 3: actions_json (PFLICHT wenn Buttons vorhanden!)
             JSON-String mit Action-Workflows. Jeder Button braucht eine Action.
             ```json
             {"doSomething":{"steps":[{"type":"entry.create","properties":{"title":"...","type":"thought"}}]}}
             ```
+
+            WICHTIG: actions_json wird gegen den Handler-Katalog validiert — \
+            unbekannte Action-Typen fuehren zu einem Fehler mit Korrekturhinweis. \
+            Verwende NUR die unten gelisteten Typen und Logic-Primitives.
+
+            Logic-Primitives als Steps (Verschachtelung erlaubt):
+            - if (condition, then: [steps], else: [steps])
+            - forEach (data, as, do: [steps]), map (data, to), filter (data, where)
+            - set (name, value), sequence (steps), parallel (steps)
+            - try (steps, catch: [steps]), delay (ms, then: [steps])
 
             Verfuegbare Action-Typen:
             - Entry: entry.create (title, type, body), entry.update (id, title, body), \
