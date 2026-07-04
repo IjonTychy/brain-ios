@@ -2,14 +2,14 @@ name: BrainCore Tests
 
 on:
   push:
-    branches: [master]
+    branches: [main, 'claude/**']
     paths-ignore:
       - '*.md'
       - 'docs/**'
       - '.claude/**'
       - 'Skills/**'
   pull_request:
-    branches: [master]
+    branches: [main]
     paths-ignore:
       - '*.md'
       - 'docs/**'

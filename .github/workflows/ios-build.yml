@@ -2,14 +2,14 @@ name: iOS Build & Test
 
 on:
   push:
-    branches: [master]
+    branches: [main, 'claude/**']
     paths-ignore:
       - '*.md'
       - 'docs/**'
       - '.claude/**'
       - 'Skills/**'
   pull_request:
-    branches: [master]
+    branches: [main]
     paths-ignore:
       - '*.md'
       - 'docs/**'
@@ -44,16 +44,18 @@ jobs:
 
       - name: Build for iOS Simulator
         run: |
+          set -o pipefail
           xcodebuild build \
             -scheme BrainApp \
             -project BrainApp.xcodeproj \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
-            | tail -20
+            | tail -100
 
       - name: Run BrainApp Tests
         run: |
+          set -o pipefail
           xcodebuild test \
             -scheme BrainApp \
             -project BrainApp.xcodeproj \
@@ -61,4 +63,4 @@ jobs:
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             -only-testing:BrainAppTests \
-            | tail -40
+            | tail -100
