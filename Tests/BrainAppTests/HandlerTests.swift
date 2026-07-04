@@ -20,7 +20,8 @@ final class AppMockDataProvider: DataProviding, @unchecked Sendable {
 
     var stubbedEntry: Entry?
     var stubbedEntries: [Entry] = []
-    var stubbedTags: [Tag] = []
+    // BrainCore.Tag — unqualified "Tag" is ambiguous with Testing.Tag
+    var stubbedTags: [BrainCore.Tag] = []
     var stubbedSkills: [Skill] = []
 
     private var nextEntryId: Int64 = 1
@@ -91,8 +92,8 @@ final class AppMockDataProvider: DataProviding, @unchecked Sendable {
         removedTags.append((entryId: entryId, tagName: tagName))
     }
 
-    func listTags() throws -> [Tag] { stubbedTags }
-    func tagCounts() throws -> [(tag: Tag, count: Int)] { stubbedTags.map { ($0, 5) } }
+    func listTags() throws -> [BrainCore.Tag] { stubbedTags }
+    func tagCounts() throws -> [(tag: BrainCore.Tag, count: Int)] { stubbedTags.map { ($0, 5) } }
     func autocomplete(prefix: String, limit: Int) throws -> [Entry] {
         stubbedEntries.filter { ($0.title ?? "").hasPrefix(prefix) }
     }
