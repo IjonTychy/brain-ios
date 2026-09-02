@@ -47,4 +47,15 @@ public protocol DataProviding: Sendable {
 
     // LLM
     func buildLLMProvider() async -> (any LLMProvider)?
+    // Router-backed variant: enforces the given privacy zone level (and, in
+    // the production implementation, offline routing) before returning.
+    func buildLLMProvider(privacyLevel: PrivacyLevel) async -> (any LLMProvider)?
+}
+
+// Default: fall back to the constraint-less resolver so existing conformers
+// (test mocks) keep working without changes.
+public extension DataProviding {
+    func buildLLMProvider(privacyLevel: PrivacyLevel) async -> (any LLMProvider)? {
+        await buildLLMProvider()
+    }
 }

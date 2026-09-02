@@ -18,9 +18,6 @@ struct OnboardingView: View {
     @State private var keyValidationResult: KeyValidationResult?
     // Proxy config
     @State private var proxyURL = ""
-    @State private var proxyUsername = ""
-    @State private var proxyPassword = ""
-    @State private var isLoggingInProxy = false
     // Permissions
     @State private var contactsGranted = false
     @State private var calendarGranted = false
@@ -44,7 +41,7 @@ struct OnboardingView: View {
     private let keychain = KeychainService()
 
     private enum OnboardingField {
-        case apiKey, proxyURL, proxyUser, proxyPass
+        case apiKey, proxyURL
         case firstThought, mailAddress, mailPassword
         case mailImapHost, mailSmtpHost
     }
@@ -443,20 +440,10 @@ struct OnboardingView: View {
                 .keyboardType(.URL)
                 .focused($focusedField, equals: .proxyURL)
 
-            Text("Optionale Anmeldedaten (JWT-Auth)")
+            Text("OpenAI-kompatibler Endpoint, selbst gehostet (z.B. LiteLLM, vLLM, Ollama)")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-
-            TextField("Benutzername", text: $proxyUsername)
-                .textFieldStyle(.roundedBorder)
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
-                .focused($focusedField, equals: .proxyUser)
-
-            SecureField("Passwort", text: $proxyPassword)
-                .textFieldStyle(.roundedBorder)
-                .focused($focusedField, equals: .proxyPass)
 
             if let result = keyValidationResult {
                 validationBanner(result)
@@ -1071,14 +1058,9 @@ struct OnboardingView: View {
         do {
             try keychain.save(key: KeychainKeys.anthropicProxyURL, value: trimmedURL)
 
-            // If credentials provided, try proxy auth
-            if !proxyUsername.isEmpty && !proxyPassword.isEmpty {
-                let auth = BrainAPIAuthService.shared
-                _ = try await auth.login(baseURL: trimmedURL, username: proxyUsername, password: proxyPassword)
-            }
-
             // Test with a simple request
-            let provider = AnthropicProvider(proxyURL: trimmedURL)
+            let base = trimmedURL.hasSuffix("/") ? String(trimmedURL.dropLast()) : trimmedURL
+            let provider = AnthropicProvider(proxyURL: base)
             let testRequest = LLMRequest(
                 messages: [LLMMessage(role: "user", content: "Sag 'OK'.")],
                 maxTokens: 10

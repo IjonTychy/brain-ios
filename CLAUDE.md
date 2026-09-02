@@ -235,6 +235,16 @@ Diese Skills sind in Andys Claude Desktop-App installiert und stehen in jeder Se
 
 ## Current Objective
 
+**Update 02.09.2026:** LLMRouter im Chat verdrahtet -- Privacy Zones und
+Offline-Routing werden jetzt bei jedem Send durchgesetzt (fail-loud statt
+stillem Cloud-Fallback); Auto-Route-Sticky-Bug und "on-device"-als-OpenAI-
+Fehlrouting behoben. brain-api-Auth-Schicht restlos entfernt (Service, UI,
+Keychain-Keys, /claude-proxy-Suffix) -- Proxy-Modus ist jetzt generisch
+OpenAI-kompatibel. Zudem Provider-Auswahl in LLMProviderFactory konsolidiert:
+Auch der AI-Handler-Pfad (DataBridge.buildLLMProvider) laeuft jetzt ueber den
+Router; Entry-basierte Handler setzen Privacy Zones durch.
+Details: SESSION-LOG 02.09.2026.
+
 **Update 04.07.2026 (Wiederaufnahme nach Public Release):** CI repariert
 (Trigger main + claude/**, pipefail, libsqlite3-dev), 2 rote Test-Assertions
 gefixt, Expression-Sprache auf das dokumentierte Vokabular ausgebaut
@@ -271,8 +281,9 @@ Bei Konflikten gilt dieser Snapshot vor aelteren Zahlen in diesem Dokument.
   und StoreKit (StoreKit 2, Trial + Einmalkauf) sind implementiert.
 - **Offene Baustellen:** Echte Bundle-IDs wiederherstellen, llama.cpp-Package
   aktivieren, Device-Verifikation (OAuth, Runtime-Fixes, Gemma), God Objects
-  wieder splitten (OnboardingView 1255 Z., MailTabView 1193 Z.), LLMRouter
-  ist nicht verdrahtet (setRouter wird nie aufgerufen).
+  wieder splitten (OnboardingView, MailTabView). LLM-Routing ist seit 02.09.2026
+  konsolidiert (LLMProviderFactory): Chat- und AI-Handler-Pfad laufen ueber den
+  LLMRouter mit Privacy-/Offline-Gate.
 
 **Historischer Snapshot 23.03.2026:** App ist funktional, TestFlight aktiv, 540+ Tests grün.
 Google OAuth, Multi-Provider (7 LLM Provider), modularer System-Prompt.
@@ -309,7 +320,6 @@ Grosse Dateien aufgeteilt (4 God Objects eliminiert), ~960 Zeilen Dead Code/Dupl
 | **Mittel** | Gemma aktivieren | llama.cpp-Package in Xcode hinzufuegen (docs/ON-DEVICE-MODELS.md), auf Device verifizieren |
 | **Mittel** | Device-Verifikation | OAuth, Runtime-Fixes vom Maerz, Skill-Erstellung mit neuem Expression-Vokabular |
 | **Mittel** | God Objects splitten | OnboardingView (1255 Z.), MailTabView (1193 Z.), EmailBridge (1045 Z.), SkillManagerView (876 Z.) |
-| **Mittel** | LLMRouter verdrahten | setRouter wird nie aufgerufen — Routing-Entscheidungsbaum ist toter Code |
 | **Niedrig** | Screenshots | App Store Screenshots erstellen |
 | **Niedrig** | CloudKit Sync / Vision Pro | Bei Bedarf aktivieren bzw. fertigstellen |
 
@@ -365,8 +375,10 @@ Siehe SESSION-LOG für letzten Stand und offene Punkte.
 - **Gemma-Inferenz noch nicht aktiv:** Provider/Katalog/Downloads sind eingebaut;
   das llama.cpp-Package muss einmalig in Xcode hinzugefuegt und auf einem Geraet
   verifiziert werden (docs/ON-DEVICE-MODELS.md).
-- **LLMRouter nicht verdrahtet:** `ChatService.setRouter` wird nie aufgerufen —
-  der Routing-Entscheidungsbaum laeuft nicht.
+- **Rohtext ohne Privacy-Provenance:** ai.draftReply und llm.*-Handler erhalten
+  reinen Text und koennen kein Entry-basiertes Privacy-Level ableiten (laufen
+  unrestricted); Chat- und Entry-basierte Handler-Pfade sind seit 02.09.2026
+  ueber den LLMRouter abgesichert.
 - **Google OAuth braucht User-Setup:** PKCE Flow, Token-Refresh und Keychain-Storage sind
   implementiert; die Client-ID muss weiterhin vom User in Google Cloud Console erstellt werden.
 - **brain-api abgeschaltet:** VPS-Backend nicht mehr aktiv. Backup unter

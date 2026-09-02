@@ -11,6 +11,7 @@
 		T1010002 /* LocalizationServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1020002 /* LocalizationServiceTests.swift */; };
 		T1010003 /* LLMAuthModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1020003 /* LLMAuthModeTests.swift */; };
 		T1010004 /* BrainThemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1020004 /* BrainThemeTests.swift */; };
+		T1010005 /* LLMRoutingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = T1020005 /* LLMRoutingTests.swift */; };
 		H1010001 /* AIHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020001 /* AIHandlers.swift */; };
 		H1010002 /* CalendarReminderHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020002 /* CalendarReminderHandlers.swift */; };
 		H1010003 /* ContactHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020003 /* ContactHandlers.swift */; };
@@ -21,7 +22,6 @@
 		H1010008 /* MemoryHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020008 /* MemoryHandlers.swift */; };
 		H1010009 /* SkillRuleHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020009 /* SkillRuleHandlers.swift */; };
 		H1010010 /* SystemUIHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = H1020010 /* SystemUIHandlers.swift */; };
-		B1010072 /* BrainAPIAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020072 /* BrainAPIAuthService.swift */; };
 		B1010003 /* BiometricAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020003 /* BiometricAuth.swift */; };
 		B1010004 /* BootstrapSkills.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020004 /* BootstrapSkills.swift */; };
 		B1010005 /* BrainApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020005 /* BrainApp.swift */; };
@@ -164,6 +164,7 @@
 		GM200002 /* OnDeviceModelStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100002 /* OnDeviceModelStore.swift */; };
 		GM200003 /* GemmaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100003 /* GemmaProvider.swift */; };
 		GM200004 /* ToolLessProviderAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100004 /* ToolLessProviderAdapter.swift */; };
+		GM200005 /* LLMProviderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100005 /* LLMProviderFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -210,6 +211,7 @@
 		T1020002 /* LocalizationServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationServiceTests.swift; sourceTree = "<group>"; };
 		T1020003 /* LLMAuthModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMAuthModeTests.swift; sourceTree = "<group>"; };
 		T1020004 /* BrainThemeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainThemeTests.swift; sourceTree = "<group>"; };
+		T1020005 /* LLMRoutingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMRoutingTests.swift; sourceTree = "<group>"; };
 		T1000001 /* BrainAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BrainAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000001 /* BrainApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BrainApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1000001 /* BrainShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BrainShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -224,7 +226,6 @@
 		H1020008 /* MemoryHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryHandlers.swift; sourceTree = "<group>"; };
 		H1020009 /* SkillRuleHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRuleHandlers.swift; sourceTree = "<group>"; };
 		H1020010 /* SystemUIHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemUIHandlers.swift; sourceTree = "<group>"; };
-		B1020072 /* BrainAPIAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainAPIAuthService.swift; sourceTree = "<group>"; };
 		B1020003 /* BiometricAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BiometricAuth.swift; sourceTree = "<group>"; };
 		B1020004 /* BootstrapSkills.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BootstrapSkills.swift; sourceTree = "<group>"; };
 		B1020005 /* BrainApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrainApp.swift; sourceTree = "<group>"; };
@@ -356,6 +357,7 @@
 		GM100002 /* OnDeviceModelStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceModelStore.swift; sourceTree = "<group>"; };
 		GM100003 /* GemmaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GemmaProvider.swift; sourceTree = "<group>"; };
 		GM100004 /* ToolLessProviderAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolLessProviderAdapter.swift; sourceTree = "<group>"; };
+		GM100005 /* LLMProviderFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProviderFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -423,7 +425,6 @@
 				H1030001 /* Handlers */,
 				B1020003 /* BiometricAuth.swift */,
 				B1020004 /* BootstrapSkills.swift */,
-				B1020072 /* BrainAPIAuthService.swift */,
 				B1020005 /* BrainApp.swift */,
 				B1020021 /* ChatService.swift */,
 				B1020006 /* ContentView.swift */,
@@ -560,6 +561,7 @@
 				GM100002 /* OnDeviceModelStore.swift */,
 				GM100003 /* GemmaProvider.swift */,
 				GM100004 /* ToolLessProviderAdapter.swift */,
+				GM100005 /* LLMProviderFactory.swift */,
 			);
 			path = LLMProviders;
 			sourceTree = "<group>";
@@ -639,6 +641,7 @@
 				T1020002 /* LocalizationServiceTests.swift */,
 				T1020003 /* LLMAuthModeTests.swift */,
 				T1020004 /* BrainThemeTests.swift */,
+				T1020005 /* LLMRoutingTests.swift */,
 			);
 			path = Tests/BrainAppTests;
 			sourceTree = "<group>";
@@ -787,7 +790,6 @@
 				H1010010 /* SystemUIHandlers.swift in Sources */,
 				B1010003 /* BiometricAuth.swift in Sources */,
 				B1010004 /* BootstrapSkills.swift in Sources */,
-				B1010072 /* BrainAPIAuthService.swift in Sources */,
 				B1010005 /* BrainApp.swift in Sources */,
 				B1010021 /* ChatService.swift in Sources */,
 				B1010006 /* ContentView.swift in Sources */,
@@ -906,6 +908,7 @@
 				GM200002 /* OnDeviceModelStore.swift in Sources */,
 				GM200003 /* GemmaProvider.swift in Sources */,
 				GM200004 /* ToolLessProviderAdapter.swift in Sources */,
+				GM200005 /* LLMProviderFactory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -935,6 +938,7 @@
 				T1010002 /* LocalizationServiceTests.swift in Sources */,
 				T1010003 /* LLMAuthModeTests.swift in Sources */,
 				T1010004 /* BrainThemeTests.swift in Sources */,
+				T1010005 /* LLMRoutingTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -6,6 +6,43 @@
 
 ---
 
+## Status-Update 02.09.2026 -- LLMRouter-Verdrahtung + brain-api-Ausbau
+
+- **[BEHOBEN] LLMRouter nicht verdrahtet** (offen seit Review 03.07.2026) --
+  `ChatService.buildProvider` konstruiert den Router jetzt pro Anfrage (On-Device-
+  Adapter + User-Provider, NetworkMonitor-Konnektivitaet) und setzt Privacy Zones
+  sowie Offline-Routing bei jedem Send durch. Unerfuellbare Constraints (onDeviceOnly
+  ohne lokales Modell, offline ohne lokales Modell) brechen mit differenzierter
+  Fehlermeldung ab statt still auf Cloud zurueckzufallen. `setRouter` entfernt.
+- **[NEU BEHOBEN] Auto-Route war sticky** -- schrieb `chatModelOverride` und lief
+  danach nie wieder; Privacy-/Komplexitaets-Routing galt so nur fuer den ersten Send.
+  Jetzt pro Send lokal berechnet, Override bleibt der manuellen Modellwahl vorbehalten.
+- **[NEU BEHOBEN] "on-device" als OpenAI-Modell fehlgeroutet** -- `hasPrefix("o")`
+  matchte "on-device"; mit konfiguriertem OpenAI-Key ging eine On-Device-Wahl ohne
+  verfuegbares lokales Modell an GPT.
+- **[BEHOBEN] brain-api-Restcode** -- BrainAPIAuthService (261 Zeilen JWT-Auth gegen
+  den abgeschalteten VPS) inkl. pbxproj-Eintraegen, Login/2FA-UI (Settings +
+  Onboarding), `brainAPI*`-Keychain-Keys und `/claude-proxy`-Suffix entfernt.
+  Proxy-Modus ist jetzt ein rein generisches Feature (OpenAI-kompatible Endpoints);
+  ChatView/AvailableModels-Gates auf `anthropicProxyURL`/`anthropicMaxSessionKey`
+  umgestellt. BackupView-Importkompatibilitaet bewusst behalten.
+- **[BEHOBEN gleiche Session] DataBridge.buildLLMProvider ohne Router** -- Auswahllogik
+  in `LLMProviderFactory` konsolidiert (eine Implementierung fuer Chat- und
+  Handler-Pfad), DataBridge laeuft ueber den Router (Offline-Gate ueberall,
+  Privacy-Gate via neuem `buildLLMProvider(privacyLevel:)`). Entry-basierte
+  Handler (summarize/extractTasks per entryId, briefing, crossref) ermitteln ihr
+  Level aus den Quell-Entry-Tags. Drei Divergenz-Bugs dabei behoben:
+  Custom-Endpoint-Key aus totem Feld statt Keychain (Handler-Pfad faktisch kaputt),
+  unavailable-Provider-Rueckgabe bei "on-device", unnoetiger biometry-Keychain-Read
+  fuer Nicht-Anthropic-Modelle.
+- **[NEU / OFFEN] Schweregrad: niedrig** -- Rohtext-Handler (ai.draftReply, llm.*)
+  haben keine Entry-Provenance und laufen unrestricted; eine explizite
+  privacyLevel-Property im Skill-Schema waere der saubere Weg.
+- **[NEU / INFO]** Auf Geraeten mit fruehem brain-api-Login bleiben verwaiste
+  Keychain-Items zurueck (inert; kein Code liest sie mehr, Loesch-Pfad entfernt).
+
+---
+
 ## Status-Update 04.07.2026 -- Stabilisierungs-Session (Findings-Abgleich)
 
 Abarbeitung der Findings aus dem Review vom 03.07.2026:

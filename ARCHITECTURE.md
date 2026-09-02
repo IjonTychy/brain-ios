@@ -41,9 +41,18 @@ konkreten Implementierung verschoben:
   `entryEmbeddings` gespeichert. `sqlite-vec` ist in dieser Codebasis derzeit nicht aktiv.
 - **E-Mail heute:** Die App nutzt `EmailBridge` plus lokale `emailCache`-Persistenz statt einer
   separaten SwiftMail-Abhaengigkeit.
-- **LLM-Stack heute:** Anthropic, OpenAI, Gemini, On-Device sowie xAI/custom ueber
-  `OpenAICompatibleProvider`. Gemini-OAuth ist implementiert; Anthropic-Max/Session-Tokens sind
-  bewusst entfernt.
+- **LLM-Stack heute:** Anthropic (API-Key, Max-Session-Key oder generischer
+  OpenAI-kompatibler Proxy), OpenAI, Gemini, On-Device sowie xAI/custom ueber
+  `OpenAICompatibleProvider`. Gemini-OAuth ist implementiert.
+- **LLM-Routing heute (02.09.2026):** Die gesamte Provider-Auswahl liegt in
+  `LLMProviderFactory`; Chat (`ChatService.buildProvider`) und AI-Handler-Pfad
+  (`DataBridge.buildLLMProvider`) delegieren dorthin. Der `LLMRouter` wird pro
+  Anfrage gebaut (On-Device-Kandidaten via `ToolLessProviderAdapter` +
+  User-Provider, Konnektivitaet aus `NetworkMonitor`) und setzt Privacy Zones
+  und Offline-Routing durch; unerfuellbare Constraints brechen mit Fehlermeldung
+  ab. Entry-basierte AI-Handler (summarize, briefing, crossref) leiten ihr
+  Privacy-Level aus den Quell-Entry-Tags ab. Komplexitaets-Modellwahl bleibt
+  das Opt-in-Feature `autoRouteModels` (Chat folgt der User-Praeferenz).
 - **Self-Improve heute:** Skill-Vorschlaege werden als Proposals persistiert; bei Anwendung wird die
   Skill-Generierung an den Chat/Compiler-Pfad uebergeben.
 
@@ -642,9 +651,6 @@ class OpenAICompatibleProvider: LLMProvider { ... }  // xAI + Custom Endpoints
 class OnDeviceProvider: LLMProvider { ... }          // On-Device / Apple Foundation Models
 class GemmaProvider: LLMProvider { ... }             // On-Device / GGUF (Gemma 4) via llama.cpp
                                                      // — aktivierbar, siehe docs/ON-DEVICE-MODELS.md
-
-// Bewusst entfernt
-// Anthropic Max / Session-Key Modus
 
 // Geplant (nicht implementiert)
 class OllamaProvider: LLMProvider { ... }

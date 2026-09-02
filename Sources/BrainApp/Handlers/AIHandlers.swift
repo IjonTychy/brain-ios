@@ -17,6 +17,24 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
     return response.content
 }
 
+// Strictest privacy zone level across the entries feeding a prompt.
+// Raw-text inputs have no entry provenance and default to .unrestricted.
+private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProviding) -> PrivacyLevel {
+    guard !ids.isEmpty else { return .unrestricted }
+    let service = PrivacyZoneService(pool: data.databasePool)
+    return (try? service.strictestLevel(forEntryIds: ids)) ?? .unrestricted
+}
+
+// Uniform error when no provider satisfies the constraints (privacy zone,
+// offline, or missing key). All AI handlers are @MainActor, so the live
+// connectivity read is safe here.
+@MainActor private func noProviderError(privacyLevel: PrivacyLevel) -> ActionResult {
+    .error(LLMProviderFactory.unavailableMessage(
+        privacyLevel: privacyLevel,
+        isConnected: NetworkMonitor.shared.isConnected
+    ))
+}
+
 // MARK: - AI-powered handlers
 
 @MainActor final class AISummarizeHandler: ActionHandler {
@@ -26,19 +44,22 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
     init(data: any DataProviding) { self.data = data }
 
     func execute(properties: [String: PropertyValue], context: ExpressionContext) async throws -> ActionResult {
-        guard let provider = await data.buildLLMProvider(), provider.isAvailable else {
-            return .error("Kein API-Key konfiguriert")
-        }
-
-        // Summarize either provided text or an entry by ID
+        // Resolve the input first so entry provenance can drive the privacy zone.
         let text: String
+        var sourceEntryIds: [Int64] = []
         if let bodyText = properties["text"]?.stringValue {
             text = bodyText
         } else if let id = properties["entryId"]?.intValue.flatMap({ Int64($0) }),
                   let entry = try data.fetchEntry(id: id) {
             text = "\(entry.title ?? "")\n\n\(entry.body ?? "")"
+            sourceEntryIds = [id]
         } else {
             return .error("ai.summarize: text oder entryId erforderlich")
+        }
+
+        let privacyLevel = strictestPrivacyLevel(forEntryIds: sourceEntryIds, data: data)
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
+            return noProviderError(privacyLevel: privacyLevel)
         }
 
         let summary = try await aiComplete(
@@ -58,18 +79,22 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
     init(data: any DataProviding) { self.data = data }
 
     func execute(properties: [String: PropertyValue], context: ExpressionContext) async throws -> ActionResult {
-        guard let provider = await data.buildLLMProvider(), provider.isAvailable else {
-            return .error("Kein API-Key konfiguriert")
-        }
-
+        // Resolve the input first so entry provenance can drive the privacy zone.
         let text: String
+        var sourceEntryIds: [Int64] = []
         if let bodyText = properties["text"]?.stringValue {
             text = bodyText
         } else if let id = properties["entryId"]?.intValue.flatMap({ Int64($0) }),
                   let entry = try data.fetchEntry(id: id) {
             text = "\(entry.title ?? "")\n\n\(entry.body ?? "")"
+            sourceEntryIds = [id]
         } else {
             return .error("ai.extractTasks: text oder entryId erforderlich")
+        }
+
+        let privacyLevel = strictestPrivacyLevel(forEntryIds: sourceEntryIds, data: data)
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
+            return noProviderError(privacyLevel: privacyLevel)
         }
 
         let result = try await aiComplete(
@@ -107,13 +132,16 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
     init(data: any DataProviding) { self.data = data }
 
     func execute(properties: [String: PropertyValue], context: ExpressionContext) async throws -> ActionResult {
-        guard let provider = await data.buildLLMProvider(), provider.isAvailable else {
-            return .error("Kein API-Key konfiguriert")
-        }
-
         // Gather context: recent entries, open tasks, calendar
         let recentEntries = try data.listEntries(limit: 10)
         let openTasks = recentEntries.filter { $0.type == .task && $0.status == .active }
+
+        // The briefing prompt carries titles from these entries — honor the
+        // strictest privacy zone among them.
+        let privacyLevel = strictestPrivacyLevel(forEntryIds: recentEntries.compactMap(\.id), data: data)
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
+            return noProviderError(privacyLevel: privacyLevel)
+        }
 
         let todayEvents = await MainActor.run {
             let bridge = EventKitBridge()
@@ -167,8 +195,9 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
     init(data: any DataProviding) { self.data = data }
 
     func execute(properties: [String: PropertyValue], context: ExpressionContext) async throws -> ActionResult {
+        // Raw text input — no entry provenance, so no privacy zone applies.
         guard let provider = await data.buildLLMProvider(), provider.isAvailable else {
-            return .error("Kein API-Key konfiguriert")
+            return noProviderError(privacyLevel: .unrestricted)
         }
 
         guard let originalText = properties["text"]?.stringValue else {
@@ -205,16 +234,20 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
             return .error("entry.crossref: entryId fehlt oder Entry nicht gefunden")
         }
 
-        guard let provider = await data.buildLLMProvider(), provider.isAvailable else {
-            return .error("Kein API-Key konfiguriert")
-        }
-
         // Get other entries for comparison
         let candidates = try data.listEntries(limit: 30)
             .filter { $0.id != entryId }
 
         if candidates.isEmpty {
             return .value(.array([]))
+        }
+
+        // The prompt carries the source entry AND candidate excerpts — honor
+        // the strictest privacy zone across all of them.
+        let involvedIds = [entryId] + candidates.compactMap(\.id)
+        let privacyLevel = strictestPrivacyLevel(forEntryIds: involvedIds, data: data)
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
+            return noProviderError(privacyLevel: privacyLevel)
         }
 
         let candidateList = candidates.compactMap { e -> String? in
@@ -261,7 +294,7 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
             return .error("llm.complete: prompt fehlt")
         }
         guard let provider = await data.buildLLMProvider() else {
-            return .error("Kein API-Key konfiguriert")
+            return noProviderError(privacyLevel: .unrestricted)
         }
         let system = properties["system"]?.stringValue
         let messages = [LLMMessage(role: "user", content: prompt)]
@@ -282,7 +315,7 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
             return .error("llm.stream: prompt fehlt")
         }
         guard let provider = await data.buildLLMProvider() else {
-            return .error("Kein API-Key konfiguriert")
+            return noProviderError(privacyLevel: .unrestricted)
         }
         let messages = [LLMMessage(role: "user", content: prompt)]
         let response = try await provider.complete(LLMRequest(messages: messages))
@@ -323,7 +356,7 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
             return .error("llm.classify: text und categories erforderlich")
         }
         guard let provider = await data.buildLLMProvider() else {
-            return .error("Kein API-Key konfiguriert")
+            return noProviderError(privacyLevel: .unrestricted)
         }
         let prompt = "Klassifiziere den folgenden Text in eine der Kategorien: \(categories)\n\nText: \(text)\n\nAntwort (nur die Kategorie):"
         let messages = [LLMMessage(role: "user", content: prompt)]
@@ -346,7 +379,7 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
             return .error("llm.extract: text und schema erforderlich")
         }
         guard let provider = await data.buildLLMProvider() else {
-            return .error("Kein API-Key konfiguriert")
+            return noProviderError(privacyLevel: .unrestricted)
         }
         let prompt = "Extrahiere die folgenden Felder aus dem Text als JSON: \(schema)\n\nText: \(text)\n\nJSON:"
         let messages = [LLMMessage(role: "user", content: prompt)]

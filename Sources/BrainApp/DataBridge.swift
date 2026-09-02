@@ -512,82 +512,24 @@ final class DataBridge {
 
     // MARK: - Facade: LLM Provider
 
+    // Constraint-less variant (protocol requirement). Callers without entry
+    // provenance land here; offline routing is still enforced by the factory.
     nonisolated func buildLLMProvider() async -> (any LLMProvider)? {
-        let keychain = KeychainService()
+        await buildLLMProvider(privacyLevel: .unrestricted)
+    }
+
+    // Router-backed provider selection for the AI-handler path: the same
+    // decision tree as the chat (LLMProviderFactory), enforcing the given
+    // privacy zone level and offline routing. nil = the constraints cannot
+    // be satisfied — callers must surface an error, not fall back to cloud.
+    nonisolated func buildLLMProvider(privacyLevel: PrivacyLevel) async -> (any LLMProvider)? {
         let selectedModel = UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
-
-        if selectedModel == "on-device" {
-            // Availability decides which on-device backend serves the request:
-            // Apple Foundation Models first, then the best downloaded GGUF
-            // model (Gemma). Falls back to the Apple provider's own error
-            // path when neither is usable.
-            let apple = OnDeviceProvider()
-            if apple.isAvailable { return apple }
-            if let gemma = GemmaProvider.bestAvailable(), gemma.isAvailable {
-                return gemma
-            }
-            return apple
-        }
-
-        if selectedModel.hasPrefix("gemini") {
-            let geminiKey = keychain.read(key: KeychainKeys.geminiAPIKey) ?? ""
-            if !geminiKey.isEmpty {
-                return GeminiProvider(apiKey: geminiKey, model: selectedModel)
-            }
-            if let token = try? await GoogleOAuthService().getValidToken() {
-                return GeminiProvider(oauthToken: token, model: selectedModel)
-            }
-        }
-
-        if selectedModel.hasPrefix("gpt-") || selectedModel.hasPrefix("o") {
-            let openAIKey = keychain.read(key: KeychainKeys.openAIAPIKey) ?? ""
-            if !openAIKey.isEmpty {
-                return OpenAIProvider(apiKey: openAIKey, model: selectedModel)
-            }
-        }
-
-        if selectedModel.hasPrefix("grok") {
-            let xaiKey = keychain.read(key: KeychainKeys.xaiAPIKey) ?? ""
-            if !xaiKey.isEmpty {
-                return OpenAICompatibleProvider(
-                    baseURL: "https://api.x.ai",
-                    model: selectedModel,
-                    apiKey: xaiKey,
-                    providerName: "Grok"
-                )
-            }
-        }
-
-        if let endpoints = AvailableModels.loadCustomEndpoints() {
-            for endpoint in endpoints where endpoint.model == selectedModel {
-                return OpenAICompatibleProvider(
-                    baseURL: endpoint.baseURL,
-                    model: endpoint.model,
-                    apiKey: endpoint.apiKey,
-                    providerName: endpoint.name
-                )
-            }
-        }
-
-        let mode = UserDefaults.standard.string(forKey: "anthropicMode") ?? "api"
-        switch mode {
-        case "proxy":
-            if let baseURL = keychain.read(key: KeychainKeys.anthropicProxyURL), !baseURL.isEmpty {
-                let token = await BrainAPIAuthService.shared.getValidToken()
-                let base = baseURL.hasSuffix("/") ? String(baseURL.dropLast()) : baseURL
-                return AnthropicProvider(proxyURL: base + "/claude-proxy", model: selectedModel, bearerToken: token)
-            }
-        case "max":
-            if let sessionKey = keychain.read(key: KeychainKeys.anthropicMaxSessionKey), !sessionKey.isEmpty {
-                return AnthropicProvider(sessionKey: sessionKey, model: selectedModel)
-            }
-        default:
-            break
-        }
-
-        let anthropicKey = keychain.read(key: KeychainKeys.anthropicAPIKey) ?? ""
-        let provider = AnthropicProvider(apiKey: anthropicKey, model: selectedModel)
-        return provider.isAvailable ? provider : nil
+        let connected = await MainActor.run { NetworkMonitor.shared.isConnected }
+        return await LLMProviderFactory.routedProvider(
+            model: selectedModel,
+            privacyLevel: privacyLevel,
+            isConnected: connected
+        )?.provider
     }
 
     // MARK: - Facade: Knowledge
