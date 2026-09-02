@@ -2,11 +2,11 @@ import StoreKit
 import os.log
 
 // StoreKit 2 manager for brain-ios: 30-day trial + CHF 49.- one-time purchase.
-// Product ID must match App Store Connect configuration.
+// Product ID must match App Store Connect configuration ("<bundle id>.lifetime").
 @MainActor @Observable
 final class StoreKitManager {
 
-    static let productId = "com.example.brain-ios.lifetime"
+    static var productId: String { AppIdentifiers.storeKitLifetimeProduct }
 
     // Purchase state
     private(set) var product: Product?

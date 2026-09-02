@@ -40,6 +40,21 @@
   privacyLevel-Property im Skill-Schema waere der saubere Weg.
 - **[NEU / INFO]** Auf Geraeten mit fruehem brain-api-Login bleiben verwaiste
   Keychain-Items zurueck (inert; kein Code liest sie mehr, Loesch-Pfad entfernt).
+- **[VORBEREITET] Anonymisierungs-Platzhalter** (offen seit 03.07.2026) -- Alle
+  deploy-relevanten Identifier laufen jetzt ueber `Config/Base.xcconfig` +
+  gitignorierte `Local.xcconfig` (Projekt-Ebene) und `AppIdentifiers.swift`;
+  pbxproj/Entitlements/Info.plists/Code enthalten keine deploy-relevanten
+  `com.example`-Literale mehr. Restschritt liegt beim Owner: Local.xcconfig bzw.
+  Xcode-Cloud-Env-Vars mit echten Werten befuellen. Logger-Subsystems (31x) und
+  Keychain-Service bleiben bewusst auf dem Platzhalter (kosmetisch bzw.
+  Stabilitaet der gespeicherten Keys).
+- **[NEU BEHOBEN] Schweregrad: hoch (Deploy)** -- Share Extension und Widgets
+  hatten keine Entitlements-Datei und damit keinen App-Group-Zugriff; auf dem
+  Geraet haetten sie eine andere DB gesehen als die App. Eigene `.entitlements`
+  + `CODE_SIGN_ENTITLEMENTS` fuer beide Targets.
+- **[NEU BEHOBEN]** `ci_post_clone.sh` war nicht executable (Xcode Cloud verlangt
+  +x); zwei tote BGTask-Konstanten in BrainApp.swift entfernt; Google-OAuth
+  `resolveClientId()` wirft bei Platzhalter statt Bogus-ID zu senden.
 
 ---
 

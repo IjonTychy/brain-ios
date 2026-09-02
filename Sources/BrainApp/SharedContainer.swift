@@ -4,10 +4,10 @@ import GRDB
 
 // Phase 21: Shared database container for App Group access.
 // Used by the main app, Share Extension, and Widgets to access the same DB.
-// App Group: group.com.example.brain-ios
+// The App Group id comes from the build configuration (AppIdentifiers).
 
 enum SharedContainer {
-    static let appGroupID = "group.com.example.brain-ios"
+    static var appGroupID: String { AppIdentifiers.appGroup }
 
     // The shared database URL in the App Group container.
     // Falls back to the app's documents directory if App Group is unavailable.

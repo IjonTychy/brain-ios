@@ -8,7 +8,8 @@ import os.log
 // Architecture: local GRDB is always source of truth (offline-first).
 // Changes tracked via pending_sync table, pushed on demand or via background task.
 //
-// Container: iCloud.com.example.brain-ios (must be configured in Xcode entitlements)
+// Container: AppIdentifiers.iCloudContainer (from the build configuration;
+// must match the entitlements)
 // Zone: "BrainZone" (custom zone for incremental fetch)
 
 final class CloudKitBridge: @unchecked Sendable {
@@ -20,7 +21,7 @@ final class CloudKitBridge: @unchecked Sendable {
     private let zoneID: CKRecordZone.ID
     private let logger = Logger(subsystem: "com.example.brain-ios", category: "CloudKit")
 
-    static let containerID = "iCloud.com.example.brain-ios"
+    static var containerID: String { AppIdentifiers.iCloudContainer }
     static let zoneName = "BrainZone"
 
     init(pool: DatabasePool) {

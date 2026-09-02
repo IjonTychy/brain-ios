@@ -75,7 +75,11 @@ den gesamten Xcode Cloud Setup-Prozess und alle gelösten Build-Probleme (51+ Bu
 
 **Wichtig:**
 - Automatisches Signing (Xcode Cloud verwaltet Zertifikate)
-- `ci_scripts/ci_post_clone.sh` für Package-Resolution
+- Echte Identifier (Bundle-ID-Basis, Team-ID, Google-Client-ID) kommen aus
+  `Config/Local.xcconfig` (gitignored; Vorlage `Config/Local.xcconfig.example`)
+  bzw. auf Xcode Cloud aus den Environment-Variablen `BRAIN_BUNDLE_ID_BASE`,
+  `BRAIN_TEAM_ID`, `BRAIN_GOOGLE_CLIENT_ID`, die `ci_post_clone.sh` in die
+  Local.xcconfig schreibt. Nie echte IDs committen.
 - `Package.resolved` muss im Repo sein
 - objectVersion 56 in `.pbxproj` (Kompatibilität)
 
@@ -242,7 +246,9 @@ Fehlrouting behoben. brain-api-Auth-Schicht restlos entfernt (Service, UI,
 Keychain-Keys, /claude-proxy-Suffix) -- Proxy-Modus ist jetzt generisch
 OpenAI-kompatibel. Zudem Provider-Auswahl in LLMProviderFactory konsolidiert:
 Auch der AI-Handler-Pfad (DataBridge.buildLLMProvider) laeuft jetzt ueber den
-Router; Entry-basierte Handler setzen Privacy Zones durch.
+Router; Entry-basierte Handler setzen Privacy Zones durch (PR #2 auf main).
+Deploy-Vorarbeit: deploy-relevante Identifier laufen ueber `Config/*.xcconfig`
++ `AppIdentifiers.swift`; Extensions haben jetzt App-Group-Entitlements.
 Details: SESSION-LOG 02.09.2026.
 
 **Update 04.07.2026 (Wiederaufnahme nach Public Release):** CI repariert
@@ -260,8 +266,9 @@ Bei Konflikten gilt dieser Snapshot vor aelteren Zahlen in diesem Dokument.
 
 - **Repo-Status:** Public Release 28.03.2026 (Unlicense): Historie gesquasht
   (2 Commits + neue Arbeit), Default-Branch `main`, alle Identifier anonymisiert
-  (`com.example.brain-ios`) — fuer TestFlight/Device-Deploy muessen echte
-  Bundle-IDs/App-Group/iCloud-Container wiederhergestellt werden.
+  (`com.example.brain-ios`). Seit 02.09.2026 kommen die echten IDs fuer den
+  privaten Build aus der gitignorierten `Config/Local.xcconfig` (bzw.
+  Xcode-Cloud-Env-Vars) — das oeffentliche Repo bleibt anonym.
 - **CI:** GitHub Actions laufen wieder (main + claude/** Branches). Linux-Job
   baut BrainCore erstmals nachweisbar; iOS-Job nutzt neuestes Xcode +
   dynamische Simulator-Wahl. pipefail aktiv — keine maskierten Fehler mehr.
@@ -315,7 +322,7 @@ Grosse Dateien aufgeteilt (4 God Objects eliminiert), ~960 Zeilen Dead Code/Dupl
 
 | Priorität | Thema | Beschreibung |
 |-----------|-------|-------------|
-| **Hoch** | Deploy-Faehigkeit | Echte Bundle-IDs/App-Group/iCloud-Container wiederherstellen (Public-Release-Anonymisierung rueckgaengig fuer den privaten Build), Xcode Cloud reaktivieren |
+| **Hoch** | Deploy-Faehigkeit | Identifier-Schicht steht (Config/Base.xcconfig + gitignorierte Local.xcconfig, AppIdentifiers). Restschritt Owner: Local.xcconfig gemaess `Config/Local.xcconfig.example` befuellen bzw. Xcode-Cloud-Env-Vars setzen, Xcode Cloud reaktivieren |
 | **Hoch** | CI vollstaendig gruen | BrainCore-Linux + iOS-Build auf main stabil halten (Feedback-Loop etabliert 04.07.) |
 | **Mittel** | Gemma aktivieren | llama.cpp-Package in Xcode hinzufuegen (docs/ON-DEVICE-MODELS.md), auf Device verifizieren |
 | **Mittel** | Device-Verifikation | OAuth, Runtime-Fixes vom Maerz, Skill-Erstellung mit neuem Expression-Vokabular |
@@ -369,9 +376,12 @@ Siehe SESSION-LOG für letzten Stand und offene Punkte.
 - **Primitive-Luecke:** Wenn ein Skill ein Action Primitive braucht das nicht existiert, braucht es
   ein App-Update.
 - **64 Notification Limit:** Reschedule-on-Launch Pattern.
-- **Anonymisierte Identifier:** Seit dem Public Release stehen ueberall
-  `com.example.brain-ios`-Platzhalter (Bundle-IDs, App Group, iCloud, BGTasks) —
-  ohne Wiederherstellung echter IDs kein TestFlight/Device-Deploy.
+- **Anonymisierte Identifier (vorbereitet, 02.09.2026):** Bundle-IDs, App Group,
+  iCloud-Container, BGTask-IDs und Google-Client-ID kommen aus
+  `Config/Base.xcconfig` (Platzhalter) + gitignorierter `Config/Local.xcconfig`
+  (echte Werte, Vorlage `Local.xcconfig.example`); Xcode Cloud erhaelt sie via
+  Environment-Variablen (`ci_post_clone.sh`). Ohne befuellte Local.xcconfig
+  baut die App weiterhin mit `com.example`-Platzhaltern (CI) — kein Device-Deploy.
 - **Gemma-Inferenz noch nicht aktiv:** Provider/Katalog/Downloads sind eingebaut;
   das llama.cpp-Package muss einmalig in Xcode hinzugefuegt und auf einem Geraet
   verifiziert werden (docs/ON-DEVICE-MODELS.md).
@@ -398,6 +408,7 @@ brain-ios/
 ├── SESSION-LOG.md               # Session-Journal (Phase 17+)
 ├── REVIEW-NOTES.md              # Review-Protokoll (2 Gross-Reviews, 40+ Findings)
 ├── Package.swift                # SPM Package Definition (BrainCore)
+├── Config/                      # Base.xcconfig (Platzhalter) + Local.xcconfig (gitignored, echte IDs)
 ├── BrainApp.xcodeproj/          # Xcode Projekt
 ├── Sources/
 │   ├── BrainCore/               # SPM Package (auch auf Linux testbar)

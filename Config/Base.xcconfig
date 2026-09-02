@@ -1,0 +1,25 @@
+// Identifier configuration for all targets (referenced at project level).
+//
+// This file is committed and carries the public placeholder values. Real
+// identifiers for a private build live in Config/Local.xcconfig, which is
+// git-ignored: copy Local.xcconfig.example and fill in your values. On Xcode
+// Cloud, ci_scripts/ci_post_clone.sh writes Local.xcconfig from environment
+// variables of the same names.
+
+// Base bundle identifier of the app. Extensions and the test bundle append
+// their own suffix (see PRODUCT_BUNDLE_IDENTIFIER in the project file).
+BRAIN_BUNDLE_ID_BASE = com.example.brain-ios
+
+// Apple Developer Team ID (10 characters).
+BRAIN_TEAM_ID = TEAM_ID_HERE
+
+// Google OAuth iOS client id WITHOUT the ".apps.googleusercontent.com" suffix.
+// Info.plist derives both the client id and the reversed URL scheme from it.
+BRAIN_GOOGLE_CLIENT_ID = YOUR_GOOGLE_CLIENT_ID
+
+// Local overrides — optional, silently ignored when the file is missing.
+#include? "Local.xcconfig"
+
+// Derived identifiers: they follow the base and are not meant to be edited.
+BRAIN_APP_GROUP = group.$(BRAIN_BUNDLE_ID_BASE)
+BRAIN_ICLOUD_CONTAINER = iCloud.$(BRAIN_BUNDLE_ID_BASE)

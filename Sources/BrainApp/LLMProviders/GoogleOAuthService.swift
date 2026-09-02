@@ -59,9 +59,6 @@ final class GoogleOAuthService {
     private static let tokenURL = "https://oauth2.googleapis.com/token"
     private static let scope = "https://www.googleapis.com/auth/generative-language.retriever"
 
-    // The hardcoded iOS OAuth client ID from Google Cloud Console.
-    private static let placeholderClientID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-
     // Buffer before actual expiry to avoid edge-case failures (5 minutes).
     private static let expiryBuffer: TimeInterval = 300
 
@@ -79,7 +76,7 @@ final class GoogleOAuthService {
     // Derive the reversed client ID for use as URL scheme.
     // e.g. "888144865127-xxx.apps.googleusercontent.com" → "com.googleusercontent.apps.888144865127-xxx"
     private var callbackScheme: String {
-        let clientId = (try? resolveClientId()) ?? Self.placeholderClientID
+        let clientId = (try? resolveClientId()) ?? AppIdentifiers.placeholderGoogleClientID
         return reversedClientId(clientId)
     }
 
@@ -170,8 +167,14 @@ final class GoogleOAuthService {
 
     // Return the fixed OAuth client ID. No user configuration needed.
     private func resolveClientId() throws -> String {
-        // Always use the hardcoded client ID — user-configurable override removed.
-        return Self.placeholderClientID
+        // The id is fixed at build time (Config/Local.xcconfig → Info.plist,
+        // no user-configurable override); an unconfigured build still carries
+        // the placeholder — fail clearly instead of sending a bogus id to Google.
+        let clientId = AppIdentifiers.googleClientID
+        guard clientId != AppIdentifiers.placeholderGoogleClientID else {
+            throw GoogleOAuthError.clientIdNotConfigured
+        }
+        return clientId
     }
 
     // Reverse a Google client ID into a URL scheme.

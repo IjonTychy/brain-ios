@@ -40,10 +40,6 @@ struct BrainApp: App {
     @Environment(\.scenePhase) private var scenePhase
     private let authenticator = DeviceBiometricAuthenticator()
 
-    // Background task identifiers
-    static let analysisRefreshId = "com.example.brain-ios.analysis"
-    static let deepAnalysisId = "com.example.brain-ios.deep-analysis"
-
     // Documents directory — always available on iOS, guard is defensive only.
     // nonisolated: needed for BGTask handlers which run outside MainActor.
     nonisolated private static var documentsDirectory: URL {
@@ -75,17 +71,17 @@ struct BrainApp: App {
         _dbError = State(initialValue: initDbError)
 
         // Register background tasks
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.example.brain-ios.analysis",
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: AppIdentifiers.BackgroundTask.analysis,
                                          using: nil) { task in
             guard let refreshTask = task as? BGAppRefreshTask else { return }
             Self.handleAnalysisRefresh(refreshTask)
         }
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.example.brain-ios.deep-analysis",
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: AppIdentifiers.BackgroundTask.deepAnalysis,
                                          using: nil) { task in
             guard let processingTask = task as? BGProcessingTask else { return }
             Self.handleDeepAnalysis(processingTask)
         }
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: "com.example.brain-ios.mail-sync",
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: AppIdentifiers.BackgroundTask.mailSync,
                                          using: nil) { task in
             guard let refreshTask = task as? BGAppRefreshTask else { return }
             Self.handleMailSync(refreshTask)
@@ -330,7 +326,7 @@ struct BrainApp: App {
 
     private func scheduleBackgroundTasks() {
         // Light refresh: runs every ~30 min, 30s execution time
-        let refreshRequest = BGAppRefreshTaskRequest(identifier: "com.example.brain-ios.analysis")
+        let refreshRequest = BGAppRefreshTaskRequest(identifier: AppIdentifiers.BackgroundTask.analysis)
         refreshRequest.earliestBeginDate = Date(timeIntervalSinceNow: 30 * 60)
         do {
             try BGTaskScheduler.shared.submit(refreshRequest)
@@ -339,7 +335,7 @@ struct BrainApp: App {
         }
 
         // Deep analysis: runs ~1-2x/day, up to 10 min execution
-        let processingRequest = BGProcessingTaskRequest(identifier: "com.example.brain-ios.deep-analysis")
+        let processingRequest = BGProcessingTaskRequest(identifier: AppIdentifiers.BackgroundTask.deepAnalysis)
         processingRequest.earliestBeginDate = Date(timeIntervalSinceNow: 6 * 3600)
         processingRequest.requiresExternalPower = false
         processingRequest.requiresNetworkConnectivity = false
@@ -350,7 +346,7 @@ struct BrainApp: App {
         }
 
         // Mail sync: runs every ~15 min, needs network
-        let mailRequest = BGAppRefreshTaskRequest(identifier: "com.example.brain-ios.mail-sync")
+        let mailRequest = BGAppRefreshTaskRequest(identifier: AppIdentifiers.BackgroundTask.mailSync)
         mailRequest.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
         do {
             try BGTaskScheduler.shared.submit(mailRequest)
@@ -379,7 +375,7 @@ struct BrainApp: App {
             helper.complete(success: false)
         }
         // Schedule next refresh
-        let request = BGAppRefreshTaskRequest(identifier: "com.example.brain-ios.analysis")
+        let request = BGAppRefreshTaskRequest(identifier: AppIdentifiers.BackgroundTask.analysis)
         request.earliestBeginDate = Date(timeIntervalSinceNow: 30 * 60)
         try? BGTaskScheduler.shared.submit(request)
     }
@@ -402,7 +398,7 @@ struct BrainApp: App {
             helper.complete(success: false)
         }
         // Schedule next deep analysis
-        let request = BGProcessingTaskRequest(identifier: "com.example.brain-ios.deep-analysis")
+        let request = BGProcessingTaskRequest(identifier: AppIdentifiers.BackgroundTask.deepAnalysis)
         request.earliestBeginDate = Date(timeIntervalSinceNow: 6 * 3600)
         request.requiresExternalPower = false
         request.requiresNetworkConnectivity = false
@@ -446,7 +442,7 @@ struct BrainApp: App {
             helper.complete(success: false)
         }
         // Schedule next mail sync (~15 min)
-        let request = BGAppRefreshTaskRequest(identifier: "com.example.brain-ios.mail-sync")
+        let request = BGAppRefreshTaskRequest(identifier: AppIdentifiers.BackgroundTask.mailSync)
         request.earliestBeginDate = Date(timeIntervalSinceNow: 15 * 60)
         try? BGTaskScheduler.shared.submit(request)
     }

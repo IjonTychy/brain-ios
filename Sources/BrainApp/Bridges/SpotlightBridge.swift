@@ -18,7 +18,7 @@ final class SpotlightBridge: Sendable {
 
         let item = CSSearchableItem(
             uniqueIdentifier: "entry-\(id)",
-            domainIdentifier: "com.example.brain-ios.entries",
+            domainIdentifier: AppIdentifiers.spotlightDomain,
             attributeSet: attributeSet
         )
 
@@ -32,7 +32,7 @@ final class SpotlightBridge: Sendable {
 
     // Remove all brain entries from Spotlight.
     func deindexAll() {
-        CSSearchableIndex.default().deleteSearchableItems(withDomainIdentifiers: ["com.example.brain-ios.entries"])
+        CSSearchableIndex.default().deleteSearchableItems(withDomainIdentifiers: [AppIdentifiers.spotlightDomain])
     }
 
     // Batch index multiple entries.
@@ -48,7 +48,7 @@ final class SpotlightBridge: Sendable {
 
             return CSSearchableItem(
                 uniqueIdentifier: "entry-\(id)",
-                domainIdentifier: "com.example.brain-ios.entries",
+                domainIdentifier: AppIdentifiers.spotlightDomain,
                 attributeSet: attributeSet
             )
         }
