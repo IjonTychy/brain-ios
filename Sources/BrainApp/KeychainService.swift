@@ -140,17 +140,11 @@ enum KeychainKeys {
     static let anthropicAPIKey = "anthropic-api-key"
     static let openAIAPIKey = "openai-api-key"
     static let geminiAPIKey = "gemini-api-key"
-    // User-configurable proxy URL (e.g. https://my-vps:8082 for self-hosted LLMs)
     static let xaiAPIKey = "xai-api-key"
     // Claude Max session key (from browser cookie, ~30 days valid)
     static let anthropicMaxSessionKey = "anthropic-max-session-key"
-    // User-configurable proxy URL
+    // User-configurable proxy URL (e.g. https://my-vps:8082 for self-hosted LLMs)
     static let anthropicProxyURL = "anthropic-proxy-url"
-    // brain-api JWT auth for proxy access
-    static let brainAPIAccessToken = "brain-api-access-token"
-    static let brainAPIRefreshToken = "brain-api-refresh-token"
-    static let brainAPIBaseURL = "brain-api-base-url"
-    static let brainAPIDisplayName = "brain-api-display-name"
 }
 
 // K3: API key format validation before storage.

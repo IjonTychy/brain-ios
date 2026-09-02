@@ -29,7 +29,6 @@ final class ChatService {
     private let memory: ConversationMemory
     private let keychain = KeychainService()
     private var currentTask: Task<Void, Never>?
-    private var router: LLMRouter?
 
     // Action handlers for executing tool calls
     private var handlers: [String: any ActionHandler] = [:]
@@ -70,11 +69,6 @@ final class ChatService {
         for handler in handlerList {
             handlers[handler.type] = handler
         }
-    }
-
-    // Configure the LLM router for provider selection.
-    func setRouter(_ router: LLMRouter) {
-        self.router = router
     }
 
     // MARK: - Message loading
@@ -164,29 +158,37 @@ final class ChatService {
                     privacyLevel: privacyLevel
                 )
 
-                // Auto-route model based on complexity if enabled and no manual override
+                // Auto-route: pick a model from complexity/privacy when enabled.
+                // Deliberately NOT stored in chatModelOverride — the override is
+                // reserved for the user's manual pick, so routing re-evaluates
+                // on every send instead of sticking to the first result.
+                var autoRoutedModel: String?
                 if self.chatModelOverride == nil,
                    UserDefaults.standard.bool(forKey: "autoRouteModels") {
-                    let modelKey: String
-                    switch complexity {
-                    case .low: modelKey = "model.low"
-                    case .medium: modelKey = "model.medium"
-                    case .high: modelKey = "model.high"
-                    }
                     if privacyLevel == .onDeviceOnly {
-                        self.chatModelOverride = UserDefaults.standard.string(forKey: "model.private") ?? "on-device"
-                    } else if let routedModel = UserDefaults.standard.string(forKey: modelKey) {
-                        self.chatModelOverride = routedModel
+                        autoRoutedModel = UserDefaults.standard.string(forKey: "model.private") ?? "on-device"
+                    } else {
+                        let modelKey: String
+                        switch complexity {
+                        case .low: modelKey = "model.low"
+                        case .medium: modelKey = "model.medium"
+                        case .high: modelKey = "model.high"
+                        }
+                        autoRoutedModel = UserDefaults.standard.string(forKey: modelKey)
                     }
                 }
 
-                guard let provider = await self.buildProvider(for: request) else {
-                    self.error = "Kein API-Key konfiguriert. Bitte in den Einstellungen hinterlegen."
+                guard let selection = await self.buildProvider(for: request, autoRoutedModel: autoRoutedModel) else {
+                    self.error = Self.noProviderMessage(
+                        privacyLevel: privacyLevel,
+                        isConnected: NetworkMonitor.shared.isConnected
+                    )
                     self.isStreaming = false
                     self.isSending = false
                     self.streamingTimer?.cancel()
                     return
                 }
+                let provider = selection.provider
 
                 // Phase 30: Budget check before LLM call
                 let budgetLimit = UserDefaults.standard.double(forKey: "llmMonthlyBudget")
@@ -270,8 +272,10 @@ final class ChatService {
 
                 guard !Task.isCancelled else { return }
 
-                // Save assistant message (full text content)
-                let usedModel = self.chatModelOverride ?? UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
+                // Save assistant message (full text content).
+                // selection.model is the model that actually served the request —
+                // including auto-route picks and router-forced on-device fallbacks.
+                let usedModel = selection.model
                 if !fullContent.isEmpty {
                     let assistantMsg = ChatMessage(role: .assistant, content: fullContent, model: usedModel)
                     try await self.pool.write { [assistantMsg] db in
@@ -307,12 +311,9 @@ final class ChatService {
                 // Phase 30: Track LLM usage costs
                 if totalInputTokens > 0 || totalOutputTokens > 0 {
                     let costTracker = CostTracker(pool: self.pool)
-                    let providerName = provider.name
-                    let selectedModelId = UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
-                    let modelName = (provider as? AnthropicProvider != nil) ? selectedModelId : providerName
                     try? costTracker.record(
-                        provider: providerName,
-                        model: modelName,
+                        provider: provider.name,
+                        model: selection.model,
                         inputTokens: totalInputTokens,
                         outputTokens: totalOutputTokens,
                         requestType: self.activeToolCalls.isEmpty ? "chat" : "tool"
@@ -365,14 +366,75 @@ final class ChatService {
 
     // MARK: - Provider
 
-    private func buildProvider(for request: LLMRequest) async -> (any ToolUseProvider)? {
-        // Try router first (F-04: use LLMRouter for sensitivity-aware routing)
-        if let router = self.router,
-           let provider = router.route(request) as? any ToolUseProvider {
-            return provider
-        }
-        let selectedModel = chatModelOverride ?? UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
+    // Select the provider for this request. The user's model choice (or
+    // auto-route) resolves a concrete provider; LLMRouter then enforces
+    // privacy zones and offline routing on top — on every send, not only
+    // when auto-route is enabled. Returns the provider plus the model that
+    // will actually serve the request (for the message badge and cost tracking).
+    private func buildProvider(
+        for request: LLMRequest,
+        autoRoutedModel: String? = nil
+    ) async -> (provider: any ToolUseProvider, model: String)? {
+        let resolvedModel = chatModelOverride
+            ?? autoRoutedModel
+            ?? UserDefaults.standard.string(forKey: "selectedModel")
+            ?? "claude-opus-4-6"
+        let userProvider = await buildUserSelectedProvider(model: resolvedModel)
 
+        // On-device candidates, adapter-wrapped so they can serve the chat's
+        // tool-streaming interface (the adapter answers tool-less).
+        var candidates: [any ToolUseProvider] = []
+        let apple = OnDeviceProvider()
+        if apple.isAvailable {
+            candidates.append(ToolLessProviderAdapter(base: apple))
+        }
+        if let gemma = GemmaProvider.bestAvailable(), gemma.isAvailable {
+            candidates.append(ToolLessProviderAdapter(base: gemma))
+        }
+        // The user's pick can itself be one of the on-device adapters above —
+        // skip the duplicate so the candidate list stays unambiguous.
+        if let userProvider, !candidates.contains(where: { $0.name == userProvider.name }) {
+            candidates.append(userProvider)
+        }
+        guard !candidates.isEmpty else { return nil }
+
+        // Complexity-based model choice already happened via auto-route (an
+        // opt-in, model-level feature), so it is neutralised here: the router
+        // only enforces privacy zones, sensitivity, and connectivity
+        // (ARCHITECTURE: "Chat / Analyse → User-Präferenz").
+        var routingRequest = request
+        routingRequest.complexity = .medium
+
+        let connected = NetworkMonitor.shared.isConnected
+        let router = LLMRouter(
+            providers: candidates.map { $0 as any LLMProvider },
+            isConnected: { connected }
+        )
+        // A nil route means the constraints cannot be satisfied (e.g. the
+        // privacy zone demands on-device and none is available) — fail loudly
+        // in send(), never fall back to cloud.
+        guard let routed = router.route(routingRequest) as? any ToolUseProvider else {
+            return nil
+        }
+        // Cloud picks keep the resolved model id; when the router (or the user)
+        // landed on a local model, report the on-device provider's name instead.
+        let servedModel = routed.isOnDevice ? routed.name : resolvedModel
+        return (routed, servedModel)
+    }
+
+    // Explain why no provider could be selected: privacy gate, offline, or no key.
+    private static func noProviderMessage(privacyLevel: PrivacyLevel, isConnected: Bool) -> String {
+        if privacyLevel == .onDeviceOnly {
+            return "Privacy Zone aktiv: Diese Unterhaltung darf das Gerät nicht verlassen, es ist aber kein On-Device-Modell verfügbar."
+        }
+        if !isConnected {
+            return "Offline: Kein On-Device-Modell verfügbar. Internetverbindung herstellen oder ein lokales Modell in den Einstellungen laden."
+        }
+        return "Kein API-Key konfiguriert. Bitte in den Einstellungen hinterlegen."
+    }
+
+    // Resolve the provider matching the given (already resolved) model choice.
+    private func buildUserSelectedProvider(model selectedModel: String) async -> (any ToolUseProvider)? {
         // Route to an on-device provider if explicitly selected. Availability
         // decides which one: Apple Foundation Models first, then the best
         // downloaded GGUF model (Gemma). Both run tool-less through the adapter.
@@ -403,8 +465,11 @@ final class ChatService {
             }
         }
 
-        // Route to OpenAI if a GPT/o-series model is selected
-        if selectedModel.hasPrefix("gpt-") || selectedModel.hasPrefix("o") {
+        // Route to OpenAI if a GPT/o-series model is selected.
+        // "on-device" also starts with "o" but is not an OpenAI model — it
+        // falls through to the Anthropic chain when nothing local is usable.
+        if selectedModel.hasPrefix("gpt-")
+            || (selectedModel.hasPrefix("o") && !selectedModel.hasPrefix("on-device")) {
             let openAIKey = keychain.read(key: KeychainKeys.openAIAPIKey) ?? ""
             if !openAIKey.isEmpty {
                 return OpenAIProvider(apiKey: openAIKey, model: selectedModel)
@@ -442,7 +507,7 @@ final class ChatService {
         let mode = UserDefaults.standard.string(forKey: "anthropicMode") ?? "api"
         switch mode {
         case "proxy":
-            if let provider = await buildProxyProvider() { return provider }
+            if let provider = buildProxyProvider(model: selectedModel) { return provider }
         case "max":
             if let sessionKey = keychain.read(key: KeychainKeys.anthropicMaxSessionKey), !sessionKey.isEmpty {
                 return AnthropicProvider(sessionKey: sessionKey, model: selectedModel)
@@ -454,7 +519,7 @@ final class ChatService {
             break
         }
         // Fallback chain: proxy → max → api
-        if let provider = await buildProxyProvider() { return provider }
+        if let provider = buildProxyProvider(model: selectedModel) { return provider }
         if let sessionKey = keychain.read(key: KeychainKeys.anthropicMaxSessionKey), !sessionKey.isEmpty {
             return AnthropicProvider(sessionKey: sessionKey, model: selectedModel)
         }
@@ -462,17 +527,15 @@ final class ChatService {
         return provider.isAvailable ? provider : nil
     }
 
-    /// Build proxy provider with JWT auth token from BrainAPIAuthService.
-    /// Appends /claude-proxy to the base URL since the VPS routes LLM calls through that path.
-    private func buildProxyProvider() async -> AnthropicProvider? {
+    /// Build a provider for the user-configured OpenAI-compatible proxy.
+    /// The URL comes from the Keychain; AnthropicProvider appends the
+    /// standard /v1/chat/completions path.
+    private func buildProxyProvider(model: String) -> AnthropicProvider? {
         guard let baseURL = keychain.read(key: KeychainKeys.anthropicProxyURL), !baseURL.isEmpty else {
             return nil
         }
-        let selectedModel = UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
-        let token = await BrainAPIAuthService.shared.getValidToken()
         let base = baseURL.hasSuffix("/") ? String(baseURL.dropLast()) : baseURL
-        let proxyURL = base + "/claude-proxy"
-        return AnthropicProvider(proxyURL: proxyURL, model: selectedModel, bearerToken: token)
+        return AnthropicProvider(proxyURL: base, model: model)
     }
 
     // MARK: - Privacy Zone Detection

@@ -6,6 +6,36 @@
 
 ---
 
+## Status-Update 02.09.2026 -- LLMRouter-Verdrahtung + brain-api-Ausbau
+
+- **[BEHOBEN] LLMRouter nicht verdrahtet** (offen seit Review 03.07.2026) --
+  `ChatService.buildProvider` konstruiert den Router jetzt pro Anfrage (On-Device-
+  Adapter + User-Provider, NetworkMonitor-Konnektivitaet) und setzt Privacy Zones
+  sowie Offline-Routing bei jedem Send durch. Unerfuellbare Constraints (onDeviceOnly
+  ohne lokales Modell, offline ohne lokales Modell) brechen mit differenzierter
+  Fehlermeldung ab statt still auf Cloud zurueckzufallen. `setRouter` entfernt.
+- **[NEU BEHOBEN] Auto-Route war sticky** -- schrieb `chatModelOverride` und lief
+  danach nie wieder; Privacy-/Komplexitaets-Routing galt so nur fuer den ersten Send.
+  Jetzt pro Send lokal berechnet, Override bleibt der manuellen Modellwahl vorbehalten.
+- **[NEU BEHOBEN] "on-device" als OpenAI-Modell fehlgeroutet** -- `hasPrefix("o")`
+  matchte "on-device"; mit konfiguriertem OpenAI-Key ging eine On-Device-Wahl ohne
+  verfuegbares lokales Modell an GPT.
+- **[BEHOBEN] brain-api-Restcode** -- BrainAPIAuthService (261 Zeilen JWT-Auth gegen
+  den abgeschalteten VPS) inkl. pbxproj-Eintraegen, Login/2FA-UI (Settings +
+  Onboarding), `brainAPI*`-Keychain-Keys und `/claude-proxy`-Suffix entfernt.
+  Proxy-Modus ist jetzt ein rein generisches Feature (OpenAI-kompatible Endpoints);
+  ChatView/AvailableModels-Gates auf `anthropicProxyURL`/`anthropicMaxSessionKey`
+  umgestellt. BackupView-Importkompatibilitaet bewusst behalten.
+- **[NEU / OFFEN] Schweregrad: mittel** -- `DataBridge.buildLLMProvider()` (AI-Handler:
+  summarize, briefing, llm.complete; Skill-Kompilierung) waehlt Provider weiterhin
+  OHNE Router: kein Privacy-/Offline-Gate auf diesem Pfad, und die Auswahllogik
+  existiert damit doppelt (ChatService vs. DataBridge, bereits leicht divergent).
+  Folge-Arbeit: DataBridge auf denselben Router-Pfad heben.
+- **[NEU / INFO]** Auf Geraeten mit fruehem brain-api-Login bleiben verwaiste
+  Keychain-Items zurueck (inert; kein Code liest sie mehr, Loesch-Pfad entfernt).
+
+---
+
 ## Status-Update 04.07.2026 -- Stabilisierungs-Session (Findings-Abgleich)
 
 Abarbeitung der Findings aus dem Review vom 03.07.2026:

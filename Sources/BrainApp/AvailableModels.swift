@@ -56,7 +56,8 @@ struct AvailableModels {
         var models: [Model] = []
 
         let hasAnthropic = keychain.exists(key: KeychainKeys.anthropicAPIKey)
-        let hasProxy = keychain.exists(key: KeychainKeys.brainAPIRefreshToken)
+        let hasProxy = keychain.exists(key: KeychainKeys.anthropicProxyURL)
+            || keychain.exists(key: KeychainKeys.anthropicMaxSessionKey)
         if hasAnthropic || hasProxy {
             models.append(contentsOf: cachedModels(for: "Anthropic") ?? fallbackAnthropic)
         }

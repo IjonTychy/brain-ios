@@ -573,9 +573,8 @@ final class DataBridge {
         switch mode {
         case "proxy":
             if let baseURL = keychain.read(key: KeychainKeys.anthropicProxyURL), !baseURL.isEmpty {
-                let token = await BrainAPIAuthService.shared.getValidToken()
                 let base = baseURL.hasSuffix("/") ? String(baseURL.dropLast()) : baseURL
-                return AnthropicProvider(proxyURL: base + "/claude-proxy", model: selectedModel, bearerToken: token)
+                return AnthropicProvider(proxyURL: base, model: selectedModel)
             }
         case "max":
             if let sessionKey = keychain.read(key: KeychainKeys.anthropicMaxSessionKey), !sessionKey.isEmpty {

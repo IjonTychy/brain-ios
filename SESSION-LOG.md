@@ -6,6 +6,106 @@
 
 ---
 
+## LLMRouter verdrahtet + brain-api-Auth-Schicht entfernt -- 02.09.2026
+
+### Abgeschlossen
+
+- **LLMRouter im Chat verdrahtet** -- `ChatService.buildProvider` konstruiert den
+  BrainCore-Router jetzt pro Anfrage: On-Device-Kandidaten (Apple FM + bestes
+  geladenes Gemma, via `ToolLessProviderAdapter` chat-tauglich) plus der vom User
+  gewaehlte Cloud-Provider, Konnektivitaet live aus `NetworkMonitor`. Privacy Zones
+  (`onDeviceOnly`/`approvedCloudOnly`) und Offline-Routing werden damit bei JEDEM
+  Send durchgesetzt -- nicht mehr nur im Auto-Route-Sonderpfad. Kann der Router die
+  Constraints nicht erfuellen (Privacy verlangt On-Device und keines ist verfuegbar;
+  offline ohne lokales Modell), bricht send() mit praeziser Fehlermeldung ab statt
+  still in die Cloud zu fallen. `setRouter`/`router`-Property entfernt (war nie
+  aufgerufen -- Finding aus REVIEW-NOTES 03.07.).
+- **Auto-Route-Sticky-Bug behoben** -- Auto-Route schrieb `chatModelOverride` und
+  lief danach nie wieder: eine einmal erkannte Privacy-Zone (oder Komplexitaetsstufe)
+  klebte fuer alle folgenden Nachrichten. Das geroutete Modell wird jetzt pro Send
+  lokal bestimmt; das Override bleibt der manuellen Wahl im ChatView-Menu vorbehalten.
+- **"on-device" nicht mehr als OpenAI-Modell fehlgeroutet** -- `hasPrefix("o")`
+  matchte auch "on-device"; eine On-Device-Wahl ohne verfuegbares lokales Modell
+  landete mit konfiguriertem OpenAI-Key beim GPT-Branch.
+- **brain-api-Auth-Schicht komplett entfernt** -- BrainAPIAuthService.swift geloescht
+  (inkl. 4 pbxproj-Eintraege), `brainAPI*`-Keychain-Keys entfernt, JWT-Login/2FA-UI
+  in SettingsView durch "Speichern & Testen" ersetzt, Credential-Felder im Onboarding
+  entfernt, toter `statusBadge`-Helper mit raus. Der Proxy-Modus bleibt als
+  generisches Feature (selbst gehostete OpenAI-kompatible Endpoints).
+- **`/claude-proxy`-Suffix entfernt** (ChatService, DataBridge, SettingsView) -- das
+  war die Caddy-Route des abgeschalteten VPS und machte den generischen Proxy-Modus
+  mit Standard-Proxies (LiteLLM, vLLM, Ollama) inkompatibel. Das Onboarding testete
+  bereits ohne Suffix; diese Inkonsistenz ist damit ebenfalls weg. Proxy-Provider
+  respektieren jetzt zudem die aktuelle Modellwahl statt immer `selectedModel` aus
+  UserDefaults zu lesen.
+- **Konfig-Gates korrigiert** -- ChatView-Empty-State und AvailableModels erkannten
+  Proxy-Setups am toten `brainAPIRefreshToken`; jetzt `anthropicProxyURL` bzw.
+  `anthropicMaxSessionKey`.
+- **Bewusst BEHALTEN:** BackupView-Importkompatibilitaet fuer brain-api-Exporte
+  (Backup liegt unter `/home/andy/brain-api-backup/`).
+- **Review-Finding direkt gefixt (Modell-Attribution):** Nach dem Sticky-Fix
+  haetten Modell-Badge (ChatMessage.model) und Kosten-Tracking (Phase 30) weiter
+  das UserDefaults-Modell verbucht statt des tatsaechlich servierten.
+  `buildProvider` liefert jetzt `(provider, model)` -- bei Router-Umleitung auf
+  On-Device den Provider-Namen, sonst die aufgeloeste Modell-ID; Badge und
+  CostTracker nutzen denselben Wert. Nebenbei: Cloud-Provider ausser Anthropic
+  werden im CostTracker jetzt mit echter Modell-ID statt Provider-Namen verbucht.
+- **8 neue Tests** (`Tests/BrainAppTests/LLMRoutingTests.swift`, im pbxproj
+  registriert): ToolLessProviderAdapter-Kontrakt (Identitaets-Passthrough,
+  supportsStreaming=false, Unavailability, streamWithTools-Bridge) und
+  Router-Integration mit Adapter-Kandidaten (onDeviceOnly, offline,
+  unrestricted-bevorzugt-Cloud, nil bei unerfuellbarem onDeviceOnly).
+
+### Entscheidungen
+
+- **Router pro Request statt setRouter-Lifecycle:** Die Provider haengen von der
+  aktuellen Modellwahl ab und Keychain-Reads (Face-ID-gated) duerfen nicht beim
+  App-Start gestreut werden. LLMRouter ist ein leichtes Werteobjekt -- Konstruktion
+  in buildProvider haelt die gesamte Auswahllogik an einem Ort.
+- **Komplexitaets-Routing bleibt Opt-in:** Im Router-Aufruf wird `complexity`
+  bewusst auf .medium neutralisiert. Modellwahl nach Komplexitaet macht weiterhin
+  das `autoRouteModels`-Feature (model.low/medium/high/private) VOR der
+  Provider-Aufloesung. Sonst wuerden Kurzfragen bei manueller Claude-Wahl still auf
+  toollose On-Device-Modelle degradiert (ARCHITECTURE: "Chat -> User-Praeferenz",
+  und der Chat lebt von Tool-Use).
+- **Fail-loud bei unerfuellbaren Constraints:** route() == nil fuehrt zu einer
+  differenzierten Fehlermeldung (Privacy/Offline/kein Key) statt Fallback -- ein
+  stilles Cloud-Fallback waere genau das Leak, das Privacy Zones verhindern sollen.
+
+### Tests
+
+- BrainCore-Routing-Suite (LLMRouterTests 8 + PrivacyZoneTests 18) deckt den
+  Router-Entscheidungsbaum ab (unveraendert gueltig).
+- NEU: LLMRoutingTests (BrainAppTests, 8 Tests) fuer Adapter-Kontrakt und
+  Router-Integration mit adapter-gewrappten On-Device-Kandidaten.
+- Pre-Commit-Review (code-reviewer): OK fuer Commit; das eine should-fix-Finding
+  (Modell-Attribution) wurde vor dem Commit behoben.
+- `swift test` lokal nicht ausfuehrbar (keine Toolchain in der Remote-Umgebung);
+  Verifikation via GitHub Actions (Linux + macOS, Trigger auf claude/**).
+
+### Offene Probleme
+
+- **DataBridge.buildLLMProvider ohne Router:** Der AI-Handler-Pfad (summarize,
+  briefing, llm.complete, Skill-Kompilierung) waehlt Provider weiterhin ohne
+  Privacy-/Offline-Gate. Folge-Arbeit; dokumentiert in REVIEW-NOTES.
+- **Verwaiste Keychain-Items:** Auf Geraeten mit fruehem brain-api-Login bleiben
+  gespeicherte Tokens zurueck (inert, kein Code liest sie mehr; ein Loesch-Pfad
+  existiert nicht mehr).
+
+### Naechster Schritt
+
+- CI-Verifikation des Branches `claude/session-7rrkg8`, dann PR nach `main`.
+- Danach gemaess Prioritaeten: God Objects splitten oder Deploy-Vorarbeit
+  (xcconfig fuer echte Bundle-IDs).
+
+### Systemzustand
+
+- OK: Privacy Zones und Offline-Routing im Chat durchgesetzt (Router aktiv)
+- OK: brain-api restlos aus dem Code (nur Backup-Import-Kompatibilitaet bleibt)
+- Ausstehend: CI-Lauf, Device-Verifikation (Privacy-Zone-Meldungen, Proxy-Test-UI)
+
+---
+
 ## Phase 1+2 Stabilisierung: CI, Engine-Vokabular, Gemma On-Device -- 04.07.2026
 
 ### Abgeschlossen

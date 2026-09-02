@@ -126,7 +126,8 @@ struct ChatView: View {
             let hasKey = keychain.exists(key: KeychainKeys.anthropicAPIKey)
                 || keychain.exists(key: KeychainKeys.openAIAPIKey)
                 || keychain.exists(key: KeychainKeys.geminiAPIKey)
-                || keychain.exists(key: KeychainKeys.brainAPIRefreshToken)
+                || keychain.exists(key: KeychainKeys.anthropicProxyURL)
+                || keychain.exists(key: KeychainKeys.anthropicMaxSessionKey)
             if hasKey {
                 VStack(spacing: 16) {
                     Image(systemName: "brain.head.profile")

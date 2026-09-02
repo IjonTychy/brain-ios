@@ -16,18 +16,10 @@ struct SettingsView: View {
 
     // Proxy state (used by proxy section in advanced)
     @State private var proxyURL = ""
-    @State private var proxyUsername = ""
-    @State private var proxyPassword = ""
-    @State private var proxy2FACode = ""
-    @State private var proxy2FATempToken = ""
     @State private var proxyStatus: KeyStatus = .unknown
-    @State private var isLoggingInProxy = false
     @State private var isTestingProxy = false
     @State private var validationError: String?
-    @State private var proxyLoggedIn = false
     @State private var showResetConfirmation = false
-    @State private var proxyDisplayName: String?
-    @State private var show2FAField = false
     @AppStorage("anthropicMode") private var anthropicMode = "api"
     @AppStorage("selectedModel") private var selectedModel = "claude-opus-4-6"
     @AppStorage(PinnedURLSession.tofuEnabledKey) private var tofuEnabled = false
@@ -172,7 +164,7 @@ struct SettingsView: View {
             // Proxy mode
             VStack(alignment: .leading, spacing: 8) {
                 Label("Proxy-URL", systemImage: "server.rack")
-                Text("OpenAI-kompatibler Proxy mit JWT-Authentifizierung")
+                Text("OpenAI-kompatibler Proxy, selbst gehostet (z.B. LiteLLM, vLLM, Ollama)")
                     .font(.caption2).foregroundStyle(.secondary)
                 TextField("https://mein-server:8082", text: $proxyURL)
                     .textFieldStyle(.roundedBorder)
@@ -180,91 +172,26 @@ struct SettingsView: View {
                     .textInputAutocapitalization(.never)
                     .keyboardType(.URL)
                     .accessibilityIdentifier("settings.proxyURL")
+                if let validationError, anthropicMode == "proxy" {
+                    Text(validationError).font(.caption2).foregroundStyle(.red)
+                }
+                Button {
+                    Task { await saveAndTestProxy() }
+                } label: {
+                    HStack {
+                        if isTestingProxy { ProgressView().tint(.white) }
+                        Text("Speichern & Testen")
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(proxyURL.isEmpty || isTestingProxy)
+                if anthropicMode == "proxy" && proxyStatus == .configured {
+                    Label("Proxy-Modus aktiv", systemImage: "checkmark.circle.fill")
+                        .font(.caption).foregroundStyle(.green)
+                }
             }
             .padding(.vertical, 4)
-
-            if proxyLoggedIn {
-                proxyLoggedInView
-            } else {
-                proxyLoginForm
-            }
-        }
-    }
-
-    @ViewBuilder
-    private var proxyLoggedInView: some View {
-        HStack {
-            Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
-            VStack(alignment: .leading) {
-                Text("Angemeldet").font(.subheadline).fontWeight(.medium)
-                if let name = proxyDisplayName {
-                    Text(name).font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            Spacer()
-            statusBadge(proxyStatus)
-        }
-        Button {
-            Task { await testProxyConnection() }
-        } label: {
-            HStack {
-                if isTestingProxy { ProgressView().tint(.white) }
-                Text("Verbindung testen")
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .buttonStyle(.borderedProminent)
-        .disabled(isTestingProxy)
-        Button("Abmelden", role: .destructive) {
-            BrainAPIAuthService.shared.logout()
-            proxyLoggedIn = false
-            proxyDisplayName = nil
-            proxyStatus = .unknown
-            anthropicMode = "api"
-        }
-    }
-
-    @ViewBuilder
-    private var proxyLoginForm: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Label("Anmeldung", systemImage: "person.badge.key")
-            TextField("Benutzername", text: $proxyUsername)
-                .textFieldStyle(.roundedBorder).autocorrectionDisabled().textInputAutocapitalization(.never)
-            SecureField("Passwort", text: $proxyPassword)
-                .textFieldStyle(.roundedBorder).textContentType(.none).autocorrectionDisabled().textInputAutocapitalization(.never)
-            if show2FAField {
-                HStack {
-                    TextField("2FA-Code", text: $proxy2FACode)
-                        .textFieldStyle(.roundedBorder).keyboardType(.numberPad)
-                    Button {
-                        Task { await submit2FA() }
-                    } label: {
-                        HStack {
-                            if isLoggingInProxy { ProgressView().tint(.white) }
-                            Text("Bestätigen")
-                        }
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .disabled(proxy2FACode.isEmpty || isLoggingInProxy)
-                }
-            }
-        }
-        .padding(.vertical, 4)
-        if let validationError, anthropicMode == "proxy" {
-            Text(validationError).font(.caption2).foregroundStyle(.red)
-        }
-        if !show2FAField {
-            Button {
-                Task { await loginToProxy() }
-            } label: {
-                HStack {
-                    if isLoggingInProxy { ProgressView().tint(.white) }
-                    Text("Anmelden")
-                }
-                .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .disabled(proxyURL.isEmpty || proxyUsername.isEmpty || proxyPassword.isEmpty || isLoggingInProxy)
         }
     }
 
@@ -469,37 +396,14 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - Components
-
-    @ViewBuilder
-    private func statusBadge(_ status: KeyStatus) -> some View {
-        switch status {
-        case .configured:
-            Label("Konfiguriert", systemImage: "checkmark.circle.fill")
-                .font(.caption)
-                .foregroundStyle(.green)
-        case .invalid:
-            Label("Ungültig", systemImage: "xmark.circle.fill")
-                .font(.caption)
-                .foregroundStyle(.red)
-        case .unknown:
-            Label("Nicht konfiguriert", systemImage: "circle.dashed")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-    }
-
     // MARK: - Actions
 
     private func loadCurrentState() {
         if let savedProxy = keychain.read(key: KeychainKeys.anthropicProxyURL), !savedProxy.isEmpty {
             proxyURL = savedProxy
-        }
-        let auth = BrainAPIAuthService.shared
-        proxyLoggedIn = auth.isLoggedIn
-        proxyDisplayName = auth.displayName
-        if proxyLoggedIn {
-            proxyStatus = .configured
+            if anthropicMode == "proxy" {
+                proxyStatus = .configured
+            }
         }
         // Load month cost for billing badge
         if let db = dataBridge?.db {
@@ -508,86 +412,22 @@ struct SettingsView: View {
         }
     }
 
-    // Login to proxy via JWT auth
-    private func loginToProxy() async {
-        isLoggingInProxy = true
-        validationError = nil
-        defer { isLoggingInProxy = false }
-
-        let trimmed = proxyURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard trimmed.hasPrefix("https://") else {
-            validationError = "Proxy-URL muss mit https:// beginnen (HTTP nicht erlaubt)."
-            return
-        }
-
-        // Save proxy URL
-        try? keychain.save(key: KeychainKeys.anthropicProxyURL, value: trimmed)
-
-        do {
-            let result = try await BrainAPIAuthService.shared.login(
-                baseURL: trimmed,
-                username: proxyUsername,
-                password: proxyPassword
-            )
-            // Login succeeded
-            proxyLoggedIn = true
-            proxyDisplayName = result.displayName.isEmpty ? proxyUsername : result.displayName
-            proxyStatus = .configured
-            anthropicMode = "proxy"
-            proxyUsername = ""
-            proxyPassword = ""
-        } catch AuthError.requires2FA(let tempToken) {
-            // Show 2FA input
-            proxy2FATempToken = tempToken
-            show2FAField = true
-        } catch {
-            validationError = error.localizedDescription
-        }
-    }
-
-    private func submit2FA() async {
-        isLoggingInProxy = true
-        validationError = nil
-        defer { isLoggingInProxy = false }
-
-        let trimmed = proxyURL.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        do {
-            let result = try await BrainAPIAuthService.shared.login2FA(
-                baseURL: trimmed,
-                tempToken: proxy2FATempToken,
-                code: proxy2FACode
-            )
-            proxyLoggedIn = true
-            proxyDisplayName = result.displayName.isEmpty ? proxyUsername : result.displayName
-            proxyStatus = .configured
-            anthropicMode = "proxy"
-            proxyUsername = ""
-            proxyPassword = ""
-            proxy2FACode = ""
-            proxy2FATempToken = ""
-            show2FAField = false
-        } catch {
-            validationError = error.localizedDescription
-        }
-    }
-
-    // Test proxy connection with current JWT
-    private func testProxyConnection() async {
+    // Save the proxy URL and verify the endpoint with a minimal request.
+    private func saveAndTestProxy() async {
         isTestingProxy = true
         validationError = nil
         defer { isTestingProxy = false }
 
-        guard let token = await BrainAPIAuthService.shared.getValidToken() else {
+        let trimmed = proxyURL.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.hasPrefix("https://") else {
+            validationError = "Proxy-URL muss mit https:// beginnen (HTTP nicht erlaubt)."
             proxyStatus = .invalid
-            proxyLoggedIn = false
-            validationError = "Session abgelaufen. Bitte erneut anmelden."
             return
         }
+        try? keychain.save(key: KeychainKeys.anthropicProxyURL, value: trimmed)
 
-        let base = proxyURL.trimmingCharacters(in: .whitespacesAndNewlines)
-        let claudeProxyURL = (base.hasSuffix("/") ? String(base.dropLast()) : base) + "/claude-proxy"
-        let provider = AnthropicProvider(proxyURL: claudeProxyURL, bearerToken: token)
+        let base = trimmed.hasSuffix("/") ? String(trimmed.dropLast()) : trimmed
+        let provider = AnthropicProvider(proxyURL: base)
         let request = LLMRequest(
             messages: [LLMMessage(role: "user", content: "Sag 'OK'.")],
             maxTokens: 10
@@ -597,8 +437,10 @@ struct SettingsView: View {
             let response = try await provider.complete(request)
             if !response.content.isEmpty {
                 proxyStatus = .configured
+                anthropicMode = "proxy"
             } else {
                 proxyStatus = .invalid
+                validationError = "Leere Antwort vom Proxy."
             }
         } catch {
             proxyStatus = .invalid
