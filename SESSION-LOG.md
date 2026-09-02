@@ -126,9 +126,13 @@
 
 ### Systemzustand
 
-- OK: Privacy Zones und Offline-Routing im Chat durchgesetzt (Router aktiv)
+- OK: Privacy Zones und Offline-Routing in Chat UND AI-Handler-Pfad durchgesetzt
+  (LLMProviderFactory + Router aktiv)
 - OK: brain-api restlos aus dem Code (nur Backup-Import-Kompatibilitaet bleibt)
-- Ausstehend: CI-Lauf, Device-Verifikation (Privacy-Zone-Meldungen, Proxy-Test-UI)
+- OK: **Beide CI-Workflows gruen** fuer beide Commits (`d6beaf7`, `125ba2a`):
+  BrainCore-Suite auf Linux + iOS Build & Test auf macOS
+- Ausstehend: PR nach main, Device-Verifikation (Privacy-Zone-Meldungen,
+  Proxy-Test-UI)
 
 ---
 
