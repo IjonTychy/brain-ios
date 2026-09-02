@@ -174,8 +174,9 @@
 - OK: **Beide CI-Workflows gruen** fuer `d6beaf7` und `125ba2a`; PR #2 gemergt
 - OK: Identifier-Schicht (xcconfig + AppIdentifiers) code-seitig komplett;
   Placeholder-Build in CI verhaelt sich identisch zu vorher
-- Ausstehend: CI-Lauf fuer Paket 3, Local.xcconfig/Xcode-Cloud-Setup durch Andy,
-  Device-Verifikation
+- OK: **CI gruen fuer Paket 3** (`e8b49a4`): xcodebuild loest xcconfig-Kette,
+  `$(...)`-Substitution und Extension-Entitlements korrekt auf
+- Ausstehend: Local.xcconfig/Xcode-Cloud-Setup durch Andy, Device-Verifikation
 
 ---
 
