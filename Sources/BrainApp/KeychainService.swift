@@ -6,6 +6,9 @@ import LocalAuthentication
 // API keys are NEVER stored in code, UserDefaults, or the database.
 struct KeychainService: Sendable {
 
+    // Deliberately a fixed string, NOT derived from the bundle id: the
+    // service name keys every stored item, so following the build
+    // configuration would orphan all keys on an identifier change.
     private let serviceName = "com.example.brain-ios"
 
     /// Keys that hold API credentials and should be protected with biometry.

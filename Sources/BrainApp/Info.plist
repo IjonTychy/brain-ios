@@ -2,17 +2,23 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BrainAppGroupID</key>
+	<string>$(BRAIN_APP_GROUP)</string>
+	<key>BrainICloudContainerID</key>
+	<string>$(BRAIN_ICLOUD_CONTAINER)</string>
+	<key>BrainGoogleClientID</key>
+	<string>$(BRAIN_GOOGLE_CLIENT_ID).apps.googleusercontent.com</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.example.brain-ios.analysis</string>
-		<string>com.example.brain-ios.deep-analysis</string>
-		<string>com.example.brain-ios.mail-sync</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).analysis</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).deep-analysis</string>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).mail-sync</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.example.brain-ios.deeplink</string>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).deeplink</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>brain</string>
@@ -20,10 +26,10 @@
 		</dict>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.example.brain-ios.google-oauth</string>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).google-oauth</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.YOUR_GOOGLE_CLIENT_ID</string>
+				<string>com.googleusercontent.apps.$(BRAIN_GOOGLE_CLIENT_ID)</string>
 			</array>
 		</dict>
 	</array>

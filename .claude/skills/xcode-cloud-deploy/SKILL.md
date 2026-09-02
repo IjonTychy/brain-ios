@@ -11,22 +11,39 @@ argument-hint: [rebuild|status|fix]
 
 | Feld | Wert |
 |------|------|
-| Bundle ID | `com.example.brain-ios` |
-| Team ID | `TEAM_ID_HERE` |
+| Bundle ID | `$(BRAIN_BUNDLE_ID_BASE)` aus `Config/Local.xcconfig` (Platzhalter im Repo: `com.example.brain-ios`) |
+| Team ID | `$(BRAIN_TEAM_ID)` aus `Config/Local.xcconfig` (Platzhalter: `TEAM_ID_HERE`) |
 | Scheme | `BrainApp` |
-| Branch | `master` |
+| Branch | `main` |
 | Min iOS | 17.0 |
 | Geraete | iPhone + iPad |
 
+## Private Identifier (xcconfig)
+
+Das oeffentliche Repo enthaelt nur Platzhalter. Alle deploy-relevanten IDs
+(Bundle-ID-Basis, Team-ID, Google-Client-ID; daraus abgeleitet App Group,
+iCloud-Container, BGTask-IDs, Extension-Bundle-IDs, IAP-Produkt-ID) kommen aus
+`Config/Base.xcconfig`, das optional `Config/Local.xcconfig` (gitignored) inkludiert.
+
+- **Lokal:** `Config/Local.xcconfig.example` nach `Config/Local.xcconfig` kopieren
+  und befuellen. Nie committen.
+- **Xcode Cloud:** Im Workflow die Environment-Variablen `BRAIN_BUNDLE_ID_BASE`,
+  `BRAIN_TEAM_ID`, `BRAIN_GOOGLE_CLIENT_ID` setzen — `ci_post_clone.sh` schreibt
+  daraus `Config/Local.xcconfig` vor dem Build.
+- Zur Laufzeit liest `AppIdentifiers.swift` die Werte aus Info.plist bzw. der
+  Bundle-ID; App, Share Extension und Widgets teilen sich so dieselbe App Group.
+- Der Keychain-Service-Name bleibt bewusst fix (`com.example.brain-ios`), damit
+  gespeicherte Keys einen Identifier-Wechsel ueberleben.
+
 ## Deployment ausloesen
 
-Ein `git push origin master` triggert automatisch einen Xcode Cloud Build.
+Ein `git push origin main` triggert automatisch einen Xcode Cloud Build.
 Der Build archiviert, signiert und laedt zu TestFlight hoch.
 
 ```bash
 # Build-Nummer erhoehen vor Push:
 # In BrainApp.xcodeproj/project.pbxproj: CURRENT_PROJECT_VERSION erhoehen
-git add -A && git commit -m "..." && git push origin master
+git add -A && git commit -m "..." && git push origin main
 ```
 
 ## Build-Status pruefen
@@ -242,33 +259,41 @@ Jedes Extension-Target braucht diese Sektionen in project.pbxproj:
 ### Wichtige Build-Settings fuer Extensions
 ```
 SKIP_INSTALL = YES
-INFOPLIST_FILE = "" (generiert via GENERATE_INFOPLIST_FILE)
+INFOPLIST_FILE = Sources/[Target]/Info.plist (plus GENERATE_INFOPLIST_FILE = YES)
 CODE_SIGN_STYLE = Automatic
-PRODUCT_BUNDLE_IDENTIFIER = com.example.brain-ios.[extension-name]
+CODE_SIGN_ENTITLEMENTS = Sources/[Target]/[Target].entitlements (App Group!)
+PRODUCT_BUNDLE_IDENTIFIER = "$(BRAIN_BUNDLE_ID_BASE).[extension-name]"
 SWIFT_EMIT_LOC_STRINGS = YES
 GENERATE_INFOPLIST_FILE = YES
 ```
 
 ### SharedContainer fuer App Group DB
-- Alle Targets die DB-Zugriff brauchen muessen `SharedContainer.swift` kompilieren
-- App Group ID: `group.com.example.brain-ios`
-- SharedContainer.swift in PBXBuildFile jedes Targets eintragen
+- Alle Targets die DB-Zugriff brauchen muessen `SharedContainer.swift` UND
+  `AppIdentifiers.swift` kompilieren
+- App Group ID: `$(BRAIN_APP_GROUP)` (= `group.$(BRAIN_BUNDLE_ID_BASE)`, aus
+  Base.xcconfig) — in den Entitlements jedes Targets und als Info.plist-Key
+  `BrainAppGroupID`
+- SharedContainer.swift + AppIdentifiers.swift in PBXBuildFile jedes Targets eintragen
 
 ## Kritische Dateien
 
 ```
 BrainApp.xcodeproj/project.pbxproj          ← Projekt-Config, Signing, Build-Nummer
+Config/Base.xcconfig                         ← Identifier-Platzhalter (committed), inkludiert Local.xcconfig
+Config/Local.xcconfig                        ← Echte IDs (gitignored; Vorlage: Local.xcconfig.example)
 BrainApp.xcodeproj/project.xcworkspace/
   xcshareddata/swiftpm/Package.resolved      ← SPM Lock-File (MUSS committed sein, NICHT in .gitignore!)
 BrainApp.xcodeproj/xcshareddata/
   xcschemes/BrainApp.xcscheme                ← Shared Scheme
-ci_scripts/ci_post_clone.sh                  ← Post-Clone Hook (Sicherheitsnetz, nicht Ersatz fuer Package.resolved)
+ci_scripts/ci_post_clone.sh                  ← Post-Clone Hook: schreibt Local.xcconfig aus Env-Vars, Docs-only-Skip
 ```
 
 ## Voraussetzungen-Checkliste
 
 - [ ] Apple Developer Program aktiv ($99/Jahr)
-- [ ] App ID `com.example.brain-ios` registriert (developer.apple.com → Identifiers)
+- [ ] `Config/Local.xcconfig` befuellt (lokal) bzw. Xcode-Cloud-Env-Vars gesetzt
+- [ ] App IDs `<base>`, `<base>.share-extension`, `<base>.widgets` registriert; App Group
+      `group.<base>` und iCloud-Container `iCloud.<base>` zugewiesen (developer.apple.com → Identifiers)
 - [ ] Geraet UDID registriert (developer.apple.com → Devices)
 - [ ] App in App Store Connect angelegt (Name: Brain, SKU: brain-ios)
 - [ ] Paid Apps Agreement akzeptiert (App Store Connect → Business)

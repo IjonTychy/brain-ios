@@ -1,0 +1,22 @@
+// Copy this file to Config/Local.xcconfig (git-ignored) and fill in the
+// identifiers of your own Apple Developer account. Anything not set here
+// keeps the placeholder from Base.xcconfig.
+//
+// Xcode Cloud: instead of this file, define environment variables with the
+// same names in the workflow (Settings → Environment); ci_post_clone.sh
+// writes them into Config/Local.xcconfig before the build starts.
+//
+// What must exist on the Apple side (developer.apple.com / App Store Connect):
+//   App IDs (explicit):   <base>, <base>.share-extension, <base>.widgets
+//   App Group:            group.<base>   (enabled on all three App IDs)
+//   iCloud container:     iCloud.<base>  (CloudKit, main App ID)
+//   In-app purchase:      <base>.lifetime (non-consumable)
+//   BGTask identifiers derive automatically from the base:
+//                         <base>.analysis, <base>.deep-analysis, <base>.mail-sync
+//
+// Note: the Keychain service name is intentionally NOT derived from the
+// bundle id (see KeychainService.swift) — changing it would orphan stored keys.
+
+BRAIN_BUNDLE_ID_BASE = com.yourname.brain
+BRAIN_TEAM_ID = ABCDE12345
+BRAIN_GOOGLE_CLIENT_ID = 123456789012-abcdefghijklmnop

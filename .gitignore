@@ -1,5 +1,6 @@
 .build/
 .env
+Config/Local.xcconfig
 .mcp.json
 .claude/settings.json
 xcuserdata/

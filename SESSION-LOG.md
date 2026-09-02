@@ -6,9 +6,37 @@
 
 ---
 
-## LLMRouter verdrahtet + brain-api-Auth-Schicht entfernt -- 02.09.2026
+## LLMRouter verdrahtet + brain-api-Auth-Schicht entfernt + Deploy-Vorarbeit -- 02.09.2026
 
 ### Abgeschlossen
+
+- **Paket 3: Deploy-Vorarbeit -- Identifier via xcconfig** -- Alle
+  deploy-relevanten Identifier kommen jetzt aus der Build-Konfiguration statt
+  aus Literalen: `Config/Base.xcconfig` (committed, Platzhalter) inkludiert
+  optional `Config/Local.xcconfig` (gitignored; Vorlage `Local.xcconfig.example`
+  mit Anleitung, welche App-IDs/App Group/iCloud-Container/IAP auf Apple-Seite
+  existieren muessen). Auf Projekt-Ebene eingehaengt (`baseConfigurationReference`),
+  damit alle vier Targets erben; `PRODUCT_BUNDLE_IDENTIFIER` und
+  `DEVELOPMENT_TEAM` referenzieren `$(BRAIN_BUNDLE_ID_BASE)`/`$(BRAIN_TEAM_ID)`.
+  Entitlements und Info.plists nutzen `$(...)`-Substitution (BGTask-IDs und
+  URL-Namen aus `PRODUCT_BUNDLE_IDENTIFIER`, Google-Client-ID und Callback-Scheme
+  aus `BRAIN_GOOGLE_CLIENT_ID`); die App Group steht als Custom-Key
+  `BrainAppGroupID` in allen drei Info.plists, iCloud-Container und
+  Google-Client-ID in der App-Info.plist. Neues `AppIdentifiers.swift` (in App,
+  Share Extension und Widgets kompiliert) ersetzt 20 Literale: App Group, iCloud
+  und Google-ID aus Info.plist; BGTask-, Spotlight- und StoreKit-IDs aus der
+  Bundle-ID abgeleitet. `ci_post_clone.sh` schreibt `Local.xcconfig` aus
+  Xcode-Cloud-Environment-Variablen gleichen Namens.
+- **Zwei Deploy-Bugs dabei behoben:** (1) Share Extension und Widgets hatten
+  keine Entitlements-Datei und damit keinen App-Group-Zugriff -- auf dem Geraet
+  haetten sie eine andere SQLite-Datei gesehen als die App (SharedContainer-
+  Fallback). Neue `.entitlements` fuer beide Targets, `CODE_SIGN_ENTITLEMENTS`
+  gesetzt. (2) `ci_post_clone.sh` war nicht executable (644) -- Xcode Cloud
+  verlangt +x. Ausserdem zwei tote BGTask-Konstanten in BrainApp.swift entfernt
+  (deklariert, nie referenziert).
+- **Google OAuth:** `resolveClientId()` liefert jetzt die konfigurierte ID und
+  wirft bei Platzhalter `clientIdNotConfigured` statt Google eine Bogus-ID zu
+  schicken.
 
 - **Paket 2: AI-Handler-Pfad auf den Router gehoben (LLMProviderFactory)** --
   Die Provider-Auswahllogik existierte doppelt (ChatService vs. DataBridge,
@@ -93,6 +121,15 @@
 - **Fail-loud bei unerfuellbaren Constraints:** route() == nil fuehrt zu einer
   differenzierten Fehlermeldung (Privacy/Offline/kein Key) statt Fallback -- ein
   stilles Cloud-Fallback waere genau das Leak, das Privacy Zones verhindern sollen.
+- **xcconfig auf Projekt-Ebene statt pro Target:** Eine Referenz statt acht;
+  Target-Settings referenzieren nur Variablen (Target-Settings haben Vorrang vor
+  Target-xcconfigs, deshalb mussten die Literale dort ohnehin raus).
+- **Keychain-Service-Name bleibt fix** (`com.example.brain-ios`): Er schluesselt
+  alle gespeicherten Items; eine Kopplung an die Bundle-ID wuerde bei jedem
+  Identifier-Wechsel alle Keys verwaisen. Ebenso bleiben die 31
+  Logger-Subsystems unangetastet (kosmetisch, kein Deploy-Effekt).
+- **Public Repo bleibt anonym:** Echte IDs leben ausschliesslich in der
+  gitignorierten Local.xcconfig bzw. in Xcode-Cloud-Environment-Variablen.
 
 ### Tests
 
@@ -120,19 +157,26 @@
 
 ### Naechster Schritt
 
-- CI-Verifikation des Branches `claude/session-7rrkg8`, dann PR nach `main`.
-- Danach gemaess Prioritaeten: God Objects splitten oder Deploy-Vorarbeit
-  (xcconfig fuer echte Bundle-IDs).
+- Pakete 1+2 sind via PR #2 auf `main` (Merge `fa392ab`). Paket 3 (xcconfig)
+  ueber CI verifizieren, dann PR nach `main`.
+- **Andy (am Mac):** `Config/Local.xcconfig.example` nach `Config/Local.xcconfig`
+  kopieren und echte Werte eintragen; fuer Xcode Cloud die drei
+  Environment-Variablen im Workflow setzen; App-IDs/App Group/iCloud/IAP gemaess
+  Example pruefen; Device-Verifikation (Privacy-Meldungen, Widgets mit App-Group-DB,
+  Google OAuth).
+- Danach: God Objects splitten.
 
 ### Systemzustand
 
 - OK: Privacy Zones und Offline-Routing in Chat UND AI-Handler-Pfad durchgesetzt
   (LLMProviderFactory + Router aktiv)
 - OK: brain-api restlos aus dem Code (nur Backup-Import-Kompatibilitaet bleibt)
-- OK: **Beide CI-Workflows gruen** fuer beide Commits (`d6beaf7`, `125ba2a`):
-  BrainCore-Suite auf Linux + iOS Build & Test auf macOS
-- Ausstehend: PR nach main, Device-Verifikation (Privacy-Zone-Meldungen,
-  Proxy-Test-UI)
+- OK: **Beide CI-Workflows gruen** fuer `d6beaf7` und `125ba2a`; PR #2 gemergt
+- OK: Identifier-Schicht (xcconfig + AppIdentifiers) code-seitig komplett;
+  Placeholder-Build in CI verhaelt sich identisch zu vorher
+- OK: **CI gruen fuer Paket 3** (`e8b49a4`): xcodebuild loest xcconfig-Kette,
+  `$(...)`-Substitution und Extension-Entitlements korrekt auf
+- Ausstehend: Local.xcconfig/Xcode-Cloud-Setup durch Andy, Device-Verifikation
 
 ---
 
