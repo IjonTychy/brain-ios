@@ -44,13 +44,15 @@ konkreten Implementierung verschoben:
 - **LLM-Stack heute:** Anthropic (API-Key, Max-Session-Key oder generischer
   OpenAI-kompatibler Proxy), OpenAI, Gemini, On-Device sowie xAI/custom ueber
   `OpenAICompatibleProvider`. Gemini-OAuth ist implementiert.
-- **LLM-Routing heute (02.09.2026):** Der Chat baut den `LLMRouter` pro Anfrage
-  (On-Device-Kandidaten via `ToolLessProviderAdapter` + User-Provider,
-  Konnektivitaet aus `NetworkMonitor`) und setzt Privacy Zones und
-  Offline-Routing bei jedem Send durch; unerfuellbare Constraints brechen mit
-  Fehlermeldung ab. Komplexitaets-Modellwahl bleibt das Opt-in-Feature
-  `autoRouteModels` (Chat folgt der User-Praeferenz). Der AI-Handler-Pfad
-  (`DataBridge.buildLLMProvider`) laeuft noch ohne Router.
+- **LLM-Routing heute (02.09.2026):** Die gesamte Provider-Auswahl liegt in
+  `LLMProviderFactory`; Chat (`ChatService.buildProvider`) und AI-Handler-Pfad
+  (`DataBridge.buildLLMProvider`) delegieren dorthin. Der `LLMRouter` wird pro
+  Anfrage gebaut (On-Device-Kandidaten via `ToolLessProviderAdapter` +
+  User-Provider, Konnektivitaet aus `NetworkMonitor`) und setzt Privacy Zones
+  und Offline-Routing durch; unerfuellbare Constraints brechen mit Fehlermeldung
+  ab. Entry-basierte AI-Handler (summarize, briefing, crossref) leiten ihr
+  Privacy-Level aus den Quell-Entry-Tags ab. Komplexitaets-Modellwahl bleibt
+  das Opt-in-Feature `autoRouteModels` (Chat folgt der User-Praeferenz).
 - **Self-Improve heute:** Skill-Vorschlaege werden als Proposals persistiert; bei Anwendung wird die
   Skill-Generierung an den Chat/Compiler-Pfad uebergeben.
 

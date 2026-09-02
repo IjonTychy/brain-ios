@@ -26,11 +26,18 @@
   Proxy-Modus ist jetzt ein rein generisches Feature (OpenAI-kompatible Endpoints);
   ChatView/AvailableModels-Gates auf `anthropicProxyURL`/`anthropicMaxSessionKey`
   umgestellt. BackupView-Importkompatibilitaet bewusst behalten.
-- **[NEU / OFFEN] Schweregrad: mittel** -- `DataBridge.buildLLMProvider()` (AI-Handler:
-  summarize, briefing, llm.complete; Skill-Kompilierung) waehlt Provider weiterhin
-  OHNE Router: kein Privacy-/Offline-Gate auf diesem Pfad, und die Auswahllogik
-  existiert damit doppelt (ChatService vs. DataBridge, bereits leicht divergent).
-  Folge-Arbeit: DataBridge auf denselben Router-Pfad heben.
+- **[BEHOBEN gleiche Session] DataBridge.buildLLMProvider ohne Router** -- Auswahllogik
+  in `LLMProviderFactory` konsolidiert (eine Implementierung fuer Chat- und
+  Handler-Pfad), DataBridge laeuft ueber den Router (Offline-Gate ueberall,
+  Privacy-Gate via neuem `buildLLMProvider(privacyLevel:)`). Entry-basierte
+  Handler (summarize/extractTasks per entryId, briefing, crossref) ermitteln ihr
+  Level aus den Quell-Entry-Tags. Drei Divergenz-Bugs dabei behoben:
+  Custom-Endpoint-Key aus totem Feld statt Keychain (Handler-Pfad faktisch kaputt),
+  unavailable-Provider-Rueckgabe bei "on-device", unnoetiger biometry-Keychain-Read
+  fuer Nicht-Anthropic-Modelle.
+- **[NEU / OFFEN] Schweregrad: niedrig** -- Rohtext-Handler (ai.draftReply, llm.*)
+  haben keine Entry-Provenance und laufen unrestricted; eine explizite
+  privacyLevel-Property im Skill-Schema waere der saubere Weg.
 - **[NEU / INFO]** Auf Geraeten mit fruehem brain-api-Login bleiben verwaiste
   Keychain-Items zurueck (inert; kein Code liest sie mehr, Loesch-Pfad entfernt).
 

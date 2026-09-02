@@ -10,6 +10,28 @@
 
 ### Abgeschlossen
 
+- **Paket 2: AI-Handler-Pfad auf den Router gehoben (LLMProviderFactory)** --
+  Die Provider-Auswahllogik existierte doppelt (ChatService vs. DataBridge,
+  bereits divergent) und ist jetzt in `LLMProviderFactory` konsolidiert; beide
+  Pfade delegieren dorthin. `DataProviding` bekam `buildLLMProvider(privacyLevel:)`
+  (Default-Extension haelt Test-Mocks kompatibel); `DataBridge.buildLLMProvider`
+  laeuft damit ueber den Router und setzt Offline-Routing bei allen 11
+  Aufrufern durch (AI-Handler + Skill-Kompilierung). Handler mit
+  Entry-Provenance (ai.summarize/ai.extractTasks im entryId-Zweig, ai.briefing,
+  entry.crossref) ermitteln ihr Privacy-Level via
+  `PrivacyZoneService.strictestLevel(forEntryIds:)` -- Privacy Zones gelten
+  jetzt auch fuer Zusammenfassungen, Briefings und Querverweise. Reine
+  Text-Inputs (ai.draftReply, llm.*) bleiben mangels Provenance unrestricted.
+  Alle Handler nutzen die differenzierte Fehlermeldung (Privacy/Offline/kein
+  Key) statt pauschal "Kein API-Key konfiguriert".
+- **Divergenz-Bugs des DataBridge-Pfads dabei behoben:** Custom-Endpoint-Keys
+  kamen noch aus dem toten `endpoint.apiKey`-Feld statt aus dem Keychain
+  (AP5-Haertung) -- Custom-Endpoints waren im Handler-Pfad faktisch kaputt;
+  explizite "on-device"-Wahl gab notfalls einen unavailable Provider zurueck
+  statt wie der Chat auf Cloud durchzufallen; der Anthropic-Key wird jetzt nur
+  noch im Anthropic-Zweig gelesen (biometry-gated Key, kein unnoetiger
+  Face-ID-Prompt bei Gemini/OpenAI-Modellen -- galt vorher auch im Chat-Pfad).
+
 - **LLMRouter im Chat verdrahtet** -- `ChatService.buildProvider` konstruiert den
   BrainCore-Router jetzt pro Anfrage: On-Device-Kandidaten (Apple FM + bestes
   geladenes Gemma, via `ToolLessProviderAdapter` chat-tauglich) plus der vom User
@@ -85,12 +107,16 @@
 
 ### Offene Probleme
 
-- **DataBridge.buildLLMProvider ohne Router:** Der AI-Handler-Pfad (summarize,
-  briefing, llm.complete, Skill-Kompilierung) waehlt Provider weiterhin ohne
-  Privacy-/Offline-Gate. Folge-Arbeit; dokumentiert in REVIEW-NOTES.
 - **Verwaiste Keychain-Items:** Auf Geraeten mit fruehem brain-api-Login bleiben
   gespeicherte Tokens zurueck (inert, kein Code liest sie mehr; ein Loesch-Pfad
   existiert nicht mehr).
+- **Text-Inputs ohne Provenance:** ai.draftReply und llm.*-Handler koennen ihr
+  Privacy-Level nicht aus Entry-Tags ableiten (Rohtext); Skills koennten
+  kuenftig eine explizite privacyLevel-Property mitgeben.
+- **Offline-Degradierung ohne UI-Hinweis (Review-Nit):** Skill-Kompilierung
+  faellt offline jetzt still auf On-Device zurueck (statt Netzwerkfehler) --
+  architekturkonform ("Kein Internet -> On-Device"), aber die UI zeigt nicht,
+  welches Modell tatsaechlich lief.
 
 ### Naechster Schritt
 

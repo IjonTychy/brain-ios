@@ -164,6 +164,7 @@
 		GM200002 /* OnDeviceModelStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100002 /* OnDeviceModelStore.swift */; };
 		GM200003 /* GemmaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100003 /* GemmaProvider.swift */; };
 		GM200004 /* ToolLessProviderAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100004 /* ToolLessProviderAdapter.swift */; };
+		GM200005 /* LLMProviderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = GM100005 /* LLMProviderFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -356,6 +357,7 @@
 		GM100002 /* OnDeviceModelStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceModelStore.swift; sourceTree = "<group>"; };
 		GM100003 /* GemmaProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GemmaProvider.swift; sourceTree = "<group>"; };
 		GM100004 /* ToolLessProviderAdapter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolLessProviderAdapter.swift; sourceTree = "<group>"; };
+		GM100005 /* LLMProviderFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMProviderFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -559,6 +561,7 @@
 				GM100002 /* OnDeviceModelStore.swift */,
 				GM100003 /* GemmaProvider.swift */,
 				GM100004 /* ToolLessProviderAdapter.swift */,
+				GM100005 /* LLMProviderFactory.swift */,
 			);
 			path = LLMProviders;
 			sourceTree = "<group>";
@@ -905,6 +908,7 @@
 				GM200002 /* OnDeviceModelStore.swift in Sources */,
 				GM200003 /* GemmaProvider.swift in Sources */,
 				GM200004 /* ToolLessProviderAdapter.swift in Sources */,
+				GM200005 /* LLMProviderFactory.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

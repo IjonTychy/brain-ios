@@ -27,7 +27,6 @@ final class ChatService {
 
     private let pool: DatabasePool
     private let memory: ConversationMemory
-    private let keychain = KeychainService()
     private var currentTask: Task<Void, Never>?
 
     // Action handlers for executing tool calls
@@ -179,7 +178,7 @@ final class ChatService {
                 }
 
                 guard let selection = await self.buildProvider(for: request, autoRoutedModel: autoRoutedModel) else {
-                    self.error = Self.noProviderMessage(
+                    self.error = LLMProviderFactory.unavailableMessage(
                         privacyLevel: privacyLevel,
                         isConnected: NetworkMonitor.shared.isConnected
                     )
@@ -366,11 +365,12 @@ final class ChatService {
 
     // MARK: - Provider
 
-    // Select the provider for this request. The user's model choice (or
-    // auto-route) resolves a concrete provider; LLMRouter then enforces
-    // privacy zones and offline routing on top — on every send, not only
-    // when auto-route is enabled. Returns the provider plus the model that
-    // will actually serve the request (for the message badge and cost tracking).
+    // Select the provider for this request via the shared LLMProviderFactory:
+    // the user's model choice (or auto-route) resolves a concrete provider,
+    // then LLMRouter enforces privacy zones and offline routing — on every
+    // send, not only when auto-route is enabled. Returns the provider plus
+    // the model that actually serves the request (message badge and cost
+    // tracking). nil = constraints cannot be satisfied; send() fails loudly.
     private func buildProvider(
         for request: LLMRequest,
         autoRoutedModel: String? = nil
@@ -379,163 +379,12 @@ final class ChatService {
             ?? autoRoutedModel
             ?? UserDefaults.standard.string(forKey: "selectedModel")
             ?? "claude-opus-4-6"
-        let userProvider = await buildUserSelectedProvider(model: resolvedModel)
-
-        // On-device candidates, adapter-wrapped so they can serve the chat's
-        // tool-streaming interface (the adapter answers tool-less).
-        var candidates: [any ToolUseProvider] = []
-        let apple = OnDeviceProvider()
-        if apple.isAvailable {
-            candidates.append(ToolLessProviderAdapter(base: apple))
-        }
-        if let gemma = GemmaProvider.bestAvailable(), gemma.isAvailable {
-            candidates.append(ToolLessProviderAdapter(base: gemma))
-        }
-        // The user's pick can itself be one of the on-device adapters above —
-        // skip the duplicate so the candidate list stays unambiguous.
-        if let userProvider, !candidates.contains(where: { $0.name == userProvider.name }) {
-            candidates.append(userProvider)
-        }
-        guard !candidates.isEmpty else { return nil }
-
-        // Complexity-based model choice already happened via auto-route (an
-        // opt-in, model-level feature), so it is neutralised here: the router
-        // only enforces privacy zones, sensitivity, and connectivity
-        // (ARCHITECTURE: "Chat / Analyse → User-Präferenz").
-        var routingRequest = request
-        routingRequest.complexity = .medium
-
-        let connected = NetworkMonitor.shared.isConnected
-        let router = LLMRouter(
-            providers: candidates.map { $0 as any LLMProvider },
-            isConnected: { connected }
+        return await LLMProviderFactory.routedProvider(
+            model: resolvedModel,
+            privacyLevel: request.privacyLevel,
+            containsSensitiveData: request.containsSensitiveData,
+            isConnected: NetworkMonitor.shared.isConnected
         )
-        // A nil route means the constraints cannot be satisfied (e.g. the
-        // privacy zone demands on-device and none is available) — fail loudly
-        // in send(), never fall back to cloud.
-        guard let routed = router.route(routingRequest) as? any ToolUseProvider else {
-            return nil
-        }
-        // Cloud picks keep the resolved model id; when the router (or the user)
-        // landed on a local model, report the on-device provider's name instead.
-        let servedModel = routed.isOnDevice ? routed.name : resolvedModel
-        return (routed, servedModel)
-    }
-
-    // Explain why no provider could be selected: privacy gate, offline, or no key.
-    private static func noProviderMessage(privacyLevel: PrivacyLevel, isConnected: Bool) -> String {
-        if privacyLevel == .onDeviceOnly {
-            return "Privacy Zone aktiv: Diese Unterhaltung darf das Gerät nicht verlassen, es ist aber kein On-Device-Modell verfügbar."
-        }
-        if !isConnected {
-            return "Offline: Kein On-Device-Modell verfügbar. Internetverbindung herstellen oder ein lokales Modell in den Einstellungen laden."
-        }
-        return "Kein API-Key konfiguriert. Bitte in den Einstellungen hinterlegen."
-    }
-
-    // Resolve the provider matching the given (already resolved) model choice.
-    private func buildUserSelectedProvider(model selectedModel: String) async -> (any ToolUseProvider)? {
-        // Route to an on-device provider if explicitly selected. Availability
-        // decides which one: Apple Foundation Models first, then the best
-        // downloaded GGUF model (Gemma). Both run tool-less through the adapter.
-        // When nothing on-device is usable, fall through to cloud providers.
-        if selectedModel == "on-device" || selectedModel.hasPrefix("on-device") {
-            let apple = OnDeviceProvider()
-            if apple.isAvailable {
-                return ToolLessProviderAdapter(base: apple)
-            }
-            if let gemma = GemmaProvider.bestAvailable(), gemma.isAvailable {
-                return ToolLessProviderAdapter(base: gemma)
-            }
-            // Nothing on-device available — fall through to cloud
-        }
-
-        // Cache API keys once to avoid redundant Keychain reads (each read triggers Face ID)
-        let cachedAnthropicKey = keychain.read(key: KeychainKeys.anthropicAPIKey) ?? ""
-        let cachedGeminiKey = selectedModel.hasPrefix("gemini")
-            ? (keychain.read(key: KeychainKeys.geminiAPIKey) ?? "") : ""
-
-        // Route to Gemini if a Gemini model is selected
-        if selectedModel.hasPrefix("gemini") {
-            if !cachedGeminiKey.isEmpty {
-                return GeminiProvider(apiKey: cachedGeminiKey, model: selectedModel)
-            }
-            if let token = try? await GoogleOAuthService().getValidToken() {
-                return GeminiProvider(oauthToken: token, model: selectedModel)
-            }
-        }
-
-        // Route to OpenAI if a GPT/o-series model is selected.
-        // "on-device" also starts with "o" but is not an OpenAI model — it
-        // falls through to the Anthropic chain when nothing local is usable.
-        if selectedModel.hasPrefix("gpt-")
-            || (selectedModel.hasPrefix("o") && !selectedModel.hasPrefix("on-device")) {
-            let openAIKey = keychain.read(key: KeychainKeys.openAIAPIKey) ?? ""
-            if !openAIKey.isEmpty {
-                return OpenAIProvider(apiKey: openAIKey, model: selectedModel)
-            }
-        }
-
-        // Route to xAI if a Grok model is selected
-        if selectedModel.hasPrefix("grok") {
-            let xaiKey = keychain.read(key: KeychainKeys.xaiAPIKey) ?? ""
-            if !xaiKey.isEmpty {
-                return OpenAICompatibleProvider(
-                    baseURL: "https://api.x.ai",
-                    model: selectedModel,
-                    apiKey: xaiKey,
-                    providerName: "Grok"
-                )
-            }
-        }
-
-        // Route to custom endpoint if model matches
-        if let endpoints = AvailableModels.loadCustomEndpoints() {
-            for endpoint in endpoints where endpoint.model == selectedModel {
-                // API key is stored in Keychain (AP5), not in the endpoint struct.
-                let customApiKey = AvailableModels.apiKey(for: endpoint.name)
-                return OpenAICompatibleProvider(
-                    baseURL: endpoint.baseURL,
-                    model: endpoint.model,
-                    apiKey: customApiKey,
-                    providerName: endpoint.name
-                )
-            }
-        }
-
-        // Claude (default): Check configured mode, then auto-detect
-        let mode = UserDefaults.standard.string(forKey: "anthropicMode") ?? "api"
-        switch mode {
-        case "proxy":
-            if let provider = buildProxyProvider(model: selectedModel) { return provider }
-        case "max":
-            if let sessionKey = keychain.read(key: KeychainKeys.anthropicMaxSessionKey), !sessionKey.isEmpty {
-                return AnthropicProvider(sessionKey: sessionKey, model: selectedModel)
-            }
-        case "api":
-            let provider = AnthropicProvider(apiKey: cachedAnthropicKey, model: selectedModel)
-            if provider.isAvailable { return provider }
-        default:
-            break
-        }
-        // Fallback chain: proxy → max → api
-        if let provider = buildProxyProvider(model: selectedModel) { return provider }
-        if let sessionKey = keychain.read(key: KeychainKeys.anthropicMaxSessionKey), !sessionKey.isEmpty {
-            return AnthropicProvider(sessionKey: sessionKey, model: selectedModel)
-        }
-        let provider = AnthropicProvider(apiKey: cachedAnthropicKey, model: selectedModel)
-        return provider.isAvailable ? provider : nil
-    }
-
-    /// Build a provider for the user-configured OpenAI-compatible proxy.
-    /// The URL comes from the Keychain; AnthropicProvider appends the
-    /// standard /v1/chat/completions path.
-    private func buildProxyProvider(model: String) -> AnthropicProvider? {
-        guard let baseURL = keychain.read(key: KeychainKeys.anthropicProxyURL), !baseURL.isEmpty else {
-            return nil
-        }
-        let base = baseURL.hasSuffix("/") ? String(baseURL.dropLast()) : baseURL
-        return AnthropicProvider(proxyURL: base, model: model)
     }
 
     // MARK: - Privacy Zone Detection
