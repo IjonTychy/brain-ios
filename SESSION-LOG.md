@@ -44,6 +44,22 @@
   und Sprachpakete erscheinen nicht mehr in Mehr-Tab und Sidebar.
 - **Mail:** Andys Gmail-Inbox war nur langsam (Erst-Sync aller Ordner), kein
   Fehler; keine Aenderung.
+- **Modelllisten blieben auf den Maerz-Fallbacks (Build 1006)** -- Andy sah als
+  neueste Modelle Opus 4.6 und GPT-5.4, nur Gemini war live (`gemini-pro-latest`).
+  Drei Ursachen: (1) `refreshFromAPIs` setzte den Cache-Zeitstempel auch dann,
+  wenn kein einziger Abruf gelang, und blockierte damit eine Stunde lang jeden
+  weiteren Versuch; (2) der Abruf las die Keys aus dem Keychain, was fuer die
+  Face-ID-geschuetzten Keys aus den Einstellungen (Anthropic, OpenAI) nicht
+  still moeglich ist, waehrend Gemini/xAI (Klartext-Save) durchkamen; (3) der
+  OpenAI-Filter kannte nur `gpt-4`/`gpt-3.5`/o-Serie und warf GPT-5 weg. Fix:
+  `AvailableModels.refresh(provider:apiKey:)` laedt die Liste direkt beim
+  Speichern eines Keys mit dem Key im Speicher (Onboarding + Einstellungen),
+  der Zeitstempel wird nur bei mindestens einem erfolgreichen Abruf gesetzt,
+  der Filter akzeptiert `gpt-*` (ohne instruct/realtime/audio/tts/whisper/
+  image/transcribe/moderation/codex). Anthropic-Fallback und Standardmodelle
+  auf Fable 5.1 / Opus 5 / Sonnet 5 / Haiku 4.5 (Opus 4.6 bleibt bedienbar;
+  Opus 5 kostet gleich viel, Sonnet 5 weniger als Sonnet 4.6). Der Provider
+  sendet keine Sampling-Parameter, ist also mit der Claude-5-Familie kompatibel.
 
 ### Entscheidungen
 
@@ -79,7 +95,8 @@
 
 - OK: Kein Certificate Pinning mehr im Codepfad; Key-Test ueber Modell-Listen
 - OK: CI gruen fuer `65329aa`, PR #8 gemergt (`42e4132`), TestFlight-Lauf 6 gruen (Build 1006 hochgeladen)
-- Ausstehend: Device-Verifikation von Build 1006 durch Andy
+- OK: Build 1006 auf dem Geraet: API-Keys akzeptiert, Mail-Sync laeuft (Erst-Sync langsam)
+- Ausstehend: Build 1007 (Modelllisten) auf dem Geraet pruefen
 
 ---
 

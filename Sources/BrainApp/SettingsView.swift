@@ -21,12 +21,12 @@ struct SettingsView: View {
     @State private var validationError: String?
     @State private var showResetConfirmation = false
     @AppStorage("anthropicMode") private var anthropicMode = "api"
-    @AppStorage("selectedModel") private var selectedModel = "claude-opus-4-6"
+    @AppStorage("selectedModel") private var selectedModel = "claude-opus-5"
     @AppStorage("autoRouteModels") private var autoRouteModels = false
     @AppStorage("showAdvancedSettings") private var showAdvanced = false
     @AppStorage("model.low") private var modelLow = "claude-haiku-4-5-20251001"
-    @AppStorage("model.medium") private var modelMedium = "claude-sonnet-4-6"
-    @AppStorage("model.high") private var modelHigh = "claude-opus-4-6"
+    @AppStorage("model.medium") private var modelMedium = "claude-sonnet-5"
+    @AppStorage("model.high") private var modelHigh = "claude-opus-5"
     @AppStorage("model.private") private var modelPrivate = "on-device"
     @State private var monthCost: Double = 0
     @State private var customSystemPrompt: String = ""

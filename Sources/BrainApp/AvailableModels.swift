@@ -11,11 +11,12 @@ struct AvailableModels {
         let provider: String
     }
 
-    // MARK: - Fallback models (late March 2026, used when API fetch fails)
+    // MARK: - Fallback models (used until the provider APIs have been queried)
 
     private static let fallbackAnthropic: [Model] = [
-        Model(id: "claude-opus-4-6", label: "Claude Opus 4.6 ($5/$25)", cost: "$$$$", provider: "Anthropic"),
-        Model(id: "claude-sonnet-4-6", label: "Claude Sonnet 4.6 ($3/$15)", cost: "$$$", provider: "Anthropic"),
+        Model(id: "claude-fable-5-1", label: "Claude Fable 5.1 ($10/$50)", cost: "$$$$", provider: "Anthropic"),
+        Model(id: "claude-opus-5", label: "Claude Opus 5 ($5/$25)", cost: "$$$$", provider: "Anthropic"),
+        Model(id: "claude-sonnet-5", label: "Claude Sonnet 5 ($2/$10)", cost: "$$$", provider: "Anthropic"),
         Model(id: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5 ($1/$5)", cost: "$", provider: "Anthropic"),
     ]
 
@@ -90,6 +91,40 @@ struct AvailableModels {
 
     // MARK: - Async fetch from APIs
 
+    enum Provider: Sendable {
+        case anthropic, openAI, gemini, xAI
+    }
+
+    // Fetches the model list of one provider with an explicit key and caches it.
+    // Used right after the user saved a key, so the list is current without a
+    // keychain read (biometry-protected keys cannot be read silently) and
+    // regardless of the cache age. Returns true when a list was stored.
+    @discardableResult
+    static func refresh(provider: Provider, apiKey: String?) async -> Bool {
+        let fetched: [Model]?
+        let cacheName: String
+        switch provider {
+        case .anthropic:
+            guard let apiKey else { return false }
+            fetched = await fetchAnthropicModels(apiKey: apiKey)
+            cacheName = "Anthropic"
+        case .openAI:
+            guard let apiKey else { return false }
+            fetched = await fetchOpenAIModels(apiKey: apiKey)
+            cacheName = "OpenAI"
+        case .gemini:
+            fetched = await fetchGeminiModels(apiKey: apiKey)
+            cacheName = "Google"
+        case .xAI:
+            guard let apiKey else { return false }
+            fetched = await fetchOpenAICompatibleModels(baseURL: "https://api.x.ai", apiKey: apiKey, providerName: "xAI")
+            cacheName = "xAI"
+        }
+        guard let fetched else { return false }
+        cacheModels(fetched, for: cacheName)
+        return true
+    }
+
     // Fetches current model lists from all configured providers.
     // Call this when the settings view appears to refresh the cache.
     static func refreshFromAPIs() async {
@@ -101,41 +136,33 @@ struct AvailableModels {
             return
         }
 
-        async let anthropicTask: Void = {
-            if let key = keychain.read(key: KeychainKeys.anthropicAPIKey) {
-                if let models = await fetchAnthropicModels(apiKey: key) {
-                    cacheModels(models, for: "Anthropic")
-                }
-            }
+        async let anthropicTask: Bool = {
+            guard let key = keychain.read(key: KeychainKeys.anthropicAPIKey) else { return false }
+            return await refresh(provider: .anthropic, apiKey: key)
         }()
 
-        async let openAITask: Void = {
-            if let key = keychain.read(key: KeychainKeys.openAIAPIKey) {
-                if let models = await fetchOpenAIModels(apiKey: key) {
-                    cacheModels(models, for: "OpenAI")
-                }
-            }
+        async let openAITask: Bool = {
+            guard let key = keychain.read(key: KeychainKeys.openAIAPIKey) else { return false }
+            return await refresh(provider: .openAI, apiKey: key)
         }()
 
-        async let geminiTask: Void = {
+        async let geminiTask: Bool = {
             let geminiKey = keychain.read(key: KeychainKeys.geminiAPIKey)
-            if geminiKey != nil || keychain.read(key: GoogleOAuthKeys.refreshToken) != nil {
-                if let models = await fetchGeminiModels(apiKey: geminiKey) {
-                    cacheModels(models, for: "Google")
-                }
-            }
+            guard geminiKey != nil || keychain.read(key: GoogleOAuthKeys.refreshToken) != nil else { return false }
+            return await refresh(provider: .gemini, apiKey: geminiKey)
         }()
 
-        async let xaiTask: Void = {
-            if let key = keychain.read(key: KeychainKeys.xaiAPIKey) {
-                if let models = await fetchOpenAICompatibleModels(baseURL: "https://api.x.ai", apiKey: key, providerName: "xAI") {
-                    cacheModels(models, for: "xAI")
-                }
-            }
+        async let xaiTask: Bool = {
+            guard let key = keychain.read(key: KeychainKeys.xaiAPIKey) else { return false }
+            return await refresh(provider: .xAI, apiKey: key)
         }()
 
-        _ = await (anthropicTask, openAITask, geminiTask, xaiTask)
-        UserDefaults.standard.set(Date(), forKey: cacheTimestampKey)
+        let results = await [anthropicTask, openAITask, geminiTask, xaiTask]
+        // Only a successful fetch counts as fresh; a round without any reachable
+        // provider (no keys yet, offline) must not block the next attempt.
+        if results.contains(true) {
+            UserDefaults.standard.set(Date(), forKey: cacheTimestampKey)
+        }
     }
 
     // Force refresh (ignores cache TTL).
@@ -188,9 +215,10 @@ struct AvailableModels {
             return nil
         }
 
-        // Filter to chat-capable models only
-        let chatPrefixes = ["gpt-4", "gpt-3.5", "o1", "o3", "o4", "chatgpt"]
-        let excluded = ["instruct", "realtime", "audio", "search", "tts", "whisper", "dall-e", "embedding"]
+        // Filter to chat-capable models only (every GPT generation plus the o-series)
+        let chatPrefixes = ["gpt-", "o1", "o3", "o4", "chatgpt"]
+        let excluded = ["instruct", "realtime", "audio", "search", "tts", "whisper", "dall-e",
+                        "embedding", "transcribe", "image", "moderation", "codex"]
 
         let models = dataArray.compactMap { obj -> Model? in
             guard let id = obj["id"] as? String else { return nil }
@@ -245,7 +273,7 @@ struct AvailableModels {
 
     private static func estimateCost(_ modelId: String) -> String {
         let id = modelId.lowercased()
-        if id.contains("opus") || id.contains("o3") && !id.contains("mini") { return "$$$$" }
+        if id.contains("fable") || id.contains("opus") || id.contains("o3") && !id.contains("mini") { return "$$$$" }
         if id.contains("pro") || id.contains("4o") && !id.contains("mini") || id.contains("4.1") && !id.contains("mini") { return "$$$" }
         if id.contains("sonnet") || id.contains("flash") || id.contains("mini") { return "$$" }
         if id.contains("haiku") || id.contains("nano") { return "$" }

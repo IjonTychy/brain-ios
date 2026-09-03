@@ -37,7 +37,7 @@ final class AnthropicProvider: ToolUseProvider, @unchecked Sendable {
     }
 
     // Standard API mode (sk-ant-... key)
-    init(apiKey: String, model: String = "claude-opus-4-6") {
+    init(apiKey: String, model: String = "claude-opus-5") {
         self.authMode = .apiKey(apiKey)
         self.model = model
         self.baseURL = "https://api.anthropic.com/v1/messages"
@@ -46,7 +46,7 @@ final class AnthropicProvider: ToolUseProvider, @unchecked Sendable {
     // Max mode: Claude Max subscription via api.claude.ai.
     // The session key is extracted from the browser (cookie "sessionKey" on claude.ai).
     // Valid for ~30 days. Uses Anthropic message format with Bearer auth.
-    init(sessionKey: String, model: String = "claude-opus-4-6") {
+    init(sessionKey: String, model: String = "claude-opus-5") {
         self.authMode = .maxSessionKey(sessionKey)
         self.model = model
         self.baseURL = "https://api.claude.ai/v1/messages"
@@ -55,7 +55,7 @@ final class AnthropicProvider: ToolUseProvider, @unchecked Sendable {
     // Proxy mode: User-configurable VPS proxy (OpenAI-compatible format).
     // Use cases: self-hosted LLMs (Ollama, vLLM), VPS with LiteLLM, or any
     // OpenAI-compatible endpoint. Optional bearerToken for JWT-authenticated proxies.
-    init(proxyURL: String, model: String = "claude-opus-4-6", bearerToken: String? = nil) {
+    init(proxyURL: String, model: String = "claude-opus-5", bearerToken: String? = nil) {
         self.authMode = .proxy(bearerToken: bearerToken)
         self.model = model
         let base = proxyURL.hasSuffix("/") ? String(proxyURL.dropLast()) : proxyURL
