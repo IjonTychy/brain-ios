@@ -21,30 +21,67 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 90
     env:
-      BRAIN_BUNDLE_ID_BASE: ${{ secrets.BRAIN_BUNDLE_ID_BASE }}
-      BRAIN_TEAM_ID: ${{ secrets.BRAIN_TEAM_ID }}
-      BRAIN_GOOGLE_CLIENT_ID: ${{ secrets.BRAIN_GOOGLE_CLIENT_ID }}
-      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
-      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
-      ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
-      MATCH_PAT: ${{ secrets.MATCH_PAT }}
-      MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
-      MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL || 'https://github.com/IjonTychy/brain-ios-certificates.git' }}
+      # Identifier and key secrets are trimmed and exported by "Prepare secrets"
+      # (values pasted in the browser often carry trailing newlines).
       BUILD_NUMBER_OFFSET: ${{ vars.BUILD_NUMBER_OFFSET || '1000' }}
       FASTLANE_SKIP_UPDATE_CHECK: "1"
       FASTLANE_HIDE_CHANGELOG: "1"
+      FASTLANE_OPT_OUT_USAGE: "1"
     steps:
       - uses: actions/checkout@v5
 
-      - name: Check secrets
+      - name: Prepare secrets
+        env:
+          RAW_BUNDLE_ID_BASE: ${{ secrets.BRAIN_BUNDLE_ID_BASE }}
+          RAW_TEAM_ID: ${{ secrets.BRAIN_TEAM_ID }}
+          RAW_GOOGLE_CLIENT_ID: ${{ secrets.BRAIN_GOOGLE_CLIENT_ID }}
+          RAW_ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          RAW_ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          RAW_ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          RAW_MATCH_PAT: ${{ secrets.MATCH_PAT }}
+          RAW_MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          RAW_MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
         run: |
+          # Strip CR/LF and surrounding whitespace from single-line secrets: a
+          # bundle id ending in "\n" makes match look for an App ID that cannot
+          # exist. Trimmed values are re-masked and exported for later steps.
           MISSING=0
-          for NAME in BRAIN_BUNDLE_ID_BASE BRAIN_TEAM_ID ASC_KEY_ID ASC_ISSUER_ID ASC_API_KEY_P8 MATCH_PAT MATCH_PASSWORD; do
-            if [ -z "${!NAME}" ]; then
-              echo "Secret $NAME fehlt (Settings -> Secrets and variables -> Actions)."
-              MISSING=1
+          export_trimmed() {
+            NAME="$1"; RAW="$2"; REQUIRED="$3"
+            VALUE=$(printf '%s' "$RAW" | tr -d '\r\n' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+            if [ -z "$VALUE" ]; then
+              if [ "$REQUIRED" = "1" ]; then
+                echo "Secret $NAME fehlt (Settings -> Secrets and variables -> Actions)."
+                MISSING=1
+              fi
+              return 0
             fi
-          done
+            echo "::add-mask::$VALUE"
+            echo "$NAME=$VALUE" >> "$GITHUB_ENV"
+          }
+          export_trimmed BRAIN_BUNDLE_ID_BASE "$RAW_BUNDLE_ID_BASE" 1
+          export_trimmed BRAIN_TEAM_ID "$RAW_TEAM_ID" 1
+          export_trimmed BRAIN_GOOGLE_CLIENT_ID "$RAW_GOOGLE_CLIENT_ID" 0
+          export_trimmed ASC_KEY_ID "$RAW_ASC_KEY_ID" 1
+          export_trimmed ASC_ISSUER_ID "$RAW_ASC_ISSUER_ID" 1
+          export_trimmed MATCH_PAT "$RAW_MATCH_PAT" 1
+          export_trimmed MATCH_PASSWORD "$RAW_MATCH_PASSWORD" 1
+          export_trimmed MATCH_GIT_URL "${RAW_MATCH_GIT_URL:-https://github.com/IjonTychy/brain-ios-certificates.git}" 1
+          # The .p8 key is multi-line: only normalise line endings.
+          if [ -z "$RAW_ASC_API_KEY_P8" ]; then
+            echo "Secret ASC_API_KEY_P8 fehlt (Settings -> Secrets and variables -> Actions)."
+            MISSING=1
+          else
+            P8=$(printf '%s' "$RAW_ASC_API_KEY_P8" | tr -d '\r')
+            while IFS= read -r LINE; do
+              if [ -n "$LINE" ]; then echo "::add-mask::$LINE"; fi
+            done <<< "$P8"
+            {
+              echo "ASC_API_KEY_P8<<__P8_EOF__"
+              printf '%s\n' "$P8"
+              echo "__P8_EOF__"
+            } >> "$GITHUB_ENV"
+          fi
           [ "$MISSING" = "0" ]
 
       - name: Select Xcode
@@ -78,9 +115,9 @@ jobs:
 
       - name: Archive, sign and upload
         run: |
-          export MATCH_GIT_BASIC_AUTHORIZATION=$(printf '%s' "IjonTychy:${MATCH_PAT}" | base64)
+          export MATCH_GIT_BASIC_AUTHORIZATION=$(printf '%s' "IjonTychy:${MATCH_PAT}" | base64 | tr -d '\n')
           echo "Build number: ${BUILD_NUMBER}"
-          fastlane ios testflight
+          fastlane ios beta
 
       - name: Show build errors
         if: failure()

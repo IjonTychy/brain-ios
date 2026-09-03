@@ -14,7 +14,7 @@
   `workflow_dispatch`): macOS-Runner waehlt das neueste Xcode, schreibt
   `Config/Local.xcconfig` aus Secrets, berechnet die Build-Nummer
   (`BUILD_NUMBER_OFFSET` + Run-Nummer), loest Packages auf und ruft
-  `fastlane ios testflight` auf; bei Failure werden die `error:`-Zeilen der
+  `fastlane ios beta` auf; bei Failure werden die `error:`-Zeilen der
   gym-Logs ausgegeben. Keine IPA-Artifacts (oeffentliches Repo).
 - **fastlane** (`fastlane/Fastfile`, `Appfile`): `match` (appstore) legt mit
   einem App-Store-Connect-API-Key Apple-Distribution-Zertifikat und Profile
@@ -44,6 +44,13 @@
 
 - `ruby -c` (Fastfile, Appfile) und YAML-Parse (Workflow) OK. Ein echter Lauf
   braucht die Secrets; beim ersten Lauf sind 1 bis 3 Korrekturrunden zu erwarten.
+- Lauf 1 (Andy, Run 1): API-Key-Auth OK, alle drei App-IDs im Portal vorhanden;
+  match scheiterte, weil das Secret `BRAIN_BUNDLE_ID_BASE` zwei Zeilenumbrueche
+  am Ende trug ("Could not find App ID ... '<id>\n\n'"). Fix: Step "Prepare
+  secrets" trimmt alle einzeiligen Secrets (CR/LF/Whitespace), maskiert die
+  getrimmten Werte und exportiert sie via GITHUB_ENV; .p8 nur CRLF->LF. Zudem
+  Lane `testflight` -> `beta` (Name kollidierte mit der fastlane-Action) und
+  `opt_out_usage`.
 
 ### Offene Probleme
 
