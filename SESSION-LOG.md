@@ -64,6 +64,9 @@
   Signierung (CODE_SIGN_STYLE, Identity, Team, Profil-Specifier) wird im
   Fastfile direkt via xcodeproj auf die Release-Konfigurationen der drei
   Targets geschrieben.
+- Lauf 3 (Run 3): xcodeproj fand `fastlane/BrainApp.xcodeproj` nicht, weil
+  fastlane Lanes mit `fastlane/` als Arbeitsverzeichnis ausfuehrt. Fix: Pfade
+  fuer Projekt, Build-Ordner und IPA in der Lane absolut (Repo-Root) aufgeloest.
 
 ### Offene Probleme
 

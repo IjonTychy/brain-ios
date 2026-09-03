@@ -22,6 +22,13 @@ APP_IDS = {
 platform :ios do
   desc "Archive, sign and upload BrainApp to TestFlight"
   lane :beta do # not :testflight, that name is taken by a built-in action
+    # fastlane runs lanes with the fastlane/ folder as working directory, so
+    # anything touching the repository must use absolute paths.
+    root = File.expand_path("..", Dir.pwd)
+    project_path = File.join(root, "BrainApp.xcodeproj")
+    build_dir = File.join(root, "build")
+    UI.user_error!("Xcode project not found at #{project_path}") unless File.directory?(project_path)
+
     setup_ci # temporary keychain for the certificate on the runner
 
     api_key = app_store_connect_api_key(
@@ -46,7 +53,7 @@ platform :ios do
     # the runner). Done directly via xcodeproj: fastlane's
     # update_code_signing_settings expects a TargetAttributes block, which this
     # hand-assembled project file does not carry.
-    project = Xcodeproj::Project.open("BrainApp.xcodeproj")
+    project = Xcodeproj::Project.open(project_path)
     project.targets.each do |target|
       app_id = APP_IDS[target.name]
       next unless app_id
@@ -64,7 +71,7 @@ platform :ios do
 
     build_number = ENV.fetch("BUILD_NUMBER")
     build_app(
-      project: "BrainApp.xcodeproj",
+      project: project_path,
       scheme: "BrainApp",
       configuration: "Release",
       export_method: "app-store",
@@ -72,13 +79,13 @@ platform :ios do
       export_options: {
         provisioningProfiles: APP_IDS.values.to_h { |app_id| [app_id, "match AppStore #{app_id}"] }
       },
-      output_directory: "build",
+      output_directory: build_dir,
       output_name: "BrainApp.ipa"
     )
 
     upload_to_testflight(
       api_key: api_key,
-      ipa: "build/BrainApp.ipa",
+      ipa: File.join(build_dir, "BrainApp.ipa"),
       skip_waiting_for_build_processing: true
     )
   end
