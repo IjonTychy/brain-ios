@@ -71,13 +71,15 @@
 
 ### Naechster Schritt
 
-- CI abwarten, PR nach main, TestFlight-Workflow auf main starten; Andy testet
-  API-Key-Eingabe und die Skill-Liste.
+- Andy testet Build 1006: API-Key-Eingabe (Onboarding und Einstellungen) und die
+  Skill-Liste im Mehr-Tab (keine Duplikate mehr). Danach Re-Baselining der
+  Architektur nach einer Woche Nutzung (Vorschlag vom 03.09., Andys Entscheid).
 
 ### Systemzustand
 
 - OK: Kein Certificate Pinning mehr im Codepfad; Key-Test ueber Modell-Listen
-- Ausstehend: CI, Merge, TestFlight-Build
+- OK: CI gruen fuer `65329aa`, PR #8 gemergt (`42e4132`), TestFlight-Lauf 6 gruen (Build 1006 hochgeladen)
+- Ausstehend: Device-Verifikation von Build 1006 durch Andy
 
 ---
 
