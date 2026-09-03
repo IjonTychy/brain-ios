@@ -39,6 +39,13 @@
   Run-Nummer ueber die alten Xcode-Cloud-Builds.
 - **Kein code-reviewer-Pass:** Konfiguration ohne App-Code; Syntax via `ruby -c`
   und YAML-Parser geprueft, funktional erst mit Andys Secrets testbar.
+- **Merge-Freigabe:** Andy hat am 03.09.2026 generell freigegeben, dass Merges
+  nach `main` eigenstaendig erfolgen (Voraussetzung: CI gruen). Nicht
+  rueckgaengig machbare Aktionen ausserhalb von Merges bleiben abstimmpflichtig.
+- **Docs-only-Skip erweitert:** `ci_post_clone.sh` ignoriert zusaetzlich
+  `.github/`, `fastlane/` und `Skills/`; dieselben Pfade sollen in Xcode Cloud
+  als "Files and Folders"-Ausschluss der Startbedingung stehen, damit ein
+  Doku- oder Pipeline-Commit gar keinen Build startet (statt eines roten).
 
 ### Tests
 
