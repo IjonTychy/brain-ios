@@ -523,13 +523,23 @@ final class DataBridge {
     // privacy zone level and offline routing. nil = the constraints cannot
     // be satisfied — callers must surface an error, not fall back to cloud.
     nonisolated func buildLLMProvider(privacyLevel: PrivacyLevel) async -> (any LLMProvider)? {
+        await buildLLMProviderSelection(privacyLevel: privacyLevel)?.provider
+    }
+
+    // Same selection, plus the model that will actually serve the request
+    // (the on-device provider name when the router redirects, e.g. offline).
+    // UI callers use it to tell the user which model ran.
+    nonisolated func buildLLMProviderSelection(
+        privacyLevel: PrivacyLevel = .unrestricted
+    ) async -> (provider: any LLMProvider, model: String)? {
         let selectedModel = UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
         let connected = await MainActor.run { NetworkMonitor.shared.isConnected }
-        return await LLMProviderFactory.routedProvider(
+        guard let routed = await LLMProviderFactory.routedProvider(
             model: selectedModel,
             privacyLevel: privacyLevel,
             isConnected: connected
-        )?.provider
+        ) else { return nil }
+        return (provider: routed.provider as any LLMProvider, model: routed.model)
     }
 
     // MARK: - Facade: Knowledge

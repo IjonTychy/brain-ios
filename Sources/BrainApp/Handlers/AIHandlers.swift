@@ -18,7 +18,8 @@ private func aiComplete(provider: any LLMProvider, systemPrompt: String, userCon
 }
 
 // Strictest privacy zone level across the entries feeding a prompt.
-// Raw-text inputs have no entry provenance and default to .unrestricted.
+// Raw-text inputs have no entry provenance; for them (and on top of the
+// entry-derived level) a skill can pin the request via `privacyLevel`.
 private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProviding) -> PrivacyLevel {
     guard !ids.isEmpty else { return .unrestricted }
     let service = PrivacyZoneService(pool: data.databasePool)
@@ -28,6 +29,19 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
 // Uniform error when no provider satisfies the constraints (privacy zone,
 // offline, or missing key). All AI handlers are @MainActor, so the live
 // connectivity read is safe here.
+// Privacy level a skill step requests explicitly via its `privacyLevel`
+// property ("unrestricted" | "approvedCloudOnly" | "onDeviceOnly"). Missing
+// means .unrestricted; an unknown spelling yields nil so the handler fails
+// loudly instead of silently running the prompt unrestricted.
+private func explicitPrivacyLevel(_ properties: [String: PropertyValue]) -> PrivacyLevel? {
+    guard let raw = properties["privacyLevel"]?.stringValue else { return .unrestricted }
+    return PrivacyLevel(skillValue: raw)
+}
+
+private func invalidPrivacyLevelError(_ handler: String) -> ActionResult {
+    .error("\(handler): unbekanntes privacyLevel (erlaubt: unrestricted, approvedCloudOnly, onDeviceOnly)")
+}
+
 @MainActor private func noProviderError(privacyLevel: PrivacyLevel) -> ActionResult {
     .error(LLMProviderFactory.unavailableMessage(
         privacyLevel: privacyLevel,
@@ -56,8 +70,11 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
         } else {
             return .error("ai.summarize: text oder entryId erforderlich")
         }
-
-        let privacyLevel = strictestPrivacyLevel(forEntryIds: sourceEntryIds, data: data)
+        guard let requestedLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("ai.summarize")
+        }
+        let privacyLevel = PrivacyLevel.stricter(
+            requestedLevel, strictestPrivacyLevel(forEntryIds: sourceEntryIds, data: data))
         guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
             return noProviderError(privacyLevel: privacyLevel)
         }
@@ -91,8 +108,11 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
         } else {
             return .error("ai.extractTasks: text oder entryId erforderlich")
         }
-
-        let privacyLevel = strictestPrivacyLevel(forEntryIds: sourceEntryIds, data: data)
+        guard let requestedLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("ai.extractTasks")
+        }
+        let privacyLevel = PrivacyLevel.stricter(
+            requestedLevel, strictestPrivacyLevel(forEntryIds: sourceEntryIds, data: data))
         guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
             return noProviderError(privacyLevel: privacyLevel)
         }
@@ -138,7 +158,11 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
 
         // The briefing prompt carries titles from these entries — honor the
         // strictest privacy zone among them.
-        let privacyLevel = strictestPrivacyLevel(forEntryIds: recentEntries.compactMap(\.id), data: data)
+        guard let requestedLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("ai.briefing")
+        }
+        let privacyLevel = PrivacyLevel.stricter(
+            requestedLevel, strictestPrivacyLevel(forEntryIds: recentEntries.compactMap(\.id), data: data))
         guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
             return noProviderError(privacyLevel: privacyLevel)
         }
@@ -195,9 +219,13 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
     init(data: any DataProviding) { self.data = data }
 
     func execute(properties: [String: PropertyValue], context: ExpressionContext) async throws -> ActionResult {
-        // Raw text input — no entry provenance, so no privacy zone applies.
-        guard let provider = await data.buildLLMProvider(), provider.isAvailable else {
-            return noProviderError(privacyLevel: .unrestricted)
+        // Raw text input — no entry provenance; the skill may still pin the
+        // prompt to a privacy level via the `privacyLevel` property.
+        guard let privacyLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("ai.draftReply")
+        }
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
+            return noProviderError(privacyLevel: privacyLevel)
         }
 
         guard let originalText = properties["text"]?.stringValue else {
@@ -245,7 +273,11 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
         // The prompt carries the source entry AND candidate excerpts — honor
         // the strictest privacy zone across all of them.
         let involvedIds = [entryId] + candidates.compactMap(\.id)
-        let privacyLevel = strictestPrivacyLevel(forEntryIds: involvedIds, data: data)
+        guard let requestedLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("entry.crossref")
+        }
+        let privacyLevel = PrivacyLevel.stricter(
+            requestedLevel, strictestPrivacyLevel(forEntryIds: involvedIds, data: data))
         guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
             return noProviderError(privacyLevel: privacyLevel)
         }
@@ -293,8 +325,11 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
         guard let prompt = properties["prompt"]?.stringValue else {
             return .error("llm.complete: prompt fehlt")
         }
-        guard let provider = await data.buildLLMProvider() else {
-            return noProviderError(privacyLevel: .unrestricted)
+        guard let privacyLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("llm.complete")
+        }
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel) else {
+            return noProviderError(privacyLevel: privacyLevel)
         }
         let system = properties["system"]?.stringValue
         let messages = [LLMMessage(role: "user", content: prompt)]
@@ -314,8 +349,11 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
         guard let prompt = properties["prompt"]?.stringValue else {
             return .error("llm.stream: prompt fehlt")
         }
-        guard let provider = await data.buildLLMProvider() else {
-            return noProviderError(privacyLevel: .unrestricted)
+        guard let privacyLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("llm.stream")
+        }
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel) else {
+            return noProviderError(privacyLevel: privacyLevel)
         }
         let messages = [LLMMessage(role: "user", content: prompt)]
         let response = try await provider.complete(LLMRequest(messages: messages))
@@ -355,8 +393,11 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
               let categories = properties["categories"]?.stringValue else {
             return .error("llm.classify: text und categories erforderlich")
         }
-        guard let provider = await data.buildLLMProvider() else {
-            return noProviderError(privacyLevel: .unrestricted)
+        guard let privacyLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("llm.classify")
+        }
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel) else {
+            return noProviderError(privacyLevel: privacyLevel)
         }
         let prompt = "Klassifiziere den folgenden Text in eine der Kategorien: \(categories)\n\nText: \(text)\n\nAntwort (nur die Kategorie):"
         let messages = [LLMMessage(role: "user", content: prompt)]
@@ -378,8 +419,11 @@ private func strictestPrivacyLevel(forEntryIds ids: [Int64], data: any DataProvi
               let schema = properties["schema"]?.stringValue else {
             return .error("llm.extract: text und schema erforderlich")
         }
-        guard let provider = await data.buildLLMProvider() else {
-            return noProviderError(privacyLevel: .unrestricted)
+        guard let privacyLevel = explicitPrivacyLevel(properties) else {
+            return invalidPrivacyLevelError("llm.extract")
+        }
+        guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel) else {
+            return noProviderError(privacyLevel: privacyLevel)
         }
         let prompt = "Extrahiere die folgenden Felder aus dem Text als JSON: \(schema)\n\nText: \(text)\n\nJSON:"
         let messages = [LLMMessage(role: "user", content: prompt)]

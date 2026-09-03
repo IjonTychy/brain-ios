@@ -6,6 +6,19 @@
 
 ---
 
+## Status-Update 03.09.2026 (2) -- Rohtext-Handler mit Privacy-Property
+
+- **[BEHOBEN] Rohtext-Handler ohne Privacy-Provenance** (offen seit 02.09.2026,
+  Schweregrad niedrig) -- `privacyLevel`-Property auf llm.*/ai.draftReply,
+  vom LLMRouter durchgesetzt; Entry-basierte Handler kombinieren Property und
+  Entry-Tags (strengeres gewinnt); unbekannte Werte brechen den Step ab.
+- **[BEHOBEN] Offline-Degradierung ohne UI-Hinweis** (Nit vom 02.09.2026) --
+  Kompilier-Views zeigen das tatsaechlich bedienende Modell.
+- **[NEU / OFFEN] Schweregrad: niedrig** -- `privacyLevel` wird vom
+  SkillCompiler nicht statisch validiert (Tippfehler erst zur Laufzeit).
+
+---
+
 ## Status-Update 03.09.2026 -- God Objects gesplittet
 
 - **[BEHOBEN] God Objects** (offen seit Review 03.07.2026) -- EmailBridge,

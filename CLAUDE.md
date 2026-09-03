@@ -242,7 +242,9 @@ Diese Skills sind in Andys Claude Desktop-App installiert und stehen in jeder Se
 **Update 03.09.2026:** God Objects gesplittet: EmailBridge, MailTabView,
 SkillManagerView und OnboardingView entlang der Top-Level-Deklarationen in 16
 Dateien zerlegt (groesste Datei jetzt 690 Zeilen), um Type-Checker-Timeouts im
-Xcode-Cloud-Build vorzubeugen. Details: SESSION-LOG 03.09.2026.
+Xcode-Cloud-Build vorzubeugen. Zudem akzeptieren die Rohtext-LLM-Steps ein
+explizites `privacyLevel` (vom Router durchgesetzt), und die Kompilier-Views
+zeigen das tatsaechlich bedienende Modell. Details: SESSION-LOG 03.09.2026.
 
 **Update 02.09.2026:** LLMRouter im Chat verdrahtet -- Privacy Zones und
 Offline-Routing werden jetzt bei jedem Send durchgesetzt (fail-loud statt
@@ -389,10 +391,10 @@ Siehe SESSION-LOG für letzten Stand und offene Punkte.
 - **Gemma-Inferenz noch nicht aktiv:** Provider/Katalog/Downloads sind eingebaut;
   das llama.cpp-Package muss einmalig in Xcode hinzugefuegt und auf einem Geraet
   verifiziert werden (docs/ON-DEVICE-MODELS.md).
-- **Rohtext ohne Privacy-Provenance:** ai.draftReply und llm.*-Handler erhalten
-  reinen Text und koennen kein Entry-basiertes Privacy-Level ableiten (laufen
-  unrestricted); Chat- und Entry-basierte Handler-Pfade sind seit 02.09.2026
-  ueber den LLMRouter abgesichert.
+- **Rohtext-Privacy nur per Skill-Property:** ai.draftReply und llm.*-Handler
+  koennen kein Entry-Level ableiten; seit 03.09.2026 pinnt das optionale
+  `privacyLevel` im Step den Router. Ohne Property laufen sie unrestricted
+  (Default, kompatibel mit bestehenden Skills).
 - **Google OAuth braucht User-Setup:** PKCE Flow, Token-Refresh und Keychain-Storage sind
   implementiert; die Client-ID muss weiterhin vom User in Google Cloud Console erstellt werden.
 - **brain-api abgeschaltet:** VPS-Backend nicht mehr aktiv. Backup unter
@@ -416,7 +418,7 @@ brain-ios/
 ├── BrainApp.xcodeproj/          # Xcode Projekt
 ├── Sources/
 │   ├── BrainCore/               # SPM Package (auch auf Linux testbar)
-│   └── BrainApp/                # iOS App (SwiftUI Views, Bridges, Services, Onboarding/, LLMProviders/)
+│   └── BrainApp/                # iOS App (SwiftUI Views, Services; Bridges/, Handlers/, LLMProviders/)
 ├── Tests/                       # BrainCoreTests + BrainAppTests
 ├── Skills/                      # 6 .brainskill.md Dateien plus Prompt-Assets
 ├── ci_scripts/                  # Xcode Cloud Build-Scripts

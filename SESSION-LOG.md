@@ -6,6 +6,72 @@
 
 ---
 
+## Privacy-Provenance fuer Rohtext-Handler + Kleinkram -- 03.09.2026
+
+### Abgeschlossen
+
+- **Explizites `privacyLevel` fuer LLM-Steps** -- Rohtext-Handler (`llm.complete`,
+  `llm.stream`, `llm.classify`, `llm.extract`, `ai.draftReply`) haben keine
+  Entry-Provenance und liefen bisher immer unrestricted. Skills koennen den
+  Step jetzt per `privacyLevel` (`unrestricted` | `approvedCloudOnly` |
+  `onDeviceOnly`) pinnen; der Wert geht als Privacy Zone in den LLMRouter.
+  Entry-basierte Handler (`ai.summarize`, `ai.extractTasks`, `ai.briefing`,
+  `entry.crossref`) nehmen das strengere von Property und Entry-Tags.
+  Unbekannte Werte brechen den Step mit Fehler ab statt still unrestricted
+  zu laufen. Parser `PrivacyLevel(skillValue:)` (BrainCore; akzeptiert
+  Raw-Value, camelCase, kebab-case) und `PrivacyLevel.stricter` (ersetzt die
+  private Kopie im PrivacyZoneService). Chat-Tools `llm_complete`,
+  `llm_classify`, `llm_extract`, `ai_draftReply` fuehren den Parameter im
+  Schema; Skill-Creator-Prompt (SystemPromptBuilder, BrainAssistantSheet)
+  und ARCHITECTURE.md dokumentieren ihn.
+- **Modell-Hinweis bei der Skill-Kompilierung** --
+  `DataBridge.buildLLMProviderSelection(privacyLevel:)` liefert Provider plus
+  tatsaechlich bedienendes Modell; SkillCompilationView und
+  SkillAutoCompileView zeigen "Modell: ..." unter der Thinking-Phrase, damit
+  ein Offline-Fallback auf On-Device sichtbar ist (Review-Nit vom 02.09.).
+- **CLAUDE.md**: Repo-Struktur nennt keinen nicht existenten `Onboarding/`-
+  Ordner mehr.
+
+### Entscheidungen
+
+- **Property statt Heuristik:** Fuer Rohtext gibt es keine belastbare
+  Provenance; eine explizite Angabe im Skill ist ehrlicher als Raten aus dem
+  Prompt-Text. Default bleibt unrestricted (kompatibel mit bestehenden Skills).
+- **Fail-loud bei Tippfehlern:** Ein unbekanntes `privacyLevel` ergibt einen
+  Step-Fehler; ein stilles Downgrade auf unrestricted waere genau das Leak,
+  das die Property verhindern soll.
+- **Body-Dekomposition zurueckgestellt:** Erst ein Release-Build auf Xcode
+  Cloud zeigt, ob der Type-Checker nach dem Datei-Split noch anschlaegt.
+
+### Tests
+
+- NEU BrainCore: `PrivacyLevelSkillValueTests` (3 Tests: Schreibweisen,
+  Ablehnung, Strictness-Ordnung).
+- NEU BrainAppTests: `LLMCompleteHandlerTests` +3 (Property wird an
+  `buildLLMProvider(privacyLevel:)` durchgereicht, Default unrestricted,
+  unbekannter Wert -> Fehler ohne Provider-Aufruf); Mock zeichnet die
+  angeforderten Level auf.
+- Pre-Commit-Review: code-reviewer (1 Pass) gestartet; Commit wegen Stop-Hook
+  (uncommitted changes) vorgezogen, Findings folgen als Fix-Commit.
+- CI: ausstehend.
+
+### Offene Probleme
+
+- Skill-Compiler/`validateSemantics` prueft `privacyLevel`-Werte nicht
+  statisch; Tippfehler fallen erst zur Laufzeit auf.
+
+### Naechster Schritt
+
+- CI abwarten, PR nach `main` (Andys Freigabe).
+- Body-Dekomposition nur bei erneutem Xcode-Cloud-Timeout.
+
+### Systemzustand
+
+- OK: Privacy-Gate deckt jetzt auch Rohtext-Pfade ab (per Skill-Property)
+- Ausstehend: CI, PR nach main, Xcode-Cloud-Release-Build durch Andy
+
+---
+
 ## God Objects gesplittet (Type-Checker-Entlastung) -- 03.09.2026
 
 ### Abgeschlossen

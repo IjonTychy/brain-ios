@@ -60,7 +60,8 @@ extension BrainTools {
                 "properties": [
                     "emailId": ["type": "integer", "description": "ID der E-Mail auf die geantwortet werden soll"],
                     "style": ["type": "string", "description": "Stil der Antwort: formal, casual, brief", "enum": ["formal", "casual", "brief"]],
-                    "instructions": ["type": "string", "description": "Zusätzliche Anweisungen für den Entwurf"]
+                    "instructions": ["type": "string", "description": "Zusätzliche Anweisungen für den Entwurf"],
+                    "privacyLevel": ["type": "string", "enum": ["unrestricted", "approvedCloudOnly", "onDeviceOnly"], "description": "Optional: haelt die Anfrage auf dem Geraet (onDeviceOnly) oder beim freigegebenen Cloud-Anbieter (approvedCloudOnly)"]
                 ],
                 "required": ["emailId"]
             ]
@@ -177,6 +178,7 @@ extension BrainTools {
             name: "llm_complete",
             description: "Sendet eine Anfrage an das LLM und gibt die vollständige Antwort zurück. Nutze dieses Tool für KI-Aufgaben innerhalb von Skills.",
             inputSchema: ["type": "object", "properties": [
+                "privacyLevel": ["type": "string", "enum": ["unrestricted", "approvedCloudOnly", "onDeviceOnly"], "description": "Optional: haelt die Anfrage auf dem Geraet (onDeviceOnly) oder beim freigegebenen Cloud-Anbieter (approvedCloudOnly)"],
                 "prompt": ["type": "string", "description": "Die Anfrage an das LLM"],
                 "system": ["type": "string", "description": "Optionaler System-Prompt"],
             ], "required": ["prompt"]]
@@ -185,6 +187,7 @@ extension BrainTools {
             name: "llm_classify",
             description: "Klassifiziert einen Text in eine der angegebenen Kategorien.",
             inputSchema: ["type": "object", "properties": [
+                "privacyLevel": ["type": "string", "enum": ["unrestricted", "approvedCloudOnly", "onDeviceOnly"], "description": "Optional: haelt die Anfrage auf dem Geraet (onDeviceOnly) oder beim freigegebenen Cloud-Anbieter (approvedCloudOnly)"],
                 "text": ["type": "string", "description": "Zu klassifizierender Text"],
                 "categories": ["type": "string", "description": "Komma-getrennte Kategorien"],
             ], "required": ["text", "categories"]]
@@ -193,6 +196,7 @@ extension BrainTools {
             name: "llm_extract",
             description: "Extrahiert strukturierte Daten aus einem Text gemaess einem Schema.",
             inputSchema: ["type": "object", "properties": [
+                "privacyLevel": ["type": "string", "enum": ["unrestricted", "approvedCloudOnly", "onDeviceOnly"], "description": "Optional: haelt die Anfrage auf dem Geraet (onDeviceOnly) oder beim freigegebenen Cloud-Anbieter (approvedCloudOnly)"],
                 "text": ["type": "string", "description": "Quelltext"],
                 "schema": ["type": "string", "description": "JSON-Schema-Beschreibung der zu extrahierenden Felder"],
             ], "required": ["text", "schema"]]

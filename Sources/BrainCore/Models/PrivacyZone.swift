@@ -12,6 +12,35 @@ public enum PrivacyLevel: String, Codable, Sendable, CaseIterable {
     case approvedCloudOnly = "approved_cloud_only"
 }
 
+public extension PrivacyLevel {
+    // Skill-facing spelling as used in a step's `privacyLevel` property:
+    // the raw value ("on_device_only") as well as camelCase ("onDeviceOnly")
+    // and kebab-case, case-insensitive. nil for anything else.
+    init?(skillValue: String) {
+        let key = skillValue.lowercased().filter { !"_- ".contains($0) }
+        switch key {
+        case "unrestricted": self = .unrestricted
+        case "ondeviceonly": self = .onDeviceOnly
+        case "approvedcloudonly": self = .approvedCloudOnly
+        default: return nil
+        }
+    }
+
+    // Strictness order: onDeviceOnly > approvedCloudOnly > unrestricted.
+    var strictness: Int {
+        switch self {
+        case .unrestricted: return 0
+        case .approvedCloudOnly: return 1
+        case .onDeviceOnly: return 2
+        }
+    }
+
+    // The stricter of two levels.
+    static func stricter(_ a: PrivacyLevel, _ b: PrivacyLevel) -> PrivacyLevel {
+        a.strictness >= b.strictness ? a : b
+    }
+}
+
 // Maps a tag to a privacy level. When an entry has a tag with a
 // privacy zone, the LLM router enforces the restriction.
 public struct PrivacyZone: Codable, Sendable, Identifiable {

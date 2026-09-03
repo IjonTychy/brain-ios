@@ -288,3 +288,30 @@ private struct PrivacyMockProvider: LLMProvider, Sendable {
         LLMResponse(content: "mock", providerName: name)
     }
 }
+
+@Suite("PrivacyLevel skill values")
+struct PrivacyLevelSkillValueTests {
+    @Test("Accepts raw, camelCase and kebab-case spellings")
+    func parsesSpellings() {
+        #expect(PrivacyLevel(skillValue: "on_device_only") == .onDeviceOnly)
+        #expect(PrivacyLevel(skillValue: "onDeviceOnly") == .onDeviceOnly)
+        #expect(PrivacyLevel(skillValue: "on-device-only") == .onDeviceOnly)
+        #expect(PrivacyLevel(skillValue: "ApprovedCloudOnly") == .approvedCloudOnly)
+        #expect(PrivacyLevel(skillValue: "approved_cloud_only") == .approvedCloudOnly)
+        #expect(PrivacyLevel(skillValue: "unrestricted") == .unrestricted)
+    }
+
+    @Test("Rejects unknown spellings")
+    func rejectsUnknown() {
+        #expect(PrivacyLevel(skillValue: "private") == nil)
+        #expect(PrivacyLevel(skillValue: "") == nil)
+    }
+
+    @Test("stricter() orders onDeviceOnly > approvedCloudOnly > unrestricted")
+    func stricterOrder() {
+        #expect(PrivacyLevel.stricter(.unrestricted, .approvedCloudOnly) == .approvedCloudOnly)
+        #expect(PrivacyLevel.stricter(.onDeviceOnly, .approvedCloudOnly) == .onDeviceOnly)
+        #expect(PrivacyLevel.stricter(.approvedCloudOnly, .onDeviceOnly) == .onDeviceOnly)
+        #expect(PrivacyLevel.stricter(.unrestricted, .unrestricted) == .unrestricted)
+    }
+}
