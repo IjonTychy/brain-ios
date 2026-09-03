@@ -1,0 +1,4 @@
+# Team and bundle identifier come from the environment (see testflight.yml);
+# the public repository carries no real identifiers.
+team_id ENV["BRAIN_TEAM_ID"]
+app_identifier ENV["BRAIN_BUNDLE_ID_BASE"]
