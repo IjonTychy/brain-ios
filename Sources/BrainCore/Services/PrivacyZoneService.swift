@@ -78,7 +78,7 @@ public struct PrivacyZoneService: Sendable {
             for row in rows {
                 if let levelStr: String = row["level"],
                    let level = PrivacyLevel(rawValue: levelStr) {
-                    strictest = Self.stricter(strictest, level)
+                    strictest = PrivacyLevel.stricter(strictest, level)
                 }
             }
             return strictest
@@ -101,7 +101,7 @@ public struct PrivacyZoneService: Sendable {
             for row in rows {
                 if let levelStr: String = row["level"],
                    let level = PrivacyLevel(rawValue: levelStr) {
-                    strictest = Self.stricter(strictest, level)
+                    strictest = PrivacyLevel.stricter(strictest, level)
                 }
             }
             return strictest
@@ -125,17 +125,10 @@ public struct PrivacyZoneService: Sendable {
             for row in rows {
                 if let levelStr: String = row["level"],
                    let level = PrivacyLevel(rawValue: levelStr) {
-                    strictest = Self.stricter(strictest, level)
+                    strictest = PrivacyLevel.stricter(strictest, level)
                 }
             }
             return strictest
         }
-    }
-
-    // Compare two privacy levels and return the stricter one.
-    // Order: onDeviceOnly > approvedCloudOnly > unrestricted
-    private static func stricter(_ a: PrivacyLevel, _ b: PrivacyLevel) -> PrivacyLevel {
-        let order: [PrivacyLevel: Int] = [.unrestricted: 0, .approvedCloudOnly: 1, .onDeviceOnly: 2]
-        return (order[a, default: 0] >= order[b, default: 0]) ? a : b
     }
 }

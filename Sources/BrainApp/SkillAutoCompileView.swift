@@ -11,6 +11,8 @@ struct SkillAutoCompileView: View {
     @State private var compiledDefinition: SkillDefinition?
     @State private var isCompiling = false
     @State private var errorMessage: String?
+    // Model actually serving the compilation (router may redirect on-device).
+    @State private var servingModel: String?
     @State private var thinkingPhrase = ThinkingPhrases.random()
     @State private var pendingJSON: String?
     @State private var safetyWarnings: [String] = []
@@ -79,6 +81,12 @@ struct SkillAutoCompileView: View {
                         .foregroundStyle(BrainTheme.Colors.textSecondary)
                         .italic()
 
+                    if let servingModel {
+                        Text("Modell: \(servingModel)")
+                            .font(BrainTheme.Typography.caption)
+                            .foregroundStyle(BrainTheme.Colors.textTertiary)
+                    }
+
                     ProgressView()
                         .controlSize(.large)
                         .tint(BrainTheme.Colors.brandPurple)
@@ -139,11 +147,13 @@ struct SkillAutoCompileView: View {
         errorMessage = nil
 
         do {
-            guard let provider = await dataBridge.buildLLMProvider() else {
+            guard let selection = await dataBridge.buildLLMProviderSelection() else {
                 errorMessage = "Kein kompatibler LLM-Anbieter fuer das gewaehlte Modell konfiguriert."
                 isCompiling = false
                 return
             }
+            let provider = selection.provider
+            servingModel = selection.model
             let prompt = SkillCompilePrompt.build(markdown: markdown)
             let request = LLMRequest(
                 messages: [LLMMessage(role: "user", content: prompt)],

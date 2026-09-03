@@ -119,6 +119,13 @@ final class AppMockDataProvider: DataProviding, @unchecked Sendable {
     }
 
     func buildLLMProvider() async -> (any LLMProvider)? { AppMockLLMProvider() }
+
+    // Privacy levels the handlers asked for, in call order.
+    var requestedPrivacyLevels: [PrivacyLevel] = []
+    func buildLLMProvider(privacyLevel: PrivacyLevel) async -> (any LLMProvider)? {
+        requestedPrivacyLevels.append(privacyLevel)
+        return AppMockLLMProvider()
+    }
 }
 
 private struct AppMockLLMProvider: LLMProvider {
@@ -453,6 +460,46 @@ struct LLMCompleteHandlerTests {
             // Expected
         } else {
             Issue.record("Expected .error for missing prompt")
+        }
+    }
+
+    @Test("Forwards an explicit privacyLevel to the provider selection")
+    @MainActor func explicitPrivacyLevel() async throws {
+        let mock = try AppMockDataProvider()
+        let handler = LLMCompleteHandler(data: mock)
+
+        _ = try await handler.execute(
+            properties: ["prompt": .string("Hello"), "privacyLevel": .string("onDeviceOnly")],
+            context: ExpressionContext()
+        )
+
+        #expect(mock.requestedPrivacyLevels == [.onDeviceOnly])
+    }
+
+    @Test("Defaults to unrestricted without privacyLevel")
+    @MainActor func defaultPrivacyLevel() async throws {
+        let mock = try AppMockDataProvider()
+        let handler = LLMCompleteHandler(data: mock)
+
+        _ = try await handler.execute(properties: ["prompt": .string("Hello")], context: ExpressionContext())
+
+        #expect(mock.requestedPrivacyLevels == [.unrestricted])
+    }
+
+    @Test("Rejects an unknown privacyLevel instead of running unrestricted")
+    @MainActor func invalidPrivacyLevel() async throws {
+        let mock = try AppMockDataProvider()
+        let handler = LLMCompleteHandler(data: mock)
+
+        let result = try await handler.execute(
+            properties: ["prompt": .string("Hello"), "privacyLevel": .string("secret")],
+            context: ExpressionContext()
+        )
+
+        if case .error = result {
+            #expect(mock.requestedPrivacyLevels.isEmpty)
+        } else {
+            Issue.record("Expected .error for unknown privacyLevel")
         }
     }
 }

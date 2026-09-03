@@ -260,7 +260,7 @@ struct SystemPromptBuilder {
         - Navigation: navigate.tab (tab: chat/mail/search/calendar), navigate.to, navigate.back
         - UI: haptic (style: success/warning/error), toast (message), set (key: value)
         - Daten: clipboard.copy (text), open-url (url), storage.get (key), storage.set (key, value)
-        - KI: llm.complete (prompt), llm.classify (text, categories), llm.extract (text, schema)
+        - KI: llm.complete (prompt), llm.classify (text, categories), llm.extract (text, schema), alle optional mit privacyLevel (unrestricted | approvedCloudOnly | onDeviceOnly)
         - Medien: camera.capture, audio.record, audio.transcribe
         - Wissen: knowledge.save (subject, predicate, object)
         - Kalender: calendar.list, calendar.create (title, startDate, endDate)

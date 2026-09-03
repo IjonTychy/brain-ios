@@ -412,6 +412,14 @@ Swift-Handler, der via JSON-Konfiguration aufgerufen wird.
 | `llm.summarize` | Text zusammenfassen |
 | `llm.extract` | Strukturierte Daten extrahieren |
 
+Rohtext hat keine Entry-Provenance, deshalb akzeptieren `llm.complete`,
+`llm.stream`, `llm.classify`, `llm.extract` und `ai.draftReply` optional
+`privacyLevel` (`unrestricted` | `approvedCloudOnly` | `onDeviceOnly`), das
+der LLMRouter wie eine Privacy Zone durchsetzt. Entry-basierte KI-Handler
+(`ai.summarize`, `ai.extractTasks`, `ai.briefing`, `entry.crossref`) nehmen
+das strengere von Property und Privacy-Zone der Quell-Entries. Unbekannte
+Werte brechen den Step mit Fehler ab (kein stilles `unrestricted`).
+
 #### Hardware & Sensoren
 
 | Primitive | Beschreibung |
