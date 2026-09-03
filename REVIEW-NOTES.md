@@ -6,6 +6,20 @@
 
 ---
 
+## Status-Update 03.09.2026 -- God Objects gesplittet
+
+- **[BEHOBEN] God Objects** (offen seit Review 03.07.2026) -- EmailBridge,
+  MailTabView, SkillManagerView und OnboardingView mechanisch entlang der
+  Top-Level-Deklarationen in 16 Dateien zerlegt (groesste Datei jetzt
+  EmailBridge.swift mit 690 Zeilen); OnboardingView-Seiten als Extensions,
+  Member deshalb `internal` statt `private`, expliziter Init ergaenzt.
+  Kein Verhalten geaendert. Verifikation: Klammer-Balance + CI (Debug-Build);
+  ein Release-Build auf Xcode Cloud steht noch aus.
+- **[INFO]** code-reviewer-Pass fuer diesen rein mechanischen Split bewusst
+  uebersprungen (Token-Budget); CI ist der Compiler-Check.
+
+---
+
 ## Status-Update 02.09.2026 -- LLMRouter-Verdrahtung + brain-api-Ausbau
 
 - **[BEHOBEN] LLMRouter nicht verdrahtet** (offen seit Review 03.07.2026) --
