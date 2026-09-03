@@ -55,7 +55,8 @@
   Fix-Commit umgesetzt (privacyLevel auch in den Tool-Schemas von ai_summarize,
   ai_extractTasks, ai_briefing, entry_crossref; ai.draftReply validiert `text`
   vor dem Provider-Build), die dritte ist der offene Punkt unten.
-- CI: ausstehend.
+- CI: beide Workflows gruen fuer `d56c4cd` (iOS Build & Test inkl. der neuen
+  BrainAppTests, BrainCore Tests inkl. PrivacyLevelSkillValueTests).
 
 ### Offene Probleme
 
@@ -70,7 +71,8 @@
 ### Systemzustand
 
 - OK: Privacy-Gate deckt jetzt auch Rohtext-Pfade ab (per Skill-Property)
-- Ausstehend: CI, PR nach main, Xcode-Cloud-Release-Build durch Andy
+- OK: CI gruen fuer `d56c4cd`
+- Ausstehend: PR nach main (Andys Freigabe), Xcode-Cloud-Release-Build durch Andy
 
 ---
 
