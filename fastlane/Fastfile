@@ -4,6 +4,8 @@
 # stored encrypted in a private git repository. Upload via `pilot`.
 # All inputs come from environment variables set by .github/workflows/testflight.yml.
 
+require "xcodeproj"
+
 opt_out_usage
 default_platform(:ios)
 
@@ -40,18 +42,25 @@ platform :ios do
       readonly: false
     )
 
-    # Manual signing with the match profiles (Release only; edits the pbxproj on the runner).
-    APP_IDS.each do |target, app_id|
-      update_code_signing_settings(
-        path: "BrainApp.xcodeproj",
-        targets: [target],
-        build_configurations: ["Release"],
-        use_automatic_signing: false,
-        team_id: TEAM_ID,
-        code_sign_identity: "Apple Distribution",
-        profile_name: "match AppStore #{app_id}"
-      )
+    # Manual signing with the match profiles (Release only; edits the pbxproj on
+    # the runner). Done directly via xcodeproj: fastlane's
+    # update_code_signing_settings expects a TargetAttributes block, which this
+    # hand-assembled project file does not carry.
+    project = Xcodeproj::Project.open("BrainApp.xcodeproj")
+    project.targets.each do |target|
+      app_id = APP_IDS[target.name]
+      next unless app_id
+      target.build_configurations.each do |config|
+        next unless config.name == "Release"
+        config.build_settings["CODE_SIGN_STYLE"] = "Manual"
+        config.build_settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
+        config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "Apple Distribution"
+        config.build_settings["DEVELOPMENT_TEAM"] = TEAM_ID
+        config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = "match AppStore #{app_id}"
+      end
     end
+    project.save
+    UI.message("Release signing switched to manual (match profiles) for #{APP_IDS.keys.join(', ')}")
 
     build_number = ENV.fetch("BUILD_NUMBER")
     build_app(

@@ -51,6 +51,12 @@
   getrimmten Werte und exportiert sie via GITHUB_ENV; .p8 nur CRLF->LF. Zudem
   Lane `testflight` -> `beta` (Name kollidierte mit der fastlane-Action) und
   `opt_out_usage`.
+- Lauf 2 (Run 2): match gruen (Zertifikat + 3 Profile im Zertifikats-Repo
+  angelegt); `update_code_signing_settings` brach ab ("very old project file
+  format"), weil das pbxproj keinen `TargetAttributes`-Block hat. Fix: Manuelle
+  Signierung (CODE_SIGN_STYLE, Identity, Team, Profil-Specifier) wird im
+  Fastfile direkt via xcodeproj auf die Release-Konfigurationen der drei
+  Targets geschrieben.
 
 ### Offene Probleme
 
