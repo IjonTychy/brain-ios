@@ -448,13 +448,17 @@ struct BrainApp: App {
     }
 
     private func ensureBootstrapSkillsInDB(lifecycle: SkillLifecycle) {
+        // Only the dashboard is a JSON skill; Mail, Kalender and Schnellerfassung
+        // are native views. Their former JSON duplicates are cleaned up below.
         let bootstrapSkills: [(String, String, SkillDefinition)] = [
             ("dashboard", "Dashboard", BootstrapSkills.dashboard),
-            ("mail-inbox", "Mail Inbox", BootstrapSkills.mailInbox),
-            ("calendar", "Kalender", BootstrapSkills.calendar),
-            ("mail-config", "Mail Konfiguration", BootstrapSkills.mailConfig),
-            ("quick-capture", "Schnellerfassung", BootstrapSkills.quickCapture),
         ]
+        let retiredBootstrapSkills = ["mail-inbox", "mail-config", "calendar", "quick-capture"]
+        for id in retiredBootstrapSkills {
+            if let existing = try? lifecycle.fetch(id: id), existing.createdBy == .system {
+                try? lifecycle.uninstall(id: id)
+            }
+        }
 
         for (id, name, definition) in bootstrapSkills {
             if let existing = try? lifecycle.fetch(id: id) {

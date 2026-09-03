@@ -400,7 +400,7 @@ struct ContentView: View {
 
     private func loadActiveSkills() {
         activeSkills = ((try? dataBridge.listSkills()) ?? [])
-            .filter { $0.enabled && ($0.hasScreens || ($0.sourceMarkdown.map { !$0.isEmpty } ?? false)) }
+            .filter { $0.isListedInNavigation && ($0.hasScreens || ($0.sourceMarkdown.map { !$0.isEmpty } ?? false)) }
     }
 
     // Load a skill definition from DB (user-modified or Brain-updated version).

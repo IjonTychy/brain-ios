@@ -18,7 +18,7 @@ final class GeminiProvider: ToolUseProvider, @unchecked Sendable {
 
     var isAvailable: Bool { !apiKey.isEmpty || (oauthToken != nil) }
 
-    init(apiKey: String, model: String = "gemini-2.5-flash-preview-05-20") {
+    init(apiKey: String, model: String = "gemini-2.5-flash") {
         self.apiKey = apiKey
         self.oauthToken = nil
         self.model = model
@@ -26,7 +26,7 @@ final class GeminiProvider: ToolUseProvider, @unchecked Sendable {
     }
 
     // OAuth-based init — uses Bearer token instead of API key header.
-    init(oauthToken: String, model: String = "gemini-2.5-flash-preview-05-20") {
+    init(oauthToken: String, model: String = "gemini-2.5-flash") {
         self.apiKey = ""
         self.oauthToken = oauthToken
         self.model = model
@@ -49,7 +49,7 @@ final class GeminiProvider: ToolUseProvider, @unchecked Sendable {
             let body = self.buildRequestBody(request, tools: nil)
             urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-            let session = PinnedURLSession.shared.session
+            let session = LLMURLSession.shared.session
             let (data, response) = try await session.data(for: urlRequest)
 
             guard let httpResponse = response as? HTTPURLResponse else {
@@ -91,7 +91,7 @@ final class GeminiProvider: ToolUseProvider, @unchecked Sendable {
                     let body = self.buildRequestBody(capturedRequest, tools: geminiTools)
                     urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-                    let session = PinnedURLSession.shared.session
+                    let session = LLMURLSession.shared.session
                     let (bytes, response) = try await session.bytes(for: urlRequest)
 
                     guard let httpResponse = response as? HTTPURLResponse,

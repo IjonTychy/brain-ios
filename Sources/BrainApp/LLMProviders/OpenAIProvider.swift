@@ -26,7 +26,7 @@ final class OpenAIProvider: ToolUseProvider, @unchecked Sendable {
 
     func complete(_ request: LLMRequest) async throws -> LLMResponse {
         let urlRequest = try buildRequest(request, tools: nil, stream: false)
-        let (data, response) = try await PinnedURLSession.shared.session.data(for: urlRequest)
+        let (data, response) = try await LLMURLSession.shared.session.data(for: urlRequest)
 
         guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
             let code = (response as? HTTPURLResponse)?.statusCode ?? 0
@@ -63,7 +63,7 @@ final class OpenAIProvider: ToolUseProvider, @unchecked Sendable {
                             maxTokens: capturedRequest.maxTokens
                         )
 
-                        let (streamBytes, streamResponse) = try await PinnedURLSession.shared.session.bytes(for: urlRequest)
+                        let (streamBytes, streamResponse) = try await LLMURLSession.shared.session.bytes(for: urlRequest)
                         guard let http = streamResponse as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
                             let code = (streamResponse as? HTTPURLResponse)?.statusCode ?? 0
                             throw LLMProviderError.apiError(statusCode: code, body: "OpenAI API Fehler")

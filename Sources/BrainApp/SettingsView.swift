@@ -22,7 +22,6 @@ struct SettingsView: View {
     @State private var showResetConfirmation = false
     @AppStorage("anthropicMode") private var anthropicMode = "api"
     @AppStorage("selectedModel") private var selectedModel = "claude-opus-4-6"
-    @AppStorage(PinnedURLSession.tofuEnabledKey) private var tofuEnabled = false
     @AppStorage("autoRouteModels") private var autoRouteModels = false
     @AppStorage("showAdvancedSettings") private var showAdvanced = false
     @AppStorage("model.low") private var modelLow = "claude-haiku-4-5-20251001"
@@ -199,13 +198,6 @@ struct SettingsView: View {
         Section("Sicherheit") {
             Toggle("Face ID / Touch ID", isOn: $faceIDEnabled)
                 .accessibilityIdentifier("settings.faceID")
-            // TOFU always visible
-                Toggle("Zertifikat-Fallback (TOFU)", isOn: $tofuEnabled)
-                    .accessibilityIdentifier("settings.tofu")
-                if tofuEnabled {
-                    Text("Bei Zertifikatsrotation wird das neue Zertifikat akzeptiert, wenn die TLS-Validierung OK ist. Deaktivieren für strengeres Pinning.")
-                        .font(.caption2).foregroundStyle(.secondary)
-                }
         }
     }
 

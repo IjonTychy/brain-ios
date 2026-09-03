@@ -116,9 +116,9 @@ struct MoreTabView: View {
     }
 
     private func loadActiveSkills() {
-        // Show ALL enabled skills (including those with sourceMarkdown for on-demand compilation)
-        // Filter out language skills — they provide labels, not UI
+        // Show enabled skills (including those with sourceMarkdown for on-demand
+        // compilation); the dashboard and language packs are not listed.
         activeSkills = ((try? dataBridge.listSkills()) ?? [])
-            .filter { $0.enabled && !$0.id.hasPrefix("brain-language-") }
+            .filter { $0.isListedInNavigation }
     }
 }

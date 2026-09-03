@@ -49,7 +49,8 @@
 		B1010GP1 /* GeminiProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020GP1 /* GeminiProvider.swift */; };
 		B1010GO1 /* GoogleOAuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020GO1 /* GoogleOAuthService.swift */; };
 		B1010AM1 /* LLMAuthMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020AM1 /* LLMAuthMode.swift */; };
-		B1010018 /* CertificatePinning.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020018 /* CertificatePinning.swift */; };
+		B1010018 /* LLMURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020018 /* LLMURLSession.swift */; };
+		B1010A01 /* LLMKeyProbe.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020A01 /* LLMKeyProbe.swift */; };
 		B1010019 /* OpenAIProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020019 /* OpenAIProvider.swift */; };
 
 		B1010020 /* BrainCore in Frameworks */ = {isa = PBXBuildFile; productRef = A1000080 /* BrainCore */; };
@@ -269,7 +270,8 @@
 		B1020GP1 /* GeminiProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiProvider.swift; sourceTree = "<group>"; };
 		B1020GO1 /* GoogleOAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleOAuthService.swift; sourceTree = "<group>"; };
 		B1020AM1 /* LLMAuthMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMAuthMode.swift; sourceTree = "<group>"; };
-		B1020018 /* CertificatePinning.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CertificatePinning.swift; sourceTree = "<group>"; };
+		B1020018 /* LLMURLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMURLSession.swift; sourceTree = "<group>"; };
+		B1020A01 /* LLMKeyProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LLMKeyProbe.swift; sourceTree = "<group>"; };
 		B1020019 /* OpenAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIProvider.swift; sourceTree = "<group>"; };
 		B1020021 /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
 		B1020022 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -596,7 +598,8 @@
 				B1020GP1 /* GeminiProvider.swift */,
 				B1020GO1 /* GoogleOAuthService.swift */,
 				B1020AM1 /* LLMAuthMode.swift */,
-				B1020018 /* CertificatePinning.swift */,
+				B1020018 /* LLMURLSession.swift */,
+				B1020A01 /* LLMKeyProbe.swift */,
 				B1020019 /* OpenAIProvider.swift */,
 				B1020045 /* OnDeviceProvider.swift */,
 				4B7A664072F34E07BE05F514 /* OpenAICompatibleProvider.swift */,
@@ -883,7 +886,8 @@
 				B1010GP1 /* GeminiProvider.swift in Sources */,
 				B1010GO1 /* GoogleOAuthService.swift in Sources */,
 				B1010AM1 /* LLMAuthMode.swift in Sources */,
-				B1010018 /* CertificatePinning.swift in Sources */,
+				B1010018 /* LLMURLSession.swift in Sources */,
+				B1010A01 /* LLMKeyProbe.swift in Sources */,
 				B1010019 /* OpenAIProvider.swift in Sources */,
 				B1010033 /* EmailBridge.swift in Sources */,
 				GO100001 /* EmailActionHandlers.swift in Sources */,
