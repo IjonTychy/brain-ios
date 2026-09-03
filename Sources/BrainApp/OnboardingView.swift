@@ -8,7 +8,7 @@ import UserNotifications
 // Pages: Welcome → Features → Privacy → Provider Selection → API Key → Mail Wizard → Permissions → First Entry
 struct OnboardingView: View {
     @Binding var hasCompletedOnboarding: Bool
-    @Environment(DataBridge.self) private var dataBridge
+    @Environment(DataBridge.self) var dataBridge
 
     @State var currentPage = 0
     // Provider selection

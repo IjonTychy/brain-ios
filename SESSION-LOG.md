@@ -50,7 +50,11 @@
 
 - Keine Testaenderungen (kein Verhalten geaendert). Statische Verifikation:
   Klammer-/Parenthesen-Balance aller 16 Dateien, 4 pbxproj-Eintraege pro Datei.
-- CI-Lauf auf `claude/session-7rrkg8` ausstehend (siehe Systemzustand).
+- CI-Lauf 1 (`a7ba9f5`): iOS-Build rot -- `@Environment(DataBridge.self) private
+  var dataBridge` war vom Sichtbarkeits-Skript nicht erfasst und blieb `private`
+  (drei Seiten-Dateien greifen darauf zu). Gefixt; zudem gibt `ios-build.yml`
+  bei Failure jetzt die `error:`-Zeilen aus (tee + grep), da `| tail -100` die
+  Diagnostik bisher abschnitt. Lauf 2 ausstehend.
 
 ### Offene Probleme
 
