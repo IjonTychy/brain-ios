@@ -56,6 +56,10 @@
 		B1010050 /* SwiftMail in Frameworks */ = {isa = PBXBuildFile; productRef = E1000080 /* SwiftMail */; };
 		B1010021 /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020021 /* ChatService.swift */; };
 		B1010022 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020022 /* OnboardingView.swift */; };
+		GO100009 /* OnboardingStaticPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200009 /* OnboardingStaticPages.swift */; };
+		GO100010 /* OnboardingProviderPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200010 /* OnboardingProviderPages.swift */; };
+		GO100011 /* OnboardingMailWizardPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200011 /* OnboardingMailWizardPage.swift */; };
+		GO100012 /* OnboardingFinalPages.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200012 /* OnboardingFinalPages.swift */; };
 		B1010023 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020023 /* SettingsView.swift */; };
 		B1010024 /* EntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020024 /* EntryDetailView.swift */; };
 		B1010025 /* SkillRendererLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020025 /* SkillRendererLayout.swift */; };
@@ -68,6 +72,7 @@
 		B1010032 /* SkillRendererSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020032 /* SkillRendererSystem.swift */; };
 		B1010039 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B1020039 /* Assets.xcassets */; };
 		B1010033 /* EmailBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020033 /* EmailBridge.swift */; };
+		GO100001 /* EmailActionHandlers.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200001 /* EmailActionHandlers.swift */; };
 		B1010034 /* ScannerBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020034 /* ScannerBridge.swift */; };
 		B1010035 /* NFCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020035 /* NFCBridge.swift */; };
 		B1010036 /* SpeechBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020036 /* SpeechBridge.swift */; };
@@ -115,6 +120,9 @@
 		B1010047 /* ConversationMemory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020047 /* ConversationMemory.swift */; };
 		B1010048 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020048 /* SharedContainer.swift */; };
 		B1010049 /* SkillManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020049 /* SkillManagerView.swift */; };
+		GO100006 /* SkillDetailSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200006 /* SkillDetailSettingsView.swift */; };
+		GO100007 /* SkillSupportViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200007 /* SkillSupportViews.swift */; };
+		GO100008 /* SkillImportPreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200008 /* SkillImportPreview.swift */; };
 		B1010056 /* ProposalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020056 /* ProposalView.swift */; };
 		B1010051 /* EntryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020051 /* EntryRepository.swift */; };
 		B1010052 /* TagRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1020052 /* TagRepository.swift */; };
@@ -136,6 +144,10 @@
 		B1SK05000000000000000001 /* SkillBundleLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1SK04000000000000000001 /* SkillBundleLoader.swift */; };
 		B1SK02000000000000000100 /* brain-handwriting-notes.brainskill.md in Resources */ = {isa = PBXBuildFile; fileRef = B1SK01000000000000000100 /* brain-handwriting-notes.brainskill.md */; };
 		F00100000000000000000001 /* MailTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000001 /* MailTabView.swift */; };
+		GO100002 /* MailMailboxesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200002 /* MailMailboxesView.swift */; };
+		GO100003 /* MailInboxView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200003 /* MailInboxView.swift */; };
+		GO100004 /* MailConfigFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200004 /* MailConfigFormView.swift */; };
+		GO100005 /* MailAccountSettingsViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = GO200005 /* MailAccountSettingsViews.swift */; };
 		F00100000000000000000002 /* PrivacyZoneSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000002 /* PrivacyZoneSettingsView.swift */; };
 		F00100000000000000000003 /* MailDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000003 /* MailDetailView.swift */; };
 		F00100000000000000000004 /* MailComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00200000000000000000004 /* MailComposeView.swift */; };
@@ -261,6 +273,10 @@
 		B1020019 /* OpenAIProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenAIProvider.swift; sourceTree = "<group>"; };
 		B1020021 /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
 		B1020022 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		GO200009 /* OnboardingStaticPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStaticPages.swift; sourceTree = "<group>"; };
+		GO200010 /* OnboardingProviderPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingProviderPages.swift; sourceTree = "<group>"; };
+		GO200011 /* OnboardingMailWizardPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingMailWizardPage.swift; sourceTree = "<group>"; };
+		GO200012 /* OnboardingFinalPages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingFinalPages.swift; sourceTree = "<group>"; };
 		B1020023 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		B1020024 /* EntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryDetailView.swift; sourceTree = "<group>"; };
 		B1020025 /* SkillRendererLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererLayout.swift; sourceTree = "<group>"; };
@@ -272,6 +288,7 @@
 		B1020031 /* SkillRendererContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererContainer.swift; sourceTree = "<group>"; };
 		B1020032 /* SkillRendererSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillRendererSystem.swift; sourceTree = "<group>"; };
 		B1020033 /* EmailBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailBridge.swift; sourceTree = "<group>"; };
+		GO200001 /* EmailActionHandlers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailActionHandlers.swift; sourceTree = "<group>"; };
 		B1020034 /* ScannerBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScannerBridge.swift; sourceTree = "<group>"; };
 		B1020035 /* NFCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFCBridge.swift; sourceTree = "<group>"; };
 		B1020036 /* SpeechBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechBridge.swift; sourceTree = "<group>"; };
@@ -319,6 +336,9 @@
 		B1020047 /* ConversationMemory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationMemory.swift; sourceTree = "<group>"; };
 		B1020048 /* SharedContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedContainer.swift; sourceTree = "<group>"; };
 		B1020049 /* SkillManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillManagerView.swift; sourceTree = "<group>"; };
+		GO200006 /* SkillDetailSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillDetailSettingsView.swift; sourceTree = "<group>"; };
+		GO200007 /* SkillSupportViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillSupportViews.swift; sourceTree = "<group>"; };
+		GO200008 /* SkillImportPreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillImportPreview.swift; sourceTree = "<group>"; };
 		B1020056 /* ProposalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProposalView.swift; sourceTree = "<group>"; };
 		B1020051 /* EntryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryRepository.swift; sourceTree = "<group>"; };
 		B1020052 /* TagRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagRepository.swift; sourceTree = "<group>"; };
@@ -334,6 +354,10 @@
 		B1SK04000000000000000001 /* SkillBundleLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkillBundleLoader.swift; sourceTree = "<group>"; };
 		B1SK01000000000000000100 /* brain-handwriting-notes.brainskill.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "brain-handwriting-notes.brainskill.md"; sourceTree = "<group>"; };
 		F00200000000000000000001 /* MailTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailTabView.swift; sourceTree = "<group>"; };
+		GO200002 /* MailMailboxesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailMailboxesView.swift; sourceTree = "<group>"; };
+		GO200003 /* MailInboxView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailInboxView.swift; sourceTree = "<group>"; };
+		GO200004 /* MailConfigFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailConfigFormView.swift; sourceTree = "<group>"; };
+		GO200005 /* MailAccountSettingsViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailAccountSettingsViews.swift; sourceTree = "<group>"; };
 		F00200000000000000000002 /* PrivacyZoneSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivacyZoneSettingsView.swift; sourceTree = "<group>"; };
 		F00200000000000000000003 /* MailDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailDetailView.swift; sourceTree = "<group>"; };
 		F00200000000000000000004 /* MailComposeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MailComposeView.swift; sourceTree = "<group>"; };
@@ -439,6 +463,10 @@
 				B1020024 /* EntryDetailView.swift */,
 				B1020008 /* KeychainService.swift */,
 				B1020022 /* OnboardingView.swift */,
+				GO200009 /* OnboardingStaticPages.swift */,
+				GO200010 /* OnboardingProviderPages.swift */,
+				GO200011 /* OnboardingMailWizardPage.swift */,
+				GO200012 /* OnboardingFinalPages.swift */,
 				B1020023 /* SettingsView.swift */,
 				B1020009 /* SkillRenderer.swift */,
 				B1020025 /* SkillRendererLayout.swift */,
@@ -486,11 +514,18 @@
 				B1020047 /* ConversationMemory.swift */,
 				B1020048 /* SharedContainer.swift */,
 				B1020049 /* SkillManagerView.swift */,
+				GO200006 /* SkillDetailSettingsView.swift */,
+				GO200007 /* SkillSupportViews.swift */,
+				GO200008 /* SkillImportPreview.swift */,
 				B1020056 /* ProposalView.swift */,
 				B1020057 /* OnThisDayView.swift */,
 				B1020058 /* MapView.swift */,
 				B1020059 /* BackupView.swift */,
 				F00200000000000000000001 /* MailTabView.swift */,
+				GO200002 /* MailMailboxesView.swift */,
+				GO200003 /* MailInboxView.swift */,
+				GO200004 /* MailConfigFormView.swift */,
+				GO200005 /* MailAccountSettingsViews.swift */,
 				F00200000000000000000002 /* PrivacyZoneSettingsView.swift */,
 				F00200000000000000000003 /* MailDetailView.swift */,
 				F00200000000000000000004 /* MailComposeView.swift */,
@@ -532,6 +567,7 @@
 				B1020015 /* NotificationBridge.swift */,
 				B1020016 /* SpotlightBridge.swift */,
 				B1020033 /* EmailBridge.swift */,
+				GO200001 /* EmailActionHandlers.swift */,
 				B1020034 /* ScannerBridge.swift */,
 				B1020035 /* NFCBridge.swift */,
 				B1020036 /* SpeechBridge.swift */,
@@ -813,6 +849,10 @@
 				B1010024 /* EntryDetailView.swift in Sources */,
 				B1010008 /* KeychainService.swift in Sources */,
 				B1010022 /* OnboardingView.swift in Sources */,
+				GO100009 /* OnboardingStaticPages.swift in Sources */,
+				GO100010 /* OnboardingProviderPages.swift in Sources */,
+				GO100011 /* OnboardingMailWizardPage.swift in Sources */,
+				GO100012 /* OnboardingFinalPages.swift in Sources */,
 				B1010023 /* SettingsView.swift in Sources */,
 				B1010009 /* SkillRenderer.swift in Sources */,
 				B1010025 /* SkillRendererLayout.swift in Sources */,
@@ -846,6 +886,7 @@
 				B1010018 /* CertificatePinning.swift in Sources */,
 				B1010019 /* OpenAIProvider.swift in Sources */,
 				B1010033 /* EmailBridge.swift in Sources */,
+				GO100001 /* EmailActionHandlers.swift in Sources */,
 				B1010034 /* ScannerBridge.swift in Sources */,
 				B1010035 /* NFCBridge.swift in Sources */,
 				B1010036 /* SpeechBridge.swift in Sources */,
@@ -887,6 +928,9 @@
 				B1010047 /* ConversationMemory.swift in Sources */,
 				B1010048 /* SharedContainer.swift in Sources */,
 				B1010049 /* SkillManagerView.swift in Sources */,
+				GO100006 /* SkillDetailSettingsView.swift in Sources */,
+				GO100007 /* SkillSupportViews.swift in Sources */,
+				GO100008 /* SkillImportPreview.swift in Sources */,
 				B1010056 /* ProposalView.swift in Sources */,
 				B1010057 /* OnThisDayView.swift in Sources */,
 				B1010058 /* MapView.swift in Sources */,
@@ -899,6 +943,10 @@
 				B1SK05000000000000000001 /* SkillBundleLoader.swift in Sources */,
 				B1010071 /* EmbeddingBridge.swift in Sources */,
 				F00100000000000000000001 /* MailTabView.swift in Sources */,
+				GO100002 /* MailMailboxesView.swift in Sources */,
+				GO100003 /* MailInboxView.swift in Sources */,
+				GO100004 /* MailConfigFormView.swift in Sources */,
+				GO100005 /* MailAccountSettingsViews.swift in Sources */,
 				F00100000000000000000002 /* PrivacyZoneSettingsView.swift in Sources */,
 				F00100000000000000000003 /* MailDetailView.swift in Sources */,
 				F00100000000000000000004 /* MailComposeView.swift in Sources */,

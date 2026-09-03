@@ -62,7 +62,12 @@ jobs:
             -destination "platform=iOS Simulator,name=$SIM_DEVICE" \
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
-            | tail -100
+            2>&1 | tee build.log | tail -100
+
+      - name: Show compiler errors
+        if: failure()
+        run: |
+          grep -E "error: " build.log | sort -u | head -80 || true
 
       - name: Run BrainApp Tests
         run: |
@@ -74,4 +79,9 @@ jobs:
             -configuration Debug \
             CODE_SIGNING_ALLOWED=NO \
             -only-testing:BrainAppTests \
-            | tail -100
+            2>&1 | tee test.log | tail -100
+
+      - name: Show test failures
+        if: failure()
+        run: |
+          grep -E "error: |failed" test.log | sort -u | head -80 || true

@@ -6,6 +6,77 @@
 
 ---
 
+## God Objects gesplittet (Type-Checker-Entlastung) -- 03.09.2026
+
+### Abgeschlossen
+
+- **Paket 4: God Objects vor dem Xcode-Cloud-Build gesplittet** -- Die vier
+  groessten Dateien wurden mechanisch entlang ihrer Top-Level-Deklarationen in
+  16 Dateien zerlegt (keine Logik-Aenderung, kein Umbenennen):
+  - `EmailBridge.swift` (1045 -> 690 Z.): die 15 `email.*`-Handler-Klassen
+    liegen jetzt in `Bridges/EmailActionHandlers.swift`.
+  - `MailTabView.swift` (1193 -> 58 Z.): `MailMailboxesView.swift` (inkl.
+    privatem `LazyMailInbox`), `MailInboxView.swift` (+ `MailRowView`),
+    `MailConfigFormView.swift`, `MailAccountSettingsViews.swift`.
+  - `SkillManagerView.swift` (876 -> 329 Z.): `SkillDetailSettingsView.swift`,
+    `SkillSupportViews.swift` (Source-/JSON-Viewer, SafetyAnalyzer, ShareSheet),
+    `SkillImportPreview.swift`.
+  - `OnboardingView.swift` (1237 -> 148 Z.): Der Struct behaelt State, `body`
+    und die geteilten Helfer; die Seiten liegen als `extension OnboardingView`
+    in `OnboardingStaticPages.swift`, `OnboardingProviderPages.swift`,
+    `OnboardingMailWizardPage.swift` (inkl. `MailProvider`/`MailWizardStep`)
+    und `OnboardingFinalPages.swift`. Dafuer wurden die Member von `private`
+    auf `internal` gesetzt (Extensions in anderen Dateien) und ein expliziter
+    `init(hasCompletedOnboarding:)` ergaenzt, damit der Aufruf in BrainApp.swift
+    unabhaengig vom synthetisierten Memberwise-Init bleibt.
+- Alle 12 neuen Dateien im pbxproj registriert (FileReference, BuildFile,
+  Gruppe, Sources-Phase) -- per Skript mit Zaehl-Assertions.
+
+### Entscheidungen
+
+- **Mechanischer Split statt Body-Dekomposition:** Der Xcode-Cloud-Timeout
+  haengt an der Compile-Zeit pro Datei; Schnitte an Top-Level-Grenzen sind
+  risikoarm und ohne Toolchain verifizierbar (Klammer-Balance, Boundary-
+  Assertions). Tiefere Zerlegung einzelner `body`-Ausdruecke bleibt ein
+  separater Schritt, falls der Type-Checker weiterhin anschlaegt.
+- **`private` -> `internal` im Onboarding:** Swift erlaubt keinen Zugriff auf
+  `private` Member aus Extensions in anderen Dateien; `internal` ist gemaess
+  Code-Konventionen OK (App-Modul).
+- **Kein code-reviewer-Pass:** Aenderung ist rein mechanisch; wegen des
+  Token-Budgets (91 % verbraucht) wurde der Agent-Review bewusst uebersprungen.
+  CI (iOS Build & Test, Debug) ist der Compiler-Check.
+
+### Tests
+
+- Keine Testaenderungen (kein Verhalten geaendert). Statische Verifikation:
+  Klammer-/Parenthesen-Balance aller 16 Dateien, 4 pbxproj-Eintraege pro Datei.
+- CI-Lauf 1 (`a7ba9f5`): iOS-Build rot -- `@Environment(DataBridge.self) private
+  var dataBridge` war vom Sichtbarkeits-Skript nicht erfasst und blieb `private`
+  (drei Seiten-Dateien greifen darauf zu). Gefixt; zudem gibt `ios-build.yml`
+  bei Failure jetzt die `error:`-Zeilen aus (tee + grep), da `| tail -100` die
+  Diagnostik bisher abschnitt. Lauf 2 scheiterte sofort an einem YAML-Fehler
+  der neuen Grep-Steps (`: ` in einem Plain-Scalar; jetzt Block-Scalar).
+  Lauf 3 (`8baad40`): beide Workflows gruen (iOS Build & Test, BrainCore Tests).
+
+### Offene Probleme
+
+- Ob der Split den Xcode-Cloud-Timeout tatsaechlich beseitigt, zeigt erst ein
+  Release-Build (WMO) auf Xcode Cloud; die GitHub-CI baut Debug.
+
+### Naechster Schritt
+
+- CI-Ergebnis abwarten, dann PR nach `main` (nur auf Andys Freigabe).
+- Bei erneutem Type-Checker-Timeout: `body`-Ausdruecke der groessten Views
+  (MailMailboxesView, SkillDetailSettingsView) in Sub-View-Structs zerlegen.
+
+### Systemzustand
+
+- OK: 16 Dateien, groesste verbleibende Datei EmailBridge.swift (690 Z.)
+- OK: CI gruen fuer `8baad40` (Debug-Build + 72 BrainAppTests + BrainCore-Suite)
+- Ausstehend: PR nach main (Andys Freigabe), Release-Build auf Xcode Cloud
+
+---
+
 ## LLMRouter verdrahtet + brain-api-Auth-Schicht entfernt + Deploy-Vorarbeit -- 02.09.2026
 
 ### Abgeschlossen

@@ -239,6 +239,11 @@ Diese Skills sind in Andys Claude Desktop-App installiert und stehen in jeder Se
 
 ## Current Objective
 
+**Update 03.09.2026:** God Objects gesplittet: EmailBridge, MailTabView,
+SkillManagerView und OnboardingView entlang der Top-Level-Deklarationen in 16
+Dateien zerlegt (groesste Datei jetzt 690 Zeilen), um Type-Checker-Timeouts im
+Xcode-Cloud-Build vorzubeugen. Details: SESSION-LOG 03.09.2026.
+
 **Update 02.09.2026:** LLMRouter im Chat verdrahtet -- Privacy Zones und
 Offline-Routing werden jetzt bei jedem Send durchgesetzt (fail-loud statt
 stillem Cloud-Fallback); Auto-Route-Sticky-Bug und "on-device"-als-OpenAI-
@@ -287,8 +292,7 @@ Bei Konflikten gilt dieser Snapshot vor aelteren Zahlen in diesem Dokument.
 - **Erledigt (Doku war veraltet):** Mail-Delete-Sync (Tombstones + IMAP-Expunge)
   und StoreKit (StoreKit 2, Trial + Einmalkauf) sind implementiert.
 - **Offene Baustellen:** Echte Bundle-IDs wiederherstellen, llama.cpp-Package
-  aktivieren, Device-Verifikation (OAuth, Runtime-Fixes, Gemma), God Objects
-  wieder splitten (OnboardingView, MailTabView). LLM-Routing ist seit 02.09.2026
+  aktivieren, Device-Verifikation (OAuth, Runtime-Fixes, Gemma). God Objects sind seit 03.09.2026 gesplittet. LLM-Routing ist seit 02.09.2026
   konsolidiert (LLMProviderFactory): Chat- und AI-Handler-Pfad laufen ueber den
   LLMRouter mit Privacy-/Offline-Gate.
 
@@ -326,7 +330,7 @@ Grosse Dateien aufgeteilt (4 God Objects eliminiert), ~960 Zeilen Dead Code/Dupl
 | **Hoch** | CI vollstaendig gruen | BrainCore-Linux + iOS-Build auf main stabil halten (Feedback-Loop etabliert 04.07.) |
 | **Mittel** | Gemma aktivieren | llama.cpp-Package in Xcode hinzufuegen (docs/ON-DEVICE-MODELS.md), auf Device verifizieren |
 | **Mittel** | Device-Verifikation | OAuth, Runtime-Fixes vom Maerz, Skill-Erstellung mit neuem Expression-Vokabular |
-| **Mittel** | God Objects splitten | OnboardingView (1255 Z.), MailTabView (1193 Z.), EmailBridge (1045 Z.), SkillManagerView (876 Z.) |
+| **Mittel** | Type-Checker-Last | God Objects sind gesplittet (03.09.); bei erneutem Timeout die `body`-Ausdruecke von MailMailboxesView/SkillDetailSettingsView in Sub-Views zerlegen |
 | **Niedrig** | Screenshots | App Store Screenshots erstellen |
 | **Niedrig** | CloudKit Sync / Vision Pro | Bei Bedarf aktivieren bzw. fertigstellen |
 
