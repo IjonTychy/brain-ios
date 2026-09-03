@@ -56,7 +56,7 @@
   bei Failure jetzt die `error:`-Zeilen aus (tee + grep), da `| tail -100` die
   Diagnostik bisher abschnitt. Lauf 2 scheiterte sofort an einem YAML-Fehler
   der neuen Grep-Steps (`: ` in einem Plain-Scalar; jetzt Block-Scalar).
-  Lauf 3 ausstehend.
+  Lauf 3 (`8baad40`): beide Workflows gruen (iOS Build & Test, BrainCore Tests).
 
 ### Offene Probleme
 
@@ -72,7 +72,8 @@
 ### Systemzustand
 
 - OK: 16 Dateien, groesste verbleibende Datei EmailBridge.swift (690 Z.)
-- Ausstehend: CI-Verifikation des Splits, PR nach main
+- OK: CI gruen fuer `8baad40` (Debug-Build + 72 BrainAppTests + BrainCore-Suite)
+- Ausstehend: PR nach main (Andys Freigabe), Release-Build auf Xcode Cloud
 
 ---
 
