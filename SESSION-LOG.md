@@ -67,6 +67,12 @@
 - Lauf 3 (Run 3): xcodeproj fand `fastlane/BrainApp.xcodeproj` nicht, weil
   fastlane Lanes mit `fastlane/` als Arbeitsverzeichnis ausfuehrt. Fix: Pfade
   fuer Projekt, Build-Ordner und IPA in der Lane absolut (Repo-Root) aufgeloest.
+- Lauf 4 (Run 4): Archiv (424 s), Signierung mit den match-Profilen, Export und
+  dSYM gruen; der Upload scheiterte an der App-Store-Connect-Validierung: Der
+  Platzhalter `YOUR_GOOGLE_CLIENT_ID` steckt via Info.plist im URL-Schema
+  `com.googleusercontent.apps.<id>`, und Unterstriche sind dort nicht erlaubt
+  (RFC 1738). Fix: Platzhalter in Base.xcconfig, AppIdentifiers und README auf
+  `placeholder-google-client-id` (nur Buchstaben, Ziffern, Punkt, Bindestrich).
 
 ### Offene Probleme
 

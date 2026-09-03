@@ -6,6 +6,21 @@
 
 ---
 
+## Status-Update 03.09.2026 (3) -- TestFlight-Pipeline (GitHub Actions)
+
+- **[BEHOBEN] Schweregrad: mittel (Deploy)** -- Der Google-Client-ID-Platzhalter
+  `YOUR_GOOGLE_CLIENT_ID` landete ueber Info.plist im URL-Schema der App;
+  App Store Connect lehnt Unterstriche in URL-Schemata ab (RFC 1738), der
+  TestFlight-Upload scheiterte an der Validierung. Platzhalter jetzt
+  `placeholder-google-client-id` (Base.xcconfig, AppIdentifiers, README);
+  die Platzhalter-Erkennung in GoogleOAuthService vergleicht weiterhin gegen
+  `AppIdentifiers.placeholderGoogleClientID`.
+- **[INFO]** Pipeline-Stand nach Lauf 4: API-Key-Auth, match (Zertifikat +
+  3 Profile), manuelle Signierung, Archiv, Export und dSYM laufen durch; offen
+  ist nur noch der Upload.
+
+---
+
 ## Status-Update 03.09.2026 (2) -- Rohtext-Handler mit Privacy-Property
 
 - **[BEHOBEN] Rohtext-Handler ohne Privacy-Provenance** (offen seit 02.09.2026,
