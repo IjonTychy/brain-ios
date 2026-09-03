@@ -6,6 +6,81 @@
 
 ---
 
+## Device-Verifikation Build 1005: Pinning entfernt, Key-Probe, Skill-Bereinigung -- 03.09.2026
+
+### Abgeschlossen
+
+- **API-Keys immer "ungueltig" (alle Provider)** -- Ursache: `PinnedURLSession`
+  erzwang SPKI-Pins vom 19.03.2026 und brach bei Mismatch jede Verbindung ab
+  (TOFU-Fallback ist Opt-in, auf einer frischen Installation aus). Pruefung
+  gegen die aktuellen Ketten von api.openai.com und
+  generativelanguage.googleapis.com: Leaf-Zertifikate rotiert; zudem hasht der
+  Code das rohe Schluesselmaterial (`SecKeyCopyExternalRepresentation`), die
+  hinterlegten Werte sind aber SPKI-Hashes -- die Pins konnten nur mit
+  aktiviertem TOFU je matchen. Pinning ersatzlos entfernt: `LLMURLSession`
+  (Timeouts 600 s, System-TLS) ersetzt `PinnedURLSession`; TOFU-Toggle in den
+  Einstellungen samt Speicherpfaden gestrichen. `OpenAICompatibleProvider`
+  nutzt dieselbe Session fuer alle Endpoints.
+- **Key-Test modellunabhaengig** -- Neues `LLMKeyProbe` prueft den Key per GET
+  auf den Modell-Listen-Endpoint des Providers (Anthropic und OpenAI
+  `/v1/models`, Gemini `/v1beta/models`, xAI/Custom `/v1/models`) statt eine
+  Completion mit fest verdrahtetem Modell zu schicken (zurueckgezogene
+  Modell-IDs haetten den Test ebenfalls scheitern lassen). Onboarding und der
+  Anthropic-Test in den Einstellungen nutzen die Probe; Fehlertexte bleiben
+  (401 -> "API-Key ungueltig", sonst Status + Body).
+- **Gemini-Defaults** -- abgeschaltete Preview-IDs (`gemini-2.5-flash-preview-05-20`,
+  `gemini-2.5-pro-preview-05-06`) durch `gemini-2.5-flash` / `gemini-2.5-pro`
+  ersetzt (GeminiProvider-Init, Fallback-Liste).
+- **Eingebaute Skills bereinigt** -- Inventur: Das Bundle enthaelt 5 Skills
+  (Sprachpakete de/en, Handschrift-Notizen, Handschrift-Font, Visitenkarten-
+  Scanner; alle referenzierten Handler existieren), aus Code kamen 5
+  Bootstrap-JSON-Skills. Davon sind `mail-inbox`, `mail-config`, `calendar` und
+  `quick-capture` seit Maerz durch native Views abgeloest (MailTabView,
+  CalendarTabView, QuickCaptureView) und tauchten nur noch als Duplikate im
+  Mehr-Tab, in der iPad-Sidebar und im Skill-Manager auf. Definitionen
+  entfernt (BootstrapSkills.swift -309 Zeilen); `ensureBootstrapSkillsInDB`
+  deinstalliert vorhandene System-Kopien beim Start (user-modifizierte
+  bleiben). Neue Regel `Skill.isListedInNavigation`: Dashboard (eigener Tab)
+  und Sprachpakete erscheinen nicht mehr in Mehr-Tab und Sidebar.
+- **Mail:** Andys Gmail-Inbox war nur langsam (Erst-Sync aller Ordner), kein
+  Fehler; keine Aenderung.
+
+### Entscheidungen
+
+- **Pinning raus statt Pins aktualisieren:** Die API-Hosts liegen hinter CDNs
+  (Cloudflare, Google), die Leaf-Keys alle paar Wochen und Issuing-CAs
+  gelegentlich wechseln; ohne eigenen Server zum Nachliefern von Pins ist jede
+  Pin-Liste in Monaten stale und legt dann die ganze App lahm. System-TLS ist
+  der ehrliche Stand (Begruendung in LLMURLSession.swift).
+- **Architektur-Abweichung dokumentiert, nicht neu entschieden:** Entscheidung 8
+  (Inbox/Kalender als Skills) ist seit Maerz faktisch ueberholt; die
+  Bereinigung entfernt nur tote Duplikate. ARCHITECTURE.md
+  (Implementierungsstand) haelt den realen Stand fest, die Entscheidungstabelle
+  bleibt bis zu Andys Freigabe unveraendert.
+
+### Tests
+
+- Keine Toolchain lokal; Compiler-Check via CI (iOS Build & Test). pbxproj:
+  LLMURLSession.swift ersetzt CertificatePinning.swift, LLMKeyProbe.swift neu.
+- Kein code-reviewer-Pass (Token-Budget): Aenderungen sind Loeschungen plus
+  eine kleine, klar umrissene Probe-Funktion.
+
+### Offene Probleme
+
+- Device-Verifikation der Fixes steht aus (naechster TestFlight-Build).
+
+### Naechster Schritt
+
+- CI abwarten, PR nach main, TestFlight-Workflow auf main starten; Andy testet
+  API-Key-Eingabe und die Skill-Liste.
+
+### Systemzustand
+
+- OK: Kein Certificate Pinning mehr im Codepfad; Key-Test ueber Modell-Listen
+- Ausstehend: CI, Merge, TestFlight-Build
+
+---
+
 ## TestFlight-Pipeline via GitHub Actions (Mac-frei) -- 03.09.2026
 
 ### Abgeschlossen

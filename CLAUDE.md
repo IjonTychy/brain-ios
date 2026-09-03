@@ -22,9 +22,10 @@ brain-ios ist eine **Runtime-Engine**, keine App mit fest codierten Modulen.
 - **Skill Engine:** KI übersetzt .brainskill.md → skill.json
 - **Proaktive Intelligenz:** Mustererkennung als nativer Code (nicht JSON-getrieben)
 
-Die App shipped mit **Bootstrap-Skills** (Dashboard, Inbox, Kalender), die genauso
-via JSON definiert sind wie user-generierte Skills. Kein Unterschied zwischen
-"eingebaut" und "generiert".
+Die App shipped mit dem **Bootstrap-Skill** Dashboard, der genauso via JSON
+definiert ist wie user-generierte Skills; Mail, Kalender, Kontakte und
+Schnellerfassung sind seit Maerz 2026 native Views (ARCHITECTURE.md,
+Implementierungsstand). Kein Unterschied zwischen "eingebaut" und "generiert".
 
 ## Dokumentations-Pflicht bei Commits
 
@@ -385,6 +386,12 @@ Siehe SESSION-LOG für letzten Stand und offene Punkte.
 | — | Security Audit + Fixes | ✅ |
 
 ## Bekannte Probleme
+
+- **Kein Certificate Pinning mehr (seit 03.09.2026):** Die SPKI-Pins vom Maerz
+  waren auf dem Geraet stale und blockierten jede LLM-Verbindung ("API-Key
+  ungueltig" bei allen Providern). LLM-Requests laufen jetzt ueber
+  `LLMURLSession` mit System-TLS; Pinning ist ohne Pin-Nachlieferung fuer
+  CDN-gehostete APIs nicht betreibbar (Begruendung in LLMURLSession.swift).
 
 - **Runtime-Fixes noch nicht auf Device verifiziert:** Kontakte-Tab, Skills, Skill-Import/Kompilierung,
   Self-Improve-Handoff und Shortcuts/App-Intents wurden code-seitig repariert, aber in dieser

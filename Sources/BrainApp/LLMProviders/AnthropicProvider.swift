@@ -69,7 +69,7 @@ final class AnthropicProvider: ToolUseProvider, @unchecked Sendable {
         return try await withNetworkRetry {
             let urlRequest = try self.buildRequest(request, stream: false)
 
-            let (data, response) = try await PinnedURLSession.shared.session.data(for: urlRequest)
+            let (data, response) = try await LLMURLSession.shared.session.data(for: urlRequest)
 
             guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                 let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
@@ -107,7 +107,7 @@ final class AnthropicProvider: ToolUseProvider, @unchecked Sendable {
                 do {
                     let urlRequest = try self.buildRequest(capturedRequest, stream: true)
 
-                    let (bytes, response) = try await PinnedURLSession.shared.session.bytes(for: urlRequest)
+                    let (bytes, response) = try await LLMURLSession.shared.session.bytes(for: urlRequest)
 
                     guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
@@ -199,7 +199,7 @@ final class AnthropicProvider: ToolUseProvider, @unchecked Sendable {
                             stream: true
                         )
 
-                        let (bytes, response) = try await PinnedURLSession.shared.session.bytes(for: urlRequest)
+                        let (bytes, response) = try await LLMURLSession.shared.session.bytes(for: urlRequest)
 
                         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
                             let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0

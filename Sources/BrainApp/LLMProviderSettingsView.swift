@@ -417,10 +417,9 @@ struct LLMProviderSettingsView: View {
             return
         }
 
-        let provider = AnthropicProvider(apiKey: anthropicKey)
         do {
-            let request = LLMRequest(messages: [LLMMessage(role: "user", content: "Hallo")])
-            _ = try await provider.complete(request)
+            // Model-list probe: no dependency on a (possibly retired) model id.
+            try await LLMKeyProbe.validate(.anthropic, apiKey: anthropicKey)
             try keychain.saveWithBiometry(key: KeychainKeys.anthropicAPIKey, value: anthropicKey)
             anthropicStatus = .configured
             anthropicKey = ""

@@ -55,6 +55,10 @@ konkreten Implementierung verschoben:
   das Opt-in-Feature `autoRouteModels` (Chat folgt der User-Praeferenz).
 - **Self-Improve heute:** Skill-Vorschlaege werden als Proposals persistiert; bei Anwendung wird die
   Skill-Generierung an den Chat/Compiler-Pfad uebergeben.
+- **Bootstrap-Skills heute (03.09.2026):** Nur das Dashboard ist ein JSON-Skill. Mail, Kalender,
+  Kontakte und Schnellerfassung sind native SwiftUI-Views (seit Maerz 2026); die frueheren
+  JSON-Duplikate (`mail-inbox`, `mail-config`, `calendar`, `quick-capture`) wurden entfernt und
+  werden beim App-Start aus der Datenbank bereinigt.
 
 ---
 

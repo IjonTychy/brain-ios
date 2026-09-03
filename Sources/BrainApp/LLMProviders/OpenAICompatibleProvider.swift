@@ -20,21 +20,9 @@ final class OpenAICompatibleProvider: ToolUseProvider, @unchecked Sendable {
 
     var isAvailable: Bool { !endpointURL.isEmpty }
 
-    // Known API hosts that have certificate pins in PinnedURLSession.
-    private static let pinnedHosts: Set<String> = [
-        "api.x.ai", "api.anthropic.com", "api.openai.com",
-        "generativelanguage.googleapis.com", "api.claude.ai",
-    ]
-
-    /// URLSession to use: PinnedURLSession for known API hosts, URLSession.shared for custom endpoints.
-    private var urlSession: URLSession {
-        if let host = URL(string: endpointURL)?.host(),
-           Self.pinnedHosts.contains(host) {
-            return PinnedURLSession.shared.session
-        }
-        // Custom endpoints (Ollama, LiteLLM, etc.) — no pins available.
-        return URLSession.shared
-    }
+    /// Shared LLM session (long timeouts, system TLS validation) for hosted
+    /// and custom endpoints alike.
+    private var urlSession: URLSession { LLMURLSession.shared.session }
 
     /// - Parameters:
     ///   - baseURL: Server URL (e.g. "http://localhost:11434" for Ollama, "https://api.x.ai" for xAI)

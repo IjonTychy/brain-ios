@@ -6,6 +6,30 @@
 
 ---
 
+## Status-Update 03.09.2026 (4) -- Device-Test Build 1005
+
+- **[BEHOBEN] Schweregrad: hoch** -- Certificate Pinning (Pins vom 19.03.2026)
+  blockierte auf dem Geraet jede LLM-Verbindung: Leaf-Zertifikate rotiert,
+  TOFU auf frischer Installation aus, und der Laufzeit-Hash (rohes
+  Schluesselmaterial) passte nie zu den hinterlegten SPKI-Hashes. Pinning
+  entfernt (`LLMURLSession`, System-TLS), TOFU-Schalter gestrichen. Das
+  Security-Finding "SPKI-Pinning" aus dem Gross-Review ist damit bewusst
+  zurueckgenommen: ohne Pin-Nachlieferung ist Pinning fuer CDN-gehostete APIs
+  nicht betreibbar.
+- **[BEHOBEN] Schweregrad: mittel** -- Key-Test hing an fest verdrahteten
+  Modell-IDs (Completion-Request); jetzt Modell-Listen-Probe (`LLMKeyProbe`).
+  Gemini-Preview-IDs durch GA-IDs ersetzt.
+- **[BEHOBEN] Schweregrad: niedrig** -- Vier tote Bootstrap-JSON-Skills
+  (mail-inbox, mail-config, calendar, quick-capture) erschienen als Duplikate
+  nativer Tabs in Mehr-Tab, iPad-Sidebar und Skill-Manager; entfernt und beim
+  Start bereinigt. Dashboard und Sprachpakete sind nicht mehr in der
+  Navigation gelistet.
+- **[INFO]** Bundle-Skills (Handschrift-Notizen, Handschrift-Font,
+  Visitenkarten-Scanner) referenzieren nur existierende Handler; ob sie auf dem
+  Geraet funktionieren, ist unverifiziert.
+
+---
+
 ## Status-Update 03.09.2026 (3) -- TestFlight-Pipeline (GitHub Actions)
 
 - **[BEHOBEN] Schweregrad: mittel (Deploy)** -- Der Google-Client-ID-Platzhalter

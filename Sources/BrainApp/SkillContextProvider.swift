@@ -67,3 +67,11 @@ struct SkillContextProvider {
         return baseVariables()
     }
 }
+
+extension Skill {
+    /// Skills that get their own entry in the "Mehr" tab and the iPad sidebar.
+    /// The dashboard has its own tab and language packs only carry labels.
+    var isListedInNavigation: Bool {
+        enabled && id != "dashboard" && !id.hasPrefix("brain-language-")
+    }
+}

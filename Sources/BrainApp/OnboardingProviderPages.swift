@@ -286,9 +286,9 @@ extension OnboardingView {
             return
         }
 
-        // Build provider for selected type
+        // Pick the keychain slot and the model-list endpoint to probe
         let keychainKey: String
-        let testProvider: any LLMProvider
+        let probeTarget: LLMKeyProbe.Target
 
         switch selectedProvider {
         case .anthropic:
@@ -297,48 +297,41 @@ extension OnboardingView {
                 return
             }
             keychainKey = KeychainKeys.anthropicAPIKey
-            testProvider = AnthropicProvider(apiKey: trimmedKey)
+            probeTarget = .anthropic
         case .openAI:
             if trimmedKey.count < 8 {
                 keyValidationResult = KeyValidationResult(isSuccess: false, message: "API-Key zu kurz. Bitte vollstaendigen Key eingeben.")
                 return
             }
             keychainKey = KeychainKeys.openAIAPIKey
-            testProvider = OpenAIProvider(apiKey: trimmedKey)
+            probeTarget = .openAI
         case .gemini:
             if trimmedKey.count < 8 {
                 keyValidationResult = KeyValidationResult(isSuccess: false, message: "API-Key zu kurz. Bitte vollstaendigen Key eingeben.")
                 return
             }
             keychainKey = KeychainKeys.geminiAPIKey
-            testProvider = GeminiProvider(apiKey: trimmedKey)
+            probeTarget = .gemini
         case .xAI:
             if trimmedKey.count < 8 {
                 keyValidationResult = KeyValidationResult(isSuccess: false, message: "API-Key zu kurz. Bitte vollstaendigen Key eingeben.")
                 return
             }
             keychainKey = KeychainKeys.xaiAPIKey
-            testProvider = OpenAICompatibleProvider(baseURL: "https://api.x.ai/v1", model: "grok-3-fast", apiKey: trimmedKey, providerName: "xAI")
+            probeTarget = .openAICompatible(baseURL: "https://api.x.ai/v1")
         case .proxy:
             return  // proxy is handled separately
         }
 
-        let testRequest = LLMRequest(
-            messages: [LLMMessage(role: "user", content: "Sag 'OK'.")],
-            maxTokens: 10
-        )
-
         do {
-            let response = try await testProvider.complete(testRequest)
-            if !response.content.isEmpty {
-                try keychain.save(key: keychainKey, value: trimmedKey)
-                apiKey = trimmedKey
-                keyValidationResult = KeyValidationResult(isSuccess: true, message: "API-Key gültig und gespeichert!")
-                try? await Task.sleep(for: .seconds(1))
-                await MainActor.run { currentPage = 5 }
-            } else {
-                keyValidationResult = KeyValidationResult(isSuccess: false, message: "Leere Antwort — Key prüfen")
-            }
+            // Lists models instead of running a completion: independent of any
+            // model id that may have been retired since the app was built.
+            try await LLMKeyProbe.validate(probeTarget, apiKey: trimmedKey)
+            try keychain.save(key: keychainKey, value: trimmedKey)
+            apiKey = trimmedKey
+            keyValidationResult = KeyValidationResult(isSuccess: true, message: "API-Key gültig und gespeichert!")
+            try? await Task.sleep(for: .seconds(1))
+            await MainActor.run { currentPage = 5 }
         } catch let error as LLMProviderError {
             switch error {
             case .apiError(let statusCode, let body):
