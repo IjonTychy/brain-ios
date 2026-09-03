@@ -114,6 +114,7 @@ extension BrainTools {
             inputSchema: [
                 "type": "object",
                 "properties": [
+                    "privacyLevel": ["type": "string", "enum": ["unrestricted", "approvedCloudOnly", "onDeviceOnly"], "description": "Optional: haelt die Anfrage auf dem Geraet (onDeviceOnly) oder beim freigegebenen Cloud-Anbieter (approvedCloudOnly)"],
                     "entryId": ["type": "integer", "description": "ID des Entries für den Verwandte gesucht werden"]
                 ],
                 "required": ["entryId"]

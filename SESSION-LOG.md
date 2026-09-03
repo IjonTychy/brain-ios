@@ -51,8 +51,10 @@
   `buildLLMProvider(privacyLevel:)` durchgereicht, Default unrestricted,
   unbekannter Wert -> Fehler ohne Provider-Aufruf); Mock zeichnet die
   angeforderten Level auf.
-- Pre-Commit-Review: code-reviewer (1 Pass) gestartet; Commit wegen Stop-Hook
-  (uncommitted changes) vorgezogen, Findings folgen als Fix-Commit.
+- Pre-Commit-Review: code-reviewer (1 Pass): OK fuer Commit, 3 Nits. Zwei im
+  Fix-Commit umgesetzt (privacyLevel auch in den Tool-Schemas von ai_summarize,
+  ai_extractTasks, ai_briefing, entry_crossref; ai.draftReply validiert `text`
+  vor dem Provider-Build), die dritte ist der offene Punkt unten.
 - CI: ausstehend.
 
 ### Offene Probleme

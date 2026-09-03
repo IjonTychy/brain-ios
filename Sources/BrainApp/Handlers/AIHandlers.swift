@@ -219,6 +219,9 @@ private func invalidPrivacyLevelError(_ handler: String) -> ActionResult {
     init(data: any DataProviding) { self.data = data }
 
     func execute(properties: [String: PropertyValue], context: ExpressionContext) async throws -> ActionResult {
+        guard let originalText = properties["text"]?.stringValue else {
+            return .error("ai.draftReply: text erforderlich")
+        }
         // Raw text input — no entry provenance; the skill may still pin the
         // prompt to a privacy level via the `privacyLevel` property.
         guard let privacyLevel = explicitPrivacyLevel(properties) else {
@@ -226,10 +229,6 @@ private func invalidPrivacyLevelError(_ handler: String) -> ActionResult {
         }
         guard let provider = await data.buildLLMProvider(privacyLevel: privacyLevel), provider.isAvailable else {
             return noProviderError(privacyLevel: privacyLevel)
-        }
-
-        guard let originalText = properties["text"]?.stringValue else {
-            return .error("ai.draftReply: text erforderlich")
         }
         let tone = properties["tone"]?.stringValue ?? "freundlich und professionell"
         let instructions = properties["instructions"]?.stringValue ?? ""

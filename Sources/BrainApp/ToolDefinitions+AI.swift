@@ -28,6 +28,7 @@ extension BrainTools {
             inputSchema: [
                 "type": "object",
                 "properties": [
+                    "privacyLevel": ["type": "string", "enum": ["unrestricted", "approvedCloudOnly", "onDeviceOnly"], "description": "Optional: haelt die Anfrage auf dem Geraet (onDeviceOnly) oder beim freigegebenen Cloud-Anbieter (approvedCloudOnly)"],
                     "text": ["type": "string", "description": "Text zum Zusammenfassen"],
                     "entryId": ["type": "integer", "description": "Alternativ: Entry-ID"]
                 ]
@@ -39,6 +40,7 @@ extension BrainTools {
             inputSchema: [
                 "type": "object",
                 "properties": [
+                    "privacyLevel": ["type": "string", "enum": ["unrestricted", "approvedCloudOnly", "onDeviceOnly"], "description": "Optional: haelt die Anfrage auf dem Geraet (onDeviceOnly) oder beim freigegebenen Cloud-Anbieter (approvedCloudOnly)"],
                     "text": ["type": "string", "description": "Text aus dem Tasks extrahiert werden"],
                     "entryId": ["type": "integer", "description": "Alternativ: Entry-ID"]
                 ]
@@ -49,7 +51,9 @@ extension BrainTools {
             description: "Erstellt ein Tages-Briefing: offene Tasks, heutige Termine, aktuelle Entries.",
             inputSchema: [
                 "type": "object",
-                "properties": [:]
+                "properties": [
+                    "privacyLevel": ["type": "string", "enum": ["unrestricted", "approvedCloudOnly", "onDeviceOnly"], "description": "Optional: haelt die Anfrage auf dem Geraet (onDeviceOnly) oder beim freigegebenen Cloud-Anbieter (approvedCloudOnly)"]
+                ]
             ]
         ),
         ToolDefinition(
