@@ -66,7 +66,8 @@ jobs:
 
       - name: Show compiler errors
         if: failure()
-        run: grep -E "error: " build.log | sort -u | head -80 || true
+        run: |
+          grep -E "error: " build.log | sort -u | head -80 || true
 
       - name: Run BrainApp Tests
         run: |
@@ -82,4 +83,5 @@ jobs:
 
       - name: Show test failures
         if: failure()
-        run: grep -E "error: |failed" test.log | sort -u | head -80 || true
+        run: |
+          grep -E "error: |failed" test.log | sort -u | head -80 || true

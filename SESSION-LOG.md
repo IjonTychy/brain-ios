@@ -54,7 +54,9 @@
   var dataBridge` war vom Sichtbarkeits-Skript nicht erfasst und blieb `private`
   (drei Seiten-Dateien greifen darauf zu). Gefixt; zudem gibt `ios-build.yml`
   bei Failure jetzt die `error:`-Zeilen aus (tee + grep), da `| tail -100` die
-  Diagnostik bisher abschnitt. Lauf 2 ausstehend.
+  Diagnostik bisher abschnitt. Lauf 2 scheiterte sofort an einem YAML-Fehler
+  der neuen Grep-Steps (`: ` in einem Plain-Scalar; jetzt Block-Scalar).
+  Lauf 3 ausstehend.
 
 ### Offene Probleme
 
