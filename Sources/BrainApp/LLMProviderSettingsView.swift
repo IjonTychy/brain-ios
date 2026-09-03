@@ -31,7 +31,7 @@ struct LLMProviderSettingsView: View {
     @State private var isRefreshingModels = false
     @State private var modelGroups: [(provider: String, models: [AvailableModels.Model])] = []
 
-    @AppStorage("selectedModel") private var selectedModel = "claude-opus-4-6"
+    @AppStorage("selectedModel") private var selectedModel = "claude-opus-5"
 
     private let keychain = KeychainService()
     private let googleOAuth = GoogleOAuthService()
@@ -152,7 +152,7 @@ struct LLMProviderSettingsView: View {
         } header: {
             Label { Text("Anthropic (Claude)") } icon: { Image("provider-anthropic").resizable().frame(width: 20, height: 20) }
         } footer: {
-            Text("Modelle: Opus ($5/$25 pro 1M Token), Sonnet ($3/$15), Haiku ($1/$5)")
+            Text("Modelle: Fable 5.1 ($10/$50 pro 1M Token), Opus 5 ($5/$25), Sonnet 5 ($2/$10), Haiku 4.5 ($1/$5). Liste wird nach dem Speichern von der API geladen.")
         }
     }
 
@@ -177,7 +177,7 @@ struct LLMProviderSettingsView: View {
         } header: {
             Label { Text("OpenAI (GPT)") } icon: { Image("provider-openai").resizable().frame(width: 20, height: 20) }
         } footer: {
-            Text("Modelle: GPT-4o, GPT-4o Mini")
+            Text("Modell-Liste wird nach dem Speichern von der OpenAI-API geladen.")
         }
     }
 
@@ -269,7 +269,7 @@ struct LLMProviderSettingsView: View {
         } header: {
             Label { Text("xAI (Grok)") } icon: { Image("provider-xai").resizable().frame(width: 20, height: 20) }
         } footer: {
-            Text("Modelle: Grok 4, Grok 4.1 Fast. OpenAI-kompatible API.")
+            Text("Modell-Liste wird von der xAI-API abgerufen. OpenAI-kompatible API.")
         }
     }
 
@@ -281,6 +281,7 @@ struct LLMProviderSettingsView: View {
         }
         try? keychain.save(key: KeychainKeys.xaiAPIKey, value: trimmed)
         xaiStatus = .configured
+        refreshModelList(.xAI, apiKey: trimmed)
         xaiKey = ""
     }
 
@@ -422,6 +423,7 @@ struct LLMProviderSettingsView: View {
             try await LLMKeyProbe.validate(.anthropic, apiKey: anthropicKey)
             try keychain.saveWithBiometry(key: KeychainKeys.anthropicAPIKey, value: anthropicKey)
             anthropicStatus = .configured
+            refreshModelList(.anthropic, apiKey: anthropicKey)
             anthropicKey = ""
         } catch {
             anthropicError = error.localizedDescription
@@ -441,7 +443,17 @@ struct LLMProviderSettingsView: View {
             try? keychain.save(key: KeychainKeys.openAIAPIKey, value: openAIKey)
         }
         openAIStatus = .configured
+        refreshModelList(.openAI, apiKey: openAIKey)
         openAIKey = ""
+    }
+
+    // Fetches the provider's model list with the key that was just saved and
+    // re-reads the picker groups. Runs in the background so saving stays snappy.
+    private func refreshModelList(_ provider: AvailableModels.Provider, apiKey: String) {
+        Task {
+            await AvailableModels.refresh(provider: provider, apiKey: apiKey)
+            modelGroups = AvailableModels.availableGrouped()
+        }
     }
 
     private func saveGeminiKey() {
@@ -456,6 +468,7 @@ struct LLMProviderSettingsView: View {
             try? keychain.save(key: KeychainKeys.geminiAPIKey, value: geminiKey)
         }
         geminiStatus = .configured
+        refreshModelList(.gemini, apiKey: geminiKey)
         geminiKey = ""
     }
 

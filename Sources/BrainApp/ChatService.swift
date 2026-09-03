@@ -378,7 +378,7 @@ final class ChatService {
         let resolvedModel = chatModelOverride
             ?? autoRoutedModel
             ?? UserDefaults.standard.string(forKey: "selectedModel")
-            ?? "claude-opus-4-6"
+            ?? "claude-opus-5"
         return await LLMProviderFactory.routedProvider(
             model: resolvedModel,
             privacyLevel: request.privacyLevel,

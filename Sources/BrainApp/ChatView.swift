@@ -14,7 +14,7 @@ struct ChatView: View {
     @State private var voiceInputManager = VoiceInputManager()
 
     // Model selection in chat
-    @AppStorage("selectedModel") private var globalModel = "claude-opus-4-6"
+    @AppStorage("selectedModel") private var globalModel = "claude-opus-5"
     @State private var chatModel: String = ""
 
     // Confirmation dialog for destructive tool calls
@@ -419,8 +419,11 @@ struct ChatView: View {
 
     private static func shortModelName(_ model: String) -> String {
         let map: [String: String] = [
-            "claude-opus-4-6": "Opus",
-            "claude-sonnet-4-6": "Sonnet",
+            "claude-fable-5-1": "Fable",
+            "claude-opus-5": "Opus",
+            "claude-opus-4-6": "Opus 4.6",
+            "claude-sonnet-5": "Sonnet",
+            "claude-sonnet-4-6": "Sonnet 4.6",
             "claude-haiku-4-5-20251001": "Haiku",
             "gemini-2.5-pro": "Gemini Pro",
             "gemini-2.0-flash": "Gemini Flash",

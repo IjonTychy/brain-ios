@@ -532,7 +532,7 @@ final class DataBridge {
     nonisolated func buildLLMProviderSelection(
         privacyLevel: PrivacyLevel = .unrestricted
     ) async -> (provider: any LLMProvider, model: String)? {
-        let selectedModel = UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-4-6"
+        let selectedModel = UserDefaults.standard.string(forKey: "selectedModel") ?? "claude-opus-5"
         let connected = await MainActor.run { NetworkMonitor.shared.isConnected }
         guard let routed = await LLMProviderFactory.routedProvider(
             model: selectedModel,

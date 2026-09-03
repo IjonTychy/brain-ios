@@ -329,6 +329,17 @@ extension OnboardingView {
             try await LLMKeyProbe.validate(probeTarget, apiKey: trimmedKey)
             try keychain.save(key: keychainKey, value: trimmedKey)
             apiKey = trimmedKey
+            // Fetch the provider's model list with the key we just validated.
+            let listProvider: AvailableModels.Provider? = switch selectedProvider {
+            case .anthropic: .anthropic
+            case .openAI: .openAI
+            case .gemini: .gemini
+            case .xAI: .xAI
+            case .proxy: nil
+            }
+            if let listProvider {
+                Task { await AvailableModels.refresh(provider: listProvider, apiKey: trimmedKey) }
+            }
             keyValidationResult = KeyValidationResult(isSuccess: true, message: "API-Key gültig und gespeichert!")
             try? await Task.sleep(for: .seconds(1))
             await MainActor.run { currentPage = 5 }

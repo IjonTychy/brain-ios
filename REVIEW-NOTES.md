@@ -27,6 +27,12 @@
 - **[INFO]** Bundle-Skills (Handschrift-Notizen, Handschrift-Font,
   Visitenkarten-Scanner) referenzieren nur existierende Handler; ob sie auf dem
   Geraet funktionieren, ist unverifiziert.
+- **[BEHOBEN] Schweregrad: mittel** -- Modelllisten aktualisierten sich nicht:
+  Cache-Zeitstempel auch ohne erfolgreichen Abruf gesetzt (1 h Sperre),
+  Keychain-Read der Face-ID-geschuetzten Keys im Hintergrund, OpenAI-Filter
+  ohne GPT-5. Jetzt Abruf beim Key-Speichern mit dem Key im Speicher,
+  Zeitstempel nur bei Erfolg, Filter fuer alle GPT-Generationen; Anthropic-
+  Defaults auf die Claude-5-Familie.
 
 ---
 
