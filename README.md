@@ -63,7 +63,7 @@ xcodebuild test -scheme brain-ios -destination 'platform=iOS Simulator,name=iPho
 **Note:** You need to replace placeholder values before building:
 - `com.example.brain-ios` → your bundle identifier
 - `TEAM_ID_HERE` → your Apple Developer Team ID
-- `YOUR_GOOGLE_CLIENT_ID` → your Google OAuth client ID (for Gemini)
+- `placeholder-google-client-id` → your Google OAuth client ID (for Gemini, optional)
 - API keys are entered by the user at runtime and stored in iOS Keychain
 
 ## Documentation

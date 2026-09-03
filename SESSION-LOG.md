@@ -14,7 +14,7 @@
   `workflow_dispatch`): macOS-Runner waehlt das neueste Xcode, schreibt
   `Config/Local.xcconfig` aus Secrets, berechnet die Build-Nummer
   (`BUILD_NUMBER_OFFSET` + Run-Nummer), loest Packages auf und ruft
-  `fastlane ios testflight` auf; bei Failure werden die `error:`-Zeilen der
+  `fastlane ios beta` auf; bei Failure werden die `error:`-Zeilen der
   gym-Logs ausgegeben. Keine IPA-Artifacts (oeffentliches Repo).
 - **fastlane** (`fastlane/Fastfile`, `Appfile`): `match` (appstore) legt mit
   einem App-Store-Connect-API-Key Apple-Distribution-Zertifikat und Profile
@@ -39,29 +39,61 @@
   Run-Nummer ueber die alten Xcode-Cloud-Builds.
 - **Kein code-reviewer-Pass:** Konfiguration ohne App-Code; Syntax via `ruby -c`
   und YAML-Parser geprueft, funktional erst mit Andys Secrets testbar.
+- **Merge-Freigabe:** Andy hat am 03.09.2026 generell freigegeben, dass Merges
+  nach `main` eigenstaendig erfolgen (Voraussetzung: CI gruen). Nicht
+  rueckgaengig machbare Aktionen ausserhalb von Merges bleiben abstimmpflichtig.
+- **Docs-only-Skip erweitert:** `ci_post_clone.sh` ignoriert zusaetzlich
+  `.github/`, `fastlane/` und `Skills/`; dieselben Pfade sollen in Xcode Cloud
+  als "Files and Folders"-Ausschluss der Startbedingung stehen, damit ein
+  Doku- oder Pipeline-Commit gar keinen Build startet (statt eines roten).
 
 ### Tests
 
 - `ruby -c` (Fastfile, Appfile) und YAML-Parse (Workflow) OK. Ein echter Lauf
   braucht die Secrets; beim ersten Lauf sind 1 bis 3 Korrekturrunden zu erwarten.
+- Lauf 1 (Andy, Run 1): API-Key-Auth OK, alle drei App-IDs im Portal vorhanden;
+  match scheiterte, weil das Secret `BRAIN_BUNDLE_ID_BASE` zwei Zeilenumbrueche
+  am Ende trug ("Could not find App ID ... '<id>\n\n'"). Fix: Step "Prepare
+  secrets" trimmt alle einzeiligen Secrets (CR/LF/Whitespace), maskiert die
+  getrimmten Werte und exportiert sie via GITHUB_ENV; .p8 nur CRLF->LF. Zudem
+  Lane `testflight` -> `beta` (Name kollidierte mit der fastlane-Action) und
+  `opt_out_usage`.
+- Lauf 2 (Run 2): match gruen (Zertifikat + 3 Profile im Zertifikats-Repo
+  angelegt); `update_code_signing_settings` brach ab ("very old project file
+  format"), weil das pbxproj keinen `TargetAttributes`-Block hat. Fix: Manuelle
+  Signierung (CODE_SIGN_STYLE, Identity, Team, Profil-Specifier) wird im
+  Fastfile direkt via xcodeproj auf die Release-Konfigurationen der drei
+  Targets geschrieben.
+- Lauf 3 (Run 3): xcodeproj fand `fastlane/BrainApp.xcodeproj` nicht, weil
+  fastlane Lanes mit `fastlane/` als Arbeitsverzeichnis ausfuehrt. Fix: Pfade
+  fuer Projekt, Build-Ordner und IPA in der Lane absolut (Repo-Root) aufgeloest.
+- Lauf 4 (Run 4): Archiv (424 s), Signierung mit den match-Profilen, Export und
+  dSYM gruen; der Upload scheiterte an der App-Store-Connect-Validierung: Der
+  Platzhalter `YOUR_GOOGLE_CLIENT_ID` steckt via Info.plist im URL-Schema
+  `com.googleusercontent.apps.<id>`, und Unterstriche sind dort nicht erlaubt
+  (RFC 1738). Fix: Platzhalter in Base.xcconfig, AppIdentifiers und README auf
+  `placeholder-google-client-id` (nur Buchstaben, Ziffern, Punkt, Bindestrich).
+- Lauf 5 (Run 5): gruen. Archiv, Signierung, Export, dSYM und Upload (Build
+  1005) durchgelaufen; der Build erscheint nach Apples Processing in TestFlight.
 
 ### Offene Probleme
 
-- Pipeline ungetestet, bis Secrets vorliegen. Capabilities (App Groups,
-  iCloud/CloudKit, HealthKit) muessen auf den App-IDs aktiv sein, sonst
-  scheitert das Signieren.
+- Keine offenen Pipeline-Probleme. Der Xcode-Cloud-Export scheitert weiterhin
+  Apple-seitig (Auth-Fehler); Startbedingung dort auf manuell gestellt.
 
 ### Naechster Schritt
 
-- Andy: Variante A (Xcode Cloud in App Store Connect reaktivieren) und die
-  Secrets fuer Variante B anlegen (docs/TESTFLIGHT-CI.md), dann Workflow starten.
-- Nach dem ersten gruenen Lauf: Device-Checkliste abarbeiten.
+- Andy: Build 1005 aus TestFlight (Gruppe "Intern") installieren und die
+  Device-Checkliste abarbeiten (Onboarding, API-Key, Mail, Widgets, Share
+  Extension, Skill-Kompilierung).
+- Weitere Builds: Workflow "TestFlight" manuell auf main starten (Actions-Tab
+  oder via Zora); Build-Nummer = 1000 + Run-Nummer.
 
 ### Systemzustand
 
-- OK: Pipeline-Dateien im Repo, syntaktisch geprueft
-- Ausstehend: Secrets, erster Lauf; Merge nach main (der Workflow muss auf main
-  liegen, damit er im Actions-Tab erscheint)
+- OK: TestFlight-Pipeline gruen (Lauf 5, Build 1005 hochgeladen)
+- OK: CI gruen fuer `8d4da86` (iOS Build & Test, BrainCore Tests)
+- Ausstehend: Device-Verifikation des TestFlight-Builds
 
 ---
 

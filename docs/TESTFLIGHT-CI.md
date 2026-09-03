@@ -79,6 +79,9 @@ Auf dem iPhone in der TestFlight-App installieren.
 
 ## Fehlerbilder
 
+- "Could not find App ID with bundle identifier": bis 03.09.2026 typischerweise ein
+  Zeilenumbruch am Ende eines eingefuegten Secrets; der Workflow trimmt Secrets
+  seither selbst. Die Liste "Available apps" darunter zeigt, was Apple kennt.
 - "Secret X fehlt": Schritt 4 unvollstaendig.
 - Entitlements- oder Provisioning-Fehler beim Signieren: Capability, Gruppe oder
   Container im Developer-Portal fehlt (Schritt 2). Danach Workflow erneut starten.

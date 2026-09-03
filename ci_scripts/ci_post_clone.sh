@@ -37,7 +37,9 @@ else
         if [ -z "$CHANGED_FILES" ]; then
             echo "Post-clone: Could not determine changed files (shallow clone?) — proceeding with build."
         else
-            CODE_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E '\.(md|txt)$' | grep -v -E '^docs/' | grep -v -E '^\.claude/' || true)
+            # Same non-code paths as the "Files and Folders" condition of the
+            # Xcode Cloud workflow (docs, agent config, skills, GitHub CI, fastlane).
+            CODE_CHANGES=$(echo "$CHANGED_FILES" | grep -v -E '\.(md|txt)$' | grep -v -E '^(docs|\.claude|Skills|\.github|fastlane)/' || true)
             if [ -z "$CODE_CHANGES" ]; then
                 echo "Post-clone: Only documentation changed — skipping build."
                 echo "Changed files: $CHANGED_FILES"

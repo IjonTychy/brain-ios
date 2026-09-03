@@ -15,7 +15,10 @@ BRAIN_TEAM_ID = TEAM_ID_HERE
 
 // Google OAuth iOS client id WITHOUT the ".apps.googleusercontent.com" suffix.
 // Info.plist derives both the client id and the reversed URL scheme from it.
-BRAIN_GOOGLE_CLIENT_ID = YOUR_GOOGLE_CLIENT_ID
+// The placeholder must stay a valid URL-scheme fragment (letters, digits,
+// period, hyphen, plus; no underscores), or App Store Connect rejects the
+// upload. AppIdentifiers.placeholderGoogleClientID mirrors it.
+BRAIN_GOOGLE_CLIENT_ID = placeholder-google-client-id
 
 // Local overrides — optional, silently ignored when the file is missing.
 #include? "Local.xcconfig"

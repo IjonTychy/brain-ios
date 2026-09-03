@@ -244,6 +244,13 @@ Diese Skills sind in Andys Claude Desktop-App installiert und stehen in jeder Se
 
 ## Current Objective
 
+**Update 03.09.2026 (Deploy):** Erster TestFlight-Build ohne Mac: Der
+GitHub-Actions-Workflow `TestFlight` (fastlane match + pilot) hat Build 1005
+signiert und hochgeladen (Lauf 5). Xcode Cloud bleibt beim Export an einem
+Apple-seitigen Auth-Fehler haengen; Startbedingung dort auf manuell. Fix auf
+dem Weg: Google-Client-ID-Platzhalter RFC-1738-konform
+(`placeholder-google-client-id`). Details: SESSION-LOG 03.09.2026.
+
 **Update 03.09.2026:** God Objects gesplittet: EmailBridge, MailTabView,
 SkillManagerView und OnboardingView entlang der Top-Level-Deklarationen in 16
 Dateien zerlegt (groesste Datei jetzt 690 Zeilen), um Type-Checker-Timeouts im
@@ -333,7 +340,7 @@ Grosse Dateien aufgeteilt (4 God Objects eliminiert), ~960 Zeilen Dead Code/Dupl
 
 | Priorität | Thema | Beschreibung |
 |-----------|-------|-------------|
-| **Hoch** | Deploy-Faehigkeit | Identifier-Schicht steht (Config/Base.xcconfig + gitignorierte Local.xcconfig, AppIdentifiers). Restschritt Owner: Local.xcconfig gemaess `Config/Local.xcconfig.example` befuellen bzw. Xcode-Cloud-Env-Vars setzen, Xcode Cloud reaktivieren |
+| **Hoch** | Device-Verifikation | TestFlight-Pipeline via GitHub Actions ist gruen (03.09.2026, Build 1005; Workflow `TestFlight` manuell starten, Setup in docs/TESTFLIGHT-CI.md). Xcode Cloud scheitert weiterhin Apple-seitig beim Export. Restschritt: Build auf dem Geraet verifizieren (Onboarding, OAuth, Runtime-Fixes, Gemma) |
 | **Hoch** | CI vollstaendig gruen | BrainCore-Linux + iOS-Build auf main stabil halten (Feedback-Loop etabliert 04.07.) |
 | **Mittel** | Gemma aktivieren | llama.cpp-Package in Xcode hinzufuegen (docs/ON-DEVICE-MODELS.md), auf Device verifizieren |
 | **Mittel** | Device-Verifikation | OAuth, Runtime-Fixes vom Maerz, Skill-Erstellung mit neuem Expression-Vokabular |

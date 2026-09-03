@@ -12,7 +12,7 @@ enum AppIdentifiers {
     // only used when a value is missing from the bundle, which a configured
     // build never hits.
     private static let placeholderBundleID = "com.example.brain-ios"
-    static let placeholderGoogleClientID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+    static let placeholderGoogleClientID = "placeholder-google-client-id.apps.googleusercontent.com"
 
     // Bundle id of the running target (app or extension).
     static var bundleID: String {

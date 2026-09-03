@@ -4,6 +4,9 @@
 # stored encrypted in a private git repository. Upload via `pilot`.
 # All inputs come from environment variables set by .github/workflows/testflight.yml.
 
+require "xcodeproj"
+
+opt_out_usage
 default_platform(:ios)
 
 BUNDLE_BASE = ENV.fetch("BRAIN_BUNDLE_ID_BASE")
@@ -18,7 +21,14 @@ APP_IDS = {
 
 platform :ios do
   desc "Archive, sign and upload BrainApp to TestFlight"
-  lane :testflight do
+  lane :beta do # not :testflight, that name is taken by a built-in action
+    # fastlane runs lanes with the fastlane/ folder as working directory, so
+    # anything touching the repository must use absolute paths.
+    root = File.expand_path("..", Dir.pwd)
+    project_path = File.join(root, "BrainApp.xcodeproj")
+    build_dir = File.join(root, "build")
+    UI.user_error!("Xcode project not found at #{project_path}") unless File.directory?(project_path)
+
     setup_ci # temporary keychain for the certificate on the runner
 
     api_key = app_store_connect_api_key(
@@ -39,22 +49,29 @@ platform :ios do
       readonly: false
     )
 
-    # Manual signing with the match profiles (Release only; edits the pbxproj on the runner).
-    APP_IDS.each do |target, app_id|
-      update_code_signing_settings(
-        path: "BrainApp.xcodeproj",
-        targets: [target],
-        build_configurations: ["Release"],
-        use_automatic_signing: false,
-        team_id: TEAM_ID,
-        code_sign_identity: "Apple Distribution",
-        profile_name: "match AppStore #{app_id}"
-      )
+    # Manual signing with the match profiles (Release only; edits the pbxproj on
+    # the runner). Done directly via xcodeproj: fastlane's
+    # update_code_signing_settings expects a TargetAttributes block, which this
+    # hand-assembled project file does not carry.
+    project = Xcodeproj::Project.open(project_path)
+    project.targets.each do |target|
+      app_id = APP_IDS[target.name]
+      next unless app_id
+      target.build_configurations.each do |config|
+        next unless config.name == "Release"
+        config.build_settings["CODE_SIGN_STYLE"] = "Manual"
+        config.build_settings["CODE_SIGN_IDENTITY"] = "Apple Distribution"
+        config.build_settings["CODE_SIGN_IDENTITY[sdk=iphoneos*]"] = "Apple Distribution"
+        config.build_settings["DEVELOPMENT_TEAM"] = TEAM_ID
+        config.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = "match AppStore #{app_id}"
+      end
     end
+    project.save
+    UI.message("Release signing switched to manual (match profiles) for #{APP_IDS.keys.join(', ')}")
 
     build_number = ENV.fetch("BUILD_NUMBER")
     build_app(
-      project: "BrainApp.xcodeproj",
+      project: project_path,
       scheme: "BrainApp",
       configuration: "Release",
       export_method: "app-store",
@@ -62,13 +79,13 @@ platform :ios do
       export_options: {
         provisioningProfiles: APP_IDS.values.to_h { |app_id| [app_id, "match AppStore #{app_id}"] }
       },
-      output_directory: "build",
+      output_directory: build_dir,
       output_name: "BrainApp.ipa"
     )
 
     upload_to_testflight(
       api_key: api_key,
-      ipa: "build/BrainApp.ipa",
+      ipa: File.join(build_dir, "BrainApp.ipa"),
       skip_waiting_for_build_processing: true
     )
   end
