@@ -73,24 +73,27 @@
   `com.googleusercontent.apps.<id>`, und Unterstriche sind dort nicht erlaubt
   (RFC 1738). Fix: Platzhalter in Base.xcconfig, AppIdentifiers und README auf
   `placeholder-google-client-id` (nur Buchstaben, Ziffern, Punkt, Bindestrich).
+- Lauf 5 (Run 5): gruen. Archiv, Signierung, Export, dSYM und Upload (Build
+  1005) durchgelaufen; der Build erscheint nach Apples Processing in TestFlight.
 
 ### Offene Probleme
 
-- Pipeline ungetestet, bis Secrets vorliegen. Capabilities (App Groups,
-  iCloud/CloudKit, HealthKit) muessen auf den App-IDs aktiv sein, sonst
-  scheitert das Signieren.
+- Keine offenen Pipeline-Probleme. Der Xcode-Cloud-Export scheitert weiterhin
+  Apple-seitig (Auth-Fehler); Startbedingung dort auf manuell gestellt.
 
 ### Naechster Schritt
 
-- Andy: Variante A (Xcode Cloud in App Store Connect reaktivieren) und die
-  Secrets fuer Variante B anlegen (docs/TESTFLIGHT-CI.md), dann Workflow starten.
-- Nach dem ersten gruenen Lauf: Device-Checkliste abarbeiten.
+- Andy: Build 1005 aus TestFlight (Gruppe "Intern") installieren und die
+  Device-Checkliste abarbeiten (Onboarding, API-Key, Mail, Widgets, Share
+  Extension, Skill-Kompilierung).
+- Weitere Builds: Workflow "TestFlight" manuell auf main starten (Actions-Tab
+  oder via Zora); Build-Nummer = 1000 + Run-Nummer.
 
 ### Systemzustand
 
-- OK: Pipeline-Dateien im Repo, syntaktisch geprueft
-- Ausstehend: Secrets, erster Lauf; Merge nach main (der Workflow muss auf main
-  liegen, damit er im Actions-Tab erscheint)
+- OK: TestFlight-Pipeline gruen (Lauf 5, Build 1005 hochgeladen)
+- OK: CI gruen fuer `8d4da86` (iOS Build & Test, BrainCore Tests)
+- Ausstehend: Device-Verifikation des TestFlight-Builds
 
 ---
 

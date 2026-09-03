@@ -15,9 +15,9 @@
   `placeholder-google-client-id` (Base.xcconfig, AppIdentifiers, README);
   die Platzhalter-Erkennung in GoogleOAuthService vergleicht weiterhin gegen
   `AppIdentifiers.placeholderGoogleClientID`.
-- **[INFO]** Pipeline-Stand nach Lauf 4: API-Key-Auth, match (Zertifikat +
-  3 Profile), manuelle Signierung, Archiv, Export und dSYM laufen durch; offen
-  ist nur noch der Upload.
+- **[INFO]** Pipeline seit Lauf 5 gruen (Build 1005 in TestFlight hochgeladen):
+  API-Key-Auth, match (Zertifikat + 3 Profile), manuelle Signierung, Archiv,
+  Export, dSYM und Upload laufen durch.
 
 ---
 
