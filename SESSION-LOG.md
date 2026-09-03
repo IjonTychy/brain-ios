@@ -6,6 +6,65 @@
 
 ---
 
+## TestFlight-Pipeline via GitHub Actions (Mac-frei) -- 03.09.2026
+
+### Abgeschlossen
+
+- **Workflow `TestFlight`** (`.github/workflows/testflight.yml`, nur
+  `workflow_dispatch`): macOS-Runner waehlt das neueste Xcode, schreibt
+  `Config/Local.xcconfig` aus Secrets, berechnet die Build-Nummer
+  (`BUILD_NUMBER_OFFSET` + Run-Nummer), loest Packages auf und ruft
+  `fastlane ios testflight` auf; bei Failure werden die `error:`-Zeilen der
+  gym-Logs ausgegeben. Keine IPA-Artifacts (oeffentliches Repo).
+- **fastlane** (`fastlane/Fastfile`, `Appfile`): `match` (appstore) legt mit
+  einem App-Store-Connect-API-Key Apple-Distribution-Zertifikat und Profile
+  fuer App, Share Extension und Widgets an (privates Git-Repo, verschluesselt),
+  `update_code_signing_settings` schaltet Release auf manuelle Signierung mit
+  den match-Profilen, `build_app` archiviert und exportiert,
+  `upload_to_testflight` laedt hoch. Alle Identifier kommen aus der Umgebung;
+  das Repo bleibt anonym.
+- **docs/TESTFLIGHT-CI.md**: Schritt-fuer-Schritt-Setup fuer Andy (API-Key,
+  App-ID-Capabilities, Zertifikats-Repo + Token, Secrets, Ausloesen,
+  Fehlerbilder). CLAUDE.md verweist darauf; `.gitignore` kennt die Artefakte.
+
+### Entscheidungen
+
+- **match statt Xcode-verwalteter Zertifikate:** `-allowProvisioningUpdates` auf
+  einem ephemeren Runner wuerde pro Lauf ein neues Distribution-Zertifikat
+  erzeugen und schnell ans Limit laufen; match persistiert es verschluesselt.
+- **Nur manueller Trigger:** Ein TestFlight-Upload pro Push waere Verschwendung
+  von Runner-Minuten und TestFlight-Builds; Andy startet gezielt.
+- **Build-Nummer mit Offset:** TestFlight verlangt streng steigende
+  CFBundleVersion je Version; der Offset (Repo-Variable, Default 1000) hebt die
+  Run-Nummer ueber die alten Xcode-Cloud-Builds.
+- **Kein code-reviewer-Pass:** Konfiguration ohne App-Code; Syntax via `ruby -c`
+  und YAML-Parser geprueft, funktional erst mit Andys Secrets testbar.
+
+### Tests
+
+- `ruby -c` (Fastfile, Appfile) und YAML-Parse (Workflow) OK. Ein echter Lauf
+  braucht die Secrets; beim ersten Lauf sind 1 bis 3 Korrekturrunden zu erwarten.
+
+### Offene Probleme
+
+- Pipeline ungetestet, bis Secrets vorliegen. Capabilities (App Groups,
+  iCloud/CloudKit, HealthKit) muessen auf den App-IDs aktiv sein, sonst
+  scheitert das Signieren.
+
+### Naechster Schritt
+
+- Andy: Variante A (Xcode Cloud in App Store Connect reaktivieren) und die
+  Secrets fuer Variante B anlegen (docs/TESTFLIGHT-CI.md), dann Workflow starten.
+- Nach dem ersten gruenen Lauf: Device-Checkliste abarbeiten.
+
+### Systemzustand
+
+- OK: Pipeline-Dateien im Repo, syntaktisch geprueft
+- Ausstehend: Secrets, erster Lauf; Merge nach main (der Workflow muss auf main
+  liegen, damit er im Actions-Tab erscheint)
+
+---
+
 ## Privacy-Provenance fuer Rohtext-Handler + Kleinkram -- 03.09.2026
 
 ### Abgeschlossen

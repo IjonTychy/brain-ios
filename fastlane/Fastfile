@@ -1,0 +1,75 @@
+# TestFlight pipeline for GitHub Actions (no Mac needed).
+# Signing via `match`: the Apple Distribution certificate and the App Store
+# provisioning profiles are created with an App Store Connect API key and
+# stored encrypted in a private git repository. Upload via `pilot`.
+# All inputs come from environment variables set by .github/workflows/testflight.yml.
+
+default_platform(:ios)
+
+BUNDLE_BASE = ENV.fetch("BRAIN_BUNDLE_ID_BASE")
+TEAM_ID = ENV.fetch("BRAIN_TEAM_ID")
+
+# Xcode target -> bundle identifier (must match project.pbxproj / Base.xcconfig).
+APP_IDS = {
+  "BrainApp" => BUNDLE_BASE,
+  "BrainShareExtension" => "#{BUNDLE_BASE}.share-extension",
+  "BrainWidgets" => "#{BUNDLE_BASE}.widgets",
+}.freeze
+
+platform :ios do
+  desc "Archive, sign and upload BrainApp to TestFlight"
+  lane :testflight do
+    setup_ci # temporary keychain for the certificate on the runner
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV.fetch("ASC_KEY_ID"),
+      issuer_id: ENV.fetch("ASC_ISSUER_ID"),
+      key_content: ENV.fetch("ASC_API_KEY_P8"),
+      in_house: false
+    )
+
+    # First run creates certificate + profiles (readonly: false); later runs reuse them.
+    match(
+      type: "appstore",
+      app_identifier: APP_IDS.values,
+      git_url: ENV.fetch("MATCH_GIT_URL"),
+      git_basic_authorization: ENV.fetch("MATCH_GIT_BASIC_AUTHORIZATION"),
+      api_key: api_key,
+      team_id: TEAM_ID,
+      readonly: false
+    )
+
+    # Manual signing with the match profiles (Release only; edits the pbxproj on the runner).
+    APP_IDS.each do |target, app_id|
+      update_code_signing_settings(
+        path: "BrainApp.xcodeproj",
+        targets: [target],
+        build_configurations: ["Release"],
+        use_automatic_signing: false,
+        team_id: TEAM_ID,
+        code_sign_identity: "Apple Distribution",
+        profile_name: "match AppStore #{app_id}"
+      )
+    end
+
+    build_number = ENV.fetch("BUILD_NUMBER")
+    build_app(
+      project: "BrainApp.xcodeproj",
+      scheme: "BrainApp",
+      configuration: "Release",
+      export_method: "app-store",
+      xcargs: "CURRENT_PROJECT_VERSION=#{build_number}",
+      export_options: {
+        provisioningProfiles: APP_IDS.values.to_h { |app_id| [app_id, "match AppStore #{app_id}"] }
+      },
+      output_directory: "build",
+      output_name: "BrainApp.ipa"
+    )
+
+    upload_to_testflight(
+      api_key: api_key,
+      ipa: "build/BrainApp.ipa",
+      skip_waiting_for_build_processing: true
+    )
+  end
+end

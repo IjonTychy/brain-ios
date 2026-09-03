@@ -59,6 +59,11 @@ Nur die SwiftUI-Views und iOS-Bridge-Schicht brauchen Xcode.
 
 Deployment läuft über **Xcode Cloud** → **TestFlight**. Kein manuelles Signing nötig.
 
+Seit 03.09.2026 gibt es zusaetzlich den GitHub-Actions-Workflow **TestFlight**
+(manuell via `workflow_dispatch`), der ohne Mac und ohne Xcode Cloud archiviert,
+mit fastlane `match` signiert und zu TestFlight hochlaedt. Setup und benoetigte
+Secrets: `docs/TESTFLIGHT-CI.md`.
+
 ```bash
 # Build-Nummer erhöhen (im Xcode-Projekt oder via Script)
 # Push zu main → Xcode Cloud baut automatisch → TestFlight

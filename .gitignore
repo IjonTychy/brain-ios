@@ -5,3 +5,10 @@ Config/Local.xcconfig
 .claude/settings.json
 xcuserdata/
 *.xcuserdatad/
+
+# fastlane / TestFlight pipeline (runner artifacts)
+fastlane/report.xml
+fastlane/README.md
+build/
+*.ipa
+*.dSYM.zip
